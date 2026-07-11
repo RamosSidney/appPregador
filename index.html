@@ -830,6 +830,64 @@
         </div>
     </div>
 
+    <!-- ONBOARDING OVERLAY MODAL -->
+    <div id="onboardingOverlay" class="modal-overlay hidden" style="z-index: 2000;">
+        <div class="onboarding-card">
+            <!-- Glow background decoration -->
+            <div class="onboarding-glow"></div>
+            
+            <!-- Header Progress -->
+            <div class="onboarding-progress-header">
+                <div class="progress-bar-group">
+                    <div class="progress-bar-segment active" id="onboardStep1Bar"></div>
+                    <div class="progress-bar-segment" id="onboardStep2Bar"></div>
+                </div>
+                <span class="step-text" id="onboardStepIndicator">Etapa 1 de 2</span>
+            </div>
+
+            <!-- STEP 1: Focus of Ministry -->
+            <div id="onboardStep1">
+                <h2 class="onboard-title"><span class="icon">✨</span> Qual o seu foco de ministério?</h2>
+                <p class="onboard-subtitle">Personalizaremos o algoritmo teológico para as suas dores reais.</p>
+                
+                <div class="onboard-options">
+                    <div class="onboard-option" data-focus="celula">
+                        <h4>Líder de Célula / GC</h4>
+                        <p>Preciso de quebra-gelos rápidos e dinâmicas fortes.</p>
+                    </div>
+                    <div class="onboard-option" data-focus="palco">
+                        <h4>Líder de Cultos / Eventos</h4>
+                        <p>Foco em mensagens profundas de impacto massivo.</p>
+                    </div>
+                    <div class="onboard-option" data-focus="pastor">
+                        <h4>Pastor de Jovens / Adolescentes</h4>
+                        <p>Visão macro, trilhas de liderança e mentoria.</p>
+                    </div>
+                </div>
+                
+                <button class="btn-onboard-next" id="btnOnboardNext" disabled>Avançar ➜</button>
+            </div>
+
+            <!-- STEP 2: Consent / LGPD -->
+            <div id="onboardStep2" class="hidden">
+                <h2 class="onboard-title"><span class="icon">🛡️</span> Governança e LGPD</h2>
+                <p class="onboard-subtitle">Sua privacidade e segurança jurídica de dados são a nossa prioridade.</p>
+                
+                <div class="lgpd-text-box">
+                    <p><strong>Termos de Uso de Inteligência Teológica Alternativa:</strong></p>
+                    O sistema utiliza processamento generativo avançado de dados para suporte homilético. Ao prosseguir, você concorda que: 1) Seus dados serão criptografados e isolados via arquitetura Supabase RLS. 2) O conteúdo intelectual gerado pode ser exportado livremente. 3) Você mantém o direito ao esquecimento e eliminação de dados a qualquer momento via painel de configurações.
+                </div>
+
+                <label class="lgpd-checkbox-label">
+                    <input type="checkbox" id="chkLgpdConsent">
+                    <span>Li e dou o meu consentimento para o tratamento seguro de dados conforme as diretrizes da LGPD.</span>
+                </label>
+
+                <button class="btn-onboard-submit" id="btnOnboardSubmit" disabled>⚡ Ativar Meu Acesso 2.0</button>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST / SNACKBAR NOTIFICATIONS -->
     <div class="toast-container" id="toastContainer"></div>
 

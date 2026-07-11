@@ -41,6 +41,10 @@ let selectedBibleRef = "";
 // --- Recharge State ---
 let selectedRechargePackage = 'premium_anual';
 let selectedPaymentMethod = 'pix';
+
+// --- Onboarding State ---
+let onboardSelectedFocus = "";
+let onboardTermsAccepted = false;
 // --- Credential Config Storage ---
 let config = {
     supabaseUrl: '',
@@ -204,7 +208,18 @@ function initDOMElements() {
         btnPayPix: document.getElementById('btnPayPix'),
         btnPayCard: document.getElementById('btnPayCard'),
         btnSubmitRecharge: document.getElementById('btnSubmitRecharge'),
-        submitQtyVal: document.getElementById('submitQtyVal')
+        submitQtyVal: document.getElementById('submitQtyVal'),
+        
+        // Onboarding DOM Elements
+        onboardingOverlay: document.getElementById('onboardingOverlay'),
+        onboardStep1: document.getElementById('onboardStep1'),
+        onboardStep2: document.getElementById('onboardStep2'),
+        onboardStep1Bar: document.getElementById('onboardStep1Bar'),
+        onboardStep2Bar: document.getElementById('onboardStep2Bar'),
+        onboardStepIndicator: document.getElementById('onboardStepIndicator'),
+        btnOnboardNext: document.getElementById('btnOnboardNext'),
+        btnOnboardSubmit: document.getElementById('btnOnboardSubmit'),
+        chkLgpdConsent: document.getElementById('chkLgpdConsent')
     };
 }
 
@@ -375,6 +390,26 @@ async function loadUserProfile(userId) {
             showLoggedInUI(userProfile);
             updateCreditsUI();
             showToast(`Bem-vindo, @${userProfile.username}!`, "success");
+            
+            // Trigger onboarding check if terms not accepted
+            if (!userProfile.aceitou_termos_lgpd) {
+                // Reset steps
+                elements.onboardStep1.classList.remove('hidden');
+                elements.onboardStep2.classList.add('hidden');
+                elements.onboardStep1Bar.classList.add('active');
+                elements.onboardStep2Bar.classList.remove('active');
+                elements.onboardStepIndicator.textContent = "Etapa 1 de 2";
+                elements.btnOnboardNext.disabled = true;
+                elements.chkLgpdConsent.checked = false;
+                elements.btnOnboardSubmit.disabled = true;
+                
+                // Remove selection from previous options
+                elements.onboardingOverlay.querySelectorAll('.onboard-option').forEach(o => o.classList.remove('selected'));
+                onboardSelectedFocus = "";
+                
+                // Show onboarding overlay
+                elements.onboardingOverlay.classList.remove('hidden');
+            }
         }
     } catch (e) {
         console.error("Erro ao carregar perfil de usuário:", e);
@@ -702,6 +737,31 @@ function setupEventListeners() {
             selectRechargePackage(card.dataset.packageId);
         });
     });
+
+    // Onboarding UI event listeners
+    const onboardOptions = elements.onboardingOverlay.querySelectorAll('.onboard-option');
+    onboardOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            onboardOptions.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            onboardSelectedFocus = opt.dataset.focus;
+            elements.btnOnboardNext.disabled = false;
+        });
+    });
+
+    elements.btnOnboardNext.addEventListener('click', () => {
+        elements.onboardStep1.classList.add('hidden');
+        elements.onboardStep2.classList.remove('hidden');
+        elements.onboardStep2Bar.classList.add('active');
+        elements.onboardStepIndicator.textContent = "Etapa 2 de 2";
+    });
+
+    elements.chkLgpdConsent.addEventListener('change', (e) => {
+        onboardTermsAccepted = e.target.checked;
+        elements.btnOnboardSubmit.disabled = !onboardTermsAccepted;
+    });
+
+    elements.btnOnboardSubmit.addEventListener('click', submitOnboardingData);
 }
 
 function switchPane(view) {
@@ -2264,4 +2324,30 @@ function handleRechargeCheckout() {
         window.open(checkoutUrl, '_blank');
         showToast("Redirecionado para o checkout Kiwify! 🛒", "success");
     }, 1000);
+}
+
+async function submitOnboardingData() {
+    if (supabaseClient && userProfile) {
+        try {
+            const { error } = await supabaseClient
+                .from('perfis_jovens')
+                .update({ 
+                    aceitou_termos_lgpd: true,
+                    data_consentimento: new Date().toISOString()
+                })
+                .eq('id', userProfile.id);
+                
+            if (error) throw error;
+            
+            userProfile.aceitou_termos_lgpd = true;
+            showToast("Consentimento registrado! Acesso liberado. ⚡", "success");
+        } catch (err) {
+            console.error(err);
+            showToast("Erro ao registrar consentimento no banco.", "error");
+        }
+    } else {
+        showToast("Simulação: Acesso 2.0 ativado! ⚡", "success");
+    }
+    
+    elements.onboardingOverlay.classList.add('hidden');
 }

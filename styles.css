@@ -2804,3 +2804,208 @@ body.cyber-theme {
     margin-top: 16px;
     text-align: center;
 }
+
+/* ==========================================================================
+   MÓDULO: ONBOARDING INTERATIVO & ACESSO (TELA 1)
+   ========================================================================== */
+#onboardingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(9, 13, 22, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+#onboardingOverlay.hidden {
+    display: none !important;
+}
+
+.onboarding-card {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    background: #131b2e;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+}
+
+.onboarding-glow {
+    position: absolute;
+    top: -96px;
+    left: -96px;
+    width: 192px;
+    height: 192px;
+    background: rgba(6, 182, 212, 0.1);
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+}
+
+.onboarding-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.progress-bar-group {
+    display: flex;
+    gap: 6px;
+    width: 60%;
+}
+
+.progress-bar-segment {
+    height: 4px;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.progress-bar-segment.active {
+    background: var(--color-neon-cyan);
+}
+
+.onboarding-progress-header .step-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.onboard-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.onboard-title .icon {
+    font-size: 20px;
+}
+
+.onboard-subtitle {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+}
+
+.onboard-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.onboard-option {
+    background: #090d16;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.onboard-option:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.onboard-option.selected {
+    border-color: var(--color-neon-cyan);
+    background: rgba(6, 182, 212, 0.05);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.05);
+}
+
+.onboard-option h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.onboard-option p {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    line-height: 1.3;
+}
+
+.btn-onboard-next {
+    width: 100%;
+    margin-top: 24px;
+    background: var(--color-neon-cyan);
+    color: #090d16;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-onboard-next:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.lgpd-text-box {
+    background: #090d16;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 24px;
+    height: 120px;
+    overflow-y: auto;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.lgpd-checkbox-label {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    cursor: pointer;
+}
+
+.lgpd-checkbox-label input {
+    margin-top: 2px;
+    accent-color: var(--color-neon-cyan);
+}
+
+.lgpd-checkbox-label span {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+}
+
+.btn-onboard-submit {
+    width: 100%;
+    margin-top: 24px;
+    background: var(--color-neon-green);
+    color: #090d16;
+    font-size: 13px;
+    font-weight: 900;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.1);
+    transition: all 0.2s ease;
+}
+
+.btn-onboard-submit:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
