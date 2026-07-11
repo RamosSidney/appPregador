@@ -1869,19 +1869,48 @@ body.cyber-theme {
         padding: 1.2rem;
     }
 
+    .pulpit-overlay {
+        overflow-x: hidden !important;
+    }
+
     .pulpit-controls {
         flex-direction: column;
         gap: 0.8rem;
         padding: 0.8rem;
+        width: 100vw !important;
+        box-sizing: border-box !important;
     }
     
     .pulpit-control-group {
         width: 100%;
         justify-content: space-between;
+        box-sizing: border-box !important;
     }
     
     .pulpit-scroll-container {
-        padding: 2rem 5% 20% 5%;
+        padding: 2rem 4% 20% 4% !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+    }
+
+    .pulpit-content {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+    }
+    
+    .pulpit-content.markdown-body h1,
+    .pulpit-content.markdown-body h2,
+    .pulpit-content.markdown-body h3,
+    .pulpit-content.markdown-body p,
+    .pulpit-content.markdown-body li,
+    .pulpit-content.markdown-body blockquote {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
     }
 }
 
@@ -2575,35 +2604,37 @@ body.cyber-theme {
     .chat-sidebar {
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        padding: 1rem;
+        padding: 0.8rem;
         flex-direction: row;
         align-items: center;
+        justify-content: space-between;
     }
     .active-mentor-summary {
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 0.8rem;
+        gap: 0.6rem;
         text-align: left;
     }
     .active-mentor-summary h3 {
-        margin-top: 0;
-        font-size: 1rem;
+        margin: 0;
+        font-size: 0.95rem;
     }
-    .active-mentor-summary .mentor-avatar.large {
-        width: 2.2rem;
-        height: 2.2rem;
-        font-size: 0.9rem;
+    .active-mentor-summary .profile-avatar {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1rem !important;
         margin: 0;
     }
-    .chat-disclaimer, .btn-back-mentors {
-        margin-bottom: 0;
+    .active-mentor-summary .alcunha {
+        display: none !important;
     }
     .chat-disclaimer {
         display: none; /* Hide disclaimer on mobile to save vertical space */
     }
     .btn-back-mentors {
         margin-bottom: 0;
+        font-size: 0.75rem;
     }
 }
 
