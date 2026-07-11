@@ -3421,3 +3421,139 @@ body.cyber-theme {
 .sidebar.collapsed .status-dot {
     margin: 0;
 }
+
+/* ==========================================================================
+   MINIMALIST ARTICLE VIEW & GEMINI STYLE TOOLBAR (appPregador V2.0)
+   ========================================================================== */
+
+.sermon-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 1.2rem;
+    width: 100%;
+}
+
+.sermon-toolbar .btn-back-generator {
+    margin-bottom: 0 !important; /* Reset margin */
+}
+
+.sermon-actions-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.action-pill-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border-glass);
+    color: var(--color-text-main);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.action-pill-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.action-pill-btn.btn-reels {
+    background: rgba(123, 44, 191, 0.08);
+    border-color: rgba(123, 44, 191, 0.2);
+    color: #C084FC;
+}
+
+.action-pill-btn.btn-reels:hover {
+    background: var(--color-neon-purple);
+    color: #FFF;
+    box-shadow: var(--glow-purple);
+}
+
+.action-pill-btn.btn-pulse {
+    background: rgba(57, 255, 20, 0.08);
+    border-color: var(--color-neon-green);
+    color: var(--color-neon-green);
+}
+
+.action-pill-btn.btn-pulse:hover {
+    background: var(--color-neon-green);
+    color: var(--color-bg-pure);
+    box-shadow: var(--glow-green);
+}
+
+/* Metadata strip */
+.sermon-metadata-strip {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.sermon-metadata-strip .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.sermon-metadata-strip .meta-icon {
+    font-size: 0.95rem;
+}
+
+.sermon-metadata-strip .meta-divider {
+    color: rgba(255, 255, 255, 0.1);
+}
+
+/* borderless read block */
+.sermon-read-block.borderless {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-height: none !important; /* Let page scroll */
+    overflow: visible !important;
+}
+
+.sermon-read-title {
+    font-size: clamp(1.2rem, 4vw, 1.8rem) !important;
+    line-height: 1.3 !important;
+    margin-bottom: 1.5rem;
+}
+
+/* Compact Saved Library Cards */
+.library-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 1rem !important;
+}
+
+.sermon-card {
+    min-height: 150px !important;
+    padding: 1rem !important;
+    border-radius: 8px !important;
+}
+
+.sermon-card-title {
+    font-size: 0.9rem !important;
+}
+
+.sermon-card-meta {
+    margin-bottom: 0.8rem !important;
+}
+
+.sermon-card-footer {
+    padding-top: 0.6rem !important;
+}

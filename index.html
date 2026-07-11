@@ -191,83 +191,41 @@
 
             <!-- VIEW 2: DEDICATED SERMON VISUALIZER -->
             <div class="view-pane" id="paneSermonReader">
-                <div class="panel-header">
-                    <h2>Visualizador de Mensagem Viral</h2>
-                    <p class="panel-subtitle">Estude seu esboço, copie roteiros para redes sociais e ative o Modo Púlpito para ministrar no palco.</p>
-                </div>
-                
                 <div class="sermon-output-wrapper" id="sermonOutputWrapper">
-                    <button class="btn-back-generator" id="backToGeneratorBtn">◄ Voltar ao Gerador</button>
                     
-                    <div class="sermon-layout-grid">
+                    <!-- Top control bar (Gemini Style Toolbar) -->
+                    <div class="sermon-toolbar">
+                        <button class="btn-back-generator" id="backToGeneratorBtn">◄ Voltar ao Gerador</button>
                         
-                        <!-- Coluna 1: Bloco de Leitura (Esquerda) -->
-                        <div class="sermon-read-block">
-                            <h2 class="sermon-read-title" id="sermonReadTitle">Título do Sermão</h2>
-                            <div class="markdown-body" id="sermonBody">
-                                <!-- Conteúdo Markdown renderizado -->
-                            </div>
+                        <div class="sermon-actions-row">
+                            <button class="action-pill-btn" id="copyFullSermonBtn">📑 Copiar Sermão</button>
+                            <button class="action-pill-btn btn-reels" id="copyReelsBtn">🎬 Roteiro Reels</button>
+                            <button class="action-pill-btn btn-pulse" id="pulpitModeBtn">🎤 Modo Púlpito</button>
+                            <button class="action-pill-btn" id="saveSermonBtn">💾 Favoritar</button>
                         </div>
-                        
-                        <!-- Coluna 2: Painel de Ações & Resumos (Direita) -->
-                        <div class="sermon-actions-sidebar">
-                            
-                            <!-- Bloco de Ações Rápidas -->
-                            <div class="actions-card">
-                                <h4 class="card-title-neon">⚡ Ações Rápidas</h4>
-                                
-                                <button class="btn btn-secondary btn-full-width mb-2" id="copyFullSermonBtn">
-                                    <span>📑 Copiar Sermão Completo</span>
-                                </button>
-                                
-                                <button class="btn btn-secondary btn-full-width mb-2 btn-reels-color" id="copyReelsBtn">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; display: inline-block; vertical-align: middle;">
-                                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                        <line x1="7" y1="2" x2="7" y2="22"></line>
-                                        <line x1="17" y1="2" x2="17" y2="22"></line>
-                                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                                        <line x1="2" y1="7" x2="7" y2="7"></line>
-                                        <line x1="2" y1="17" x2="7" y2="17"></line>
-                                        <line x1="17" y1="17" x2="22" y2="17"></line>
-                                        <line x1="17" y1="7" x2="22" y2="7"></line>
-                                    </svg>
-                                    <span>Copiar Roteiro Reels</span>
-                                </button>
-                                
-                                <button class="btn btn-accent btn-full-width btn-pulse" id="pulpitModeBtn">
-                                    <span>🎤 ENTRAR NO MODO PÚLPITO</span>
-                                </button>
-
-                                <button class="btn btn-secondary btn-full-width mt-2" id="saveSermonBtn">
-                                    <span>💾 Salvar nos Favoritos</span>
-                                </button>
-                            </div>
-                            
-                            <!-- Bloco de Resumo do Insight -->
-                            <div class="insights-card">
-                                <h4 class="card-title-neon">📊 Resumo do Insight</h4>
-                                <div class="insight-item">
-                                    <span class="insight-label">Dores Reais (Vibe):</span>
-                                    <span class="insight-value" id="insightVibeVal">Ansiedade</span>
-                                </div>
-                                <div class="insight-item">
-                                    <span class="insight-label">Cultura Pop:</span>
-                                    <span class="insight-value" id="insightPopVal">Tecnologia & IA</span>
-                                </div>
-                                <div class="insight-item mt-2">
-                                    <span class="insight-label">Data de Criação:</span>
-                                    <span class="insight-value" id="insightDateVal">10/07/2026</span>
-                                </div>
-                            </div>
-                            
-                        </div>
-                        
                     </div>
 
-                    <!-- Hidden clipboard helper block -->
-                    <div class="hidden" id="reelsCodeContent">Script do Reels será extraído...</div>
+                    <!-- Metadata Banner (Replacing insights-card) -->
+                    <div class="sermon-metadata-strip">
+                        <span class="meta-item"><span class="meta-icon">🔥</span> Vibe: <strong id="insightVibeVal">Ansiedade</strong></span>
+                        <span class="meta-divider">•</span>
+                        <span class="meta-item"><span class="meta-icon">🎮</span> Cultura Pop: <strong id="insightPopVal">Tecnologia & IA</strong></span>
+                        <span class="meta-divider">•</span>
+                        <span class="meta-item"><span class="meta-icon">📅</span> Criado em: <strong id="insightDateVal">10/07/2026</strong></span>
+                    </div>
+
+                    <!-- Sermon Reading Block (Borderless, transparent, no scroll bar inside, let page scroll) -->
+                    <div class="sermon-read-block borderless">
+                        <h2 class="sermon-read-title" id="sermonReadTitle">Título do Sermão</h2>
+                        <div class="markdown-body" id="sermonBody">
+                            <!-- Conteúdo Markdown renderizado -->
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Hidden clipboard helper block -->
+            <div class="hidden" id="reelsCodeContent">Script do Reels será extraído...</div>
 
             <!-- VIEW 2: SAVED SERMONS LIBRARY -->
             <div class="view-pane" id="paneLibrary">
