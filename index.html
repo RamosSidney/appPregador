@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>appPregador 2.0 - Conectando a Palavra com a Geração Z & Alpha</title>
+    
+    <!-- Global Error Catcher -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.position = 'fixed';
+            errorDiv.style.top = '0';
+            errorDiv.style.left = '0';
+            errorDiv.style.width = '100%';
+            errorDiv.style.backgroundColor = '#ff0055';
+            errorDiv.style.color = '#fff';
+            errorDiv.style.padding = '10px';
+            errorDiv.style.zIndex = '99999';
+            errorDiv.style.fontSize = '14px';
+            errorDiv.style.fontFamily = 'monospace';
+            errorDiv.style.borderBottom = '2px solid red';
+            errorDiv.innerHTML = '<strong>Erro de JS no Navegador:</strong> ' + message + ' <br><em>Origem:</em> ' + source + ' (Linha ' + lineno + ', Col ' + colno + ')';
+            document.body.appendChild(errorDiv);
+            return false;
+        };
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Supabase JS Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Local Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="cyber-theme">
+
+    <!-- Header / Navbar -->
+    <header class="app-header">
+        <div class="header-logo">
+            <span class="logo-icon">⚡</span>
+            <h1>appPregador <span class="logo-v2">2.0</span></h1>
+        </div>
+        
+        <!-- Gamified Battle Pass Credit Panel -->
+        <div class="credits-panel" id="creditsPanel">
+            <div class="battle-pass-info">
+                <span class="plan-badge">PREMIUM ANUAL</span>
+                <span class="credits-text"><strong id="creditsCount">100</strong> / 100 RAIOS</span>
+            </div>
+            <div class="energy-bar-container">
+                <div class="energy-bar" id="energyBar" style="width: 100%;"></div>
+            </div>
+            <!-- Gamified XP and Nível -->
+            <div class="xp-level-bar-container mt-1">
+                <div class="xp-level-text">
+                    <span>LÍDER NÍVEL <strong id="userLevelVal">1</strong></span>
+                    <span id="userXpVal">0 / 500 XP</span>
+                </div>
+                <div class="xp-progress-container">
+                    <div class="xp-progress-bar" id="xpProgressBar" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="icon-btn" id="openSettingsBtn" title="Configurações">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <button class="nav-item active" id="tabGenerateBtn">
+                    <span class="nav-icon">🔥</span>
+                    <span>Criar Mensagem</span>
+                </button>
+                <button class="nav-item" id="tabLibraryBtn">
+                    <span class="nav-icon">📚</span>
+                    <span>Sermões Salvos</span>
+                </button>
+                <button class="nav-item" id="tabMentoriaBtn">
+                    <span class="nav-icon">🤝</span>
+                    <span>Mentoria Histórica</span>
+                </button>
+                <button class="nav-item" id="tabBibliaBtn">
+                    <span class="nav-icon">📖</span>
+                    <span>Bíblia Nativa</span>
+                </button>
+                <button class="nav-item" id="tabAcademiaBtn">
+                    <span class="nav-icon">🎓</span>
+                    <span>Academia RPG</span>
+                </button>
+            </nav>
+            <div class="system-status-container">
+                <div class="status-indicator">
+                    <span class="status-dot simulated" id="statusDot"></span>
+                    <span class="status-label" id="statusLabel">Modo Simulação</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Dynamic Panels -->
+        <section class="content-panel">
+            
+            <!-- VIEW 1: GENERATE SERMON -->
+            <div class="view-pane active" id="paneGenerate">
+                <div class="panel-header">
+                    <h2>Gerador de Mensagem Viral</h2>
+                    <p class="panel-subtitle">Combine dores reais com cultura pop para falar a linguagem do jovem hyper-estimulado.</p>
+                </div>
+
+                <div class="generator-form">
+                    
+                    <!-- Vibe Selection / Chips Section -->
+                    <div class="vibe-selectors">
+                        <label class="section-label">🎯 Dores Reais (Escolha 1-2 vibes)</label>
+                        <div class="chips-row horizontal-scroll" id="painChips">
+                            <button class="chip pain-chip" data-vibe="Ansiedade">😨 Ansiedade</button>
+                            <button class="chip pain-chip" data-vibe="Identidade">🧬 Identidade / Quem Sou</button>
+                            <button class="chip pain-chip" data-vibe="Vocação e Futuro">🚀 Vocação / Futuro</button>
+                            <button class="chip pain-chip" data-vibe="Relacionamentos">❤️ Relacionamentos</button>
+                            <button class="chip pain-chip" data-vibe="Solidão">🌌 Solidão / Vazio</button>
+                            <button class="chip pain-chip" data-vibe="Produtividade e Pressão">📉 Produtividade / Pressão</button>
+                            <button class="chip pain-chip" data-vibe="Autoimagem">🤳 Autoimagem</button>
+                        </div>
+
+                        <label class="section-label mt-4">🎮 Universo Pop & Conectado (Escolha 1-2 tags)</label>
+                        <div class="chips-row horizontal-scroll" id="popChips">
+                            <button class="chip pop-chip" data-vibe="Anime/Geek">🎴 Anime & Geek</button>
+                            <button class="chip pop-chip" data-vibe="Tecnologia/IA">🤖 Tecnologia & IA</button>
+                            <button class="chip pop-chip" data-vibe="Cinemas/Séries">🎬 Cinema & Séries</button>
+                            <button class="chip pop-chip" data-vibe="Músicas Atuais">🎵 Músicas Atuais</button>
+                            <button class="chip pop-chip" data-vibe="Trends das Redes">📱 Trends / TikTok</button>
+                            <button class="chip pop-chip" data-vibe="Jogos/RPG/FPS">🎮 Jogos (RPG/FPS)</button>
+                            <button class="chip pop-chip" data-vibe="Esportes/Meme">🛹 Cultura Skate/Memes</button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Reference Inputs -->
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="customReference">🔗 Gancho Pop Específico (Opcional)</label>
+                            <input type="text" id="customReference" placeholder="Ex: Homem-Aranha, Minecraft, Divertida Mente, TikTok Trends">
+                        </div>
+                        <div class="input-group">
+                            <label for="sermonTopic">💡 Tema Central Adicional (Opcional)</label>
+                            <input type="text" id="sermonTopic" placeholder="Ex: Confiança, Amizade tóxica, Comparação online">
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button class="btn btn-primary btn-generate" id="generateSermonBtn">
+                        <span class="btn-icon">⚡</span>
+                        <span>Gerar Mensagem Viral</span>
+                    </button>
+                </div>
+
+                <!-- Live AI Response Screen (Layout Redesigned for V2.0) -->
+                <div class="sermon-output-wrapper hidden" id="sermonOutputWrapper">
+                    
+                    <button class="btn-back-generator" id="backToGeneratorBtn">◄ Voltar ao Gerador</button>
+                    
+                    <div class="sermon-layout-grid">
+                        
+                        <!-- Coluna 1: Bloco de Leitura (Esquerda) -->
+                        <div class="sermon-read-block">
+                            <h2 class="sermon-read-title" id="sermonReadTitle">Título do Sermão</h2>
+                            <div class="markdown-body" id="sermonBody">
+                                <!-- Conteúdo Markdown renderizado -->
+                            </div>
+                        </div>
+                        
+                        <!-- Coluna 2: Painel de Ações & Resumos (Direita) -->
+                        <div class="sermon-actions-sidebar">
+                            
+                            <!-- Bloco de Ações Rápidas -->
+                            <div class="actions-card">
+                                <h4 class="card-title-neon">⚡ Ações Rápidas</h4>
+                                
+                                <button class="btn btn-secondary btn-full-width mb-2" id="copyFullSermonBtn">
+                                    <span>📑 Copiar Sermão Completo</span>
+                                </button>
+                                
+                                <button class="btn btn-secondary btn-full-width mb-2 btn-reels-color" id="copyReelsBtn">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; display: inline-block; vertical-align: middle;">
+                                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                        <line x1="7" y1="2" x2="7" y2="22"></line>
+                                        <line x1="17" y1="2" x2="17" y2="22"></line>
+                                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        <line x1="2" y1="7" x2="7" y2="7"></line>
+                                        <line x1="2" y1="17" x2="7" y2="17"></line>
+                                        <line x1="17" y1="17" x2="22" y2="17"></line>
+                                        <line x1="17" y1="7" x2="22" y2="7"></line>
+                                    </svg>
+                                    <span>Copiar Roteiro Reels</span>
+                                </button>
+                                
+                                <button class="btn btn-accent btn-full-width btn-pulse" id="pulpitModeBtn">
+                                    <span>🎤 ENTRAR NO MODO PÚLPITO</span>
+                                </button>
+
+                                <button class="btn btn-secondary btn-full-width mt-2" id="saveSermonBtn">
+                                    <span>💾 Salvar nos Favoritos</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Bloco de Resumo do Insight -->
+                            <div class="insights-card">
+                                <h4 class="card-title-neon">📊 Resumo do Insight</h4>
+                                <div class="insight-item">
+                                    <span class="insight-label">Dores Reais (Vibe):</span>
+                                    <span class="insight-value" id="insightVibeVal">Ansiedade</span>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="insight-label">Cultura Pop:</span>
+                                    <span class="insight-value" id="insightPopVal">Tecnologia & IA</span>
+                                </div>
+                                <div class="insight-item mt-2">
+                                    <span class="insight-label">Data de Criação:</span>
+                                    <span class="insight-value" id="insightDateVal">10/07/2026</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+
+                    <!-- Hidden clipboard helper block (Still exists to store extracted reels) -->
+                    <div class="hidden" id="reelsCodeContent">Script do Reels será extraído...</div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: SAVED SERMONS LIBRARY -->
+            <div class="view-pane" id="paneLibrary">
+                <div class="panel-header">
+                    <h2>Sermões Salvos</h2>
+                    <p class="panel-subtitle">Gerencie e acesse seus esboços e dinâmicas criados.</p>
+                </div>
+
+                <!-- Library Filters -->
+                <div class="library-toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="librarySearchInput" placeholder="Buscar por título, tema ou vibe...">
+                    </div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">Todos</button>
+                        <button class="filter-tab" data-filter="favs">⭐️ Favoritos</button>
+                    </div>
+                </div>
+
+                <!-- Library Grid -->
+                <div class="library-grid" id="libraryGrid">
+                    <!-- Cards will be populated dynamically -->
+                    <div class="no-sermons-state">
+                        <div class="empty-icon">📂</div>
+                        <p>Nenhum sermão salvo encontrado.</p>
+                        <button class="btn btn-secondary btn-sm" id="emptyStateGenerateBtn">Criar o Primeiro</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: HISTORICAL MENTORSHIP CHAT -->
+            <div class="view-pane" id="paneMentoria">
+                <div class="panel-header">
+                    <h2>Sala de Mentoria Histórica</h2>
+                    <p class="panel-subtitle">Conselhos teológicos profundos de graça para suas dores de liderança atual.</p>
+                </div>
+
+                <!-- MENTORS HUB VIEW -->
+                <div id="mentoriaHub" class="mentoria-hub-grid">
+                    <!-- Mentor 1: C.S. Lewis -->
+                    <div class="mentor-card" data-mentor="lewis">
+                        <div class="mentor-card-header">
+                            <div class="mentor-avatar bg-cyan-glow">CS</div>
+                            <div class="mentor-info">
+                                <h3>C.S. Lewis</h3>
+                                <p>O Apologista Imaginativo</p>
+                            </div>
+                        </div>
+                        <div class="mentor-specialty">
+                            <span class="section-label">Foco de Conselho</span>
+                            <p>Ceticismo, Crises de Identidade, Apologética Urbana</p>
+                        </div>
+                        <button class="btn btn-secondary btn-full-width btn-cyan-glow mt-4" onclick="selectMentor('lewis')">Consultar Mentor</button>
+                    </div>
+
+                    <!-- Mentor 2: Spurgeon -->
+                    <div class="mentor-card" data-mentor="spurgeon">
+                        <div class="mentor-card-header">
+                            <div class="mentor-avatar bg-purple-glow">CS</div>
+                            <div class="mentor-info">
+                                <h3>Charles Spurgeon</h3>
+                                <p>O Príncipe dos Pregadores</p>
+                            </div>
+                        </div>
+                        <div class="mentor-specialty">
+                            <span class="section-label">Foco de Conselho</span>
+                            <p>Oratória de Palco, Burnout Pastoral, Ansiedade e Graça</p>
+                        </div>
+                        <button class="btn btn-secondary btn-full-width btn-purple-glow mt-4" onclick="selectMentor('spurgeon')">Consultar Mentor</button>
+                    </div>
+
+                    <!-- Mentor 3: Bonhoeffer -->
+                    <div class="mentor-card" data-mentor="bonhoeffer">
+                        <div class="mentor-card-header">
+                            <div class="mentor-avatar bg-green-glow">DB</div>
+                            <div class="mentor-info">
+                                <h3>Dietrich Bonhoeffer</h3>
+                                <p>O Líder Radical</p>
+                            </div>
+                        </div>
+                        <div class="mentor-specialty">
+                            <span class="section-label">Foco de Conselho</span>
+                            <p>Discipulado Duro, Vida em Comunidade, Coragem Moral</p>
+                        </div>
+                        <button class="btn btn-secondary btn-full-width btn-green-glow mt-4" onclick="selectMentor('bonhoeffer')">Consultar Mentor</button>
+                    </div>
+                </div>
+
+                <!-- MENTOR CHAT INTERFACE VIEW (Hidden by default) -->
+                <div id="mentoriaChat" class="mentoria-chat-container hidden">
+                    <div class="chat-sidebar bg-card-dark">
+                        <button class="btn-back-mentors" id="backToMentorsBtn">◄ Voltar aos Mentores</button>
+                        <div class="active-mentor-summary">
+                            <div class="mentor-avatar large" id="activeMentorAvatar">CS</div>
+                            <h3 id="activeMentorName">C.S. Lewis</h3>
+                            <p class="alcunha" id="activeMentorAlcunha">O Apologista Imaginativo</p>
+                        </div>
+                        <div class="chat-disclaimer">
+                            <span class="warning-icon">⚠️</span>
+                            <p>As respostas simulam os pensamentos históricos dos mentores originais através de algoritmos baseados em suas obras em domínio público.</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-main-area">
+                        <!-- Chat history and Output manuscript card -->
+                        <div class="chat-scroll-area" id="mentoriaChatScroll">
+                            <div class="mentor-empty-state" id="mentoriaEmptyState">
+                                <span class="empty-bubble">💬</span>
+                                <p class="text-sm">Qual a maior dificuldade na sua célula ou ministério de adolescentes hoje?</p>
+                                <p class="text-xs text-dim mt-1">Ex: "Como mantenho adolescentes engajados?" ou "Como falar sobre santidade sem parecer chato?"</p>
+                            </div>
+                            <div id="mentoriaConversationLog" class="chat-conversation-log"></div>
+                            
+                            <!-- Loading indicator -->
+                            <div class="mentor-loading-indicator hidden" id="mentorLoading">
+                                <span class="spinner">⏳</span>
+                                <span class="loading-text">Buscando sabedoria teológica nas bibliotecas históricas...</span>
+                            </div>
+                        </div>
+
+                        <!-- Chat input form -->
+                        <form id="mentoriaForm" class="chat-input-bar">
+                            <input type="text" id="mentoriaInput" placeholder="Faça uma pergunta difícil ao mentor..." required autocomplete="off">
+                            <button type="submit" class="btn btn-primary btn-chat-send" id="sendMentorBtn">
+                                <span>Perguntar</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: NATIVE BIBLE VIEW -->
+            <div class="view-pane" id="paneBiblia">
+                <div class="panel-header">
+                    <h2>Bíblia Nativa</h2>
+                    <p class="panel-subtitle">Consulte passagens e use a Lente Gen Z para gerar quebra-gelos ou explicações rápidas.</p>
+                </div>
+
+                <!-- Bible Filters & Selectors -->
+                <div class="bible-selector-bar">
+                    <div class="input-group-row">
+                        <div class="select-wrapper">
+                            <label for="bibleBookSelect">Livro</label>
+                            <select id="bibleBookSelect" class="cyber-select">
+                                <option value="Mateus">Mateus</option>
+                                <option value="Marcos">Marcos</option>
+                                <option value="Lucas">Lucas</option>
+                                <option value="João" selected>João</option>
+                                <option value="Atos">Atos</option>
+                                <option value="Romanos">Romanos</option>
+                                <option value="Filipenses">Filipenses</option>
+                            </select>
+                        </div>
+                        <div class="select-wrapper">
+                            <label for="bibleChapterSelect">Capítulo</label>
+                            <select id="bibleChapterSelect" class="cyber-select">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bible text container -->
+                <div class="bible-reader-card">
+                    <h3 class="bible-chapter-title" id="bibleChapterTitle">João 1</h3>
+                    <div class="bible-verses-list" id="bibleVersesList">
+                        <!-- Verses will load dynamically -->
+                    </div>
+                </div>
+
+                <!-- Floating Context Menu for Text Selection / Verse click -->
+                <div class="bible-floating-menu hidden" id="bibleFloatingMenu">
+                    <span class="selection-arrow"></span>
+                    <button class="floating-menu-btn btn-cyan" id="btnGenIcebreaker">
+                        <span>🎲 Gerar Quebra-Gelo</span>
+                    </button>
+                    <button class="floating-menu-btn btn-purple" id="btnTranslateGenZ">
+                        <span>💡 Traduzir Gen Z</span>
+                    </button>
+                </div>
+
+                <!-- Bible Action Output Modal -->
+                <div class="modal-backdrop hidden" id="bibleActionModal">
+                    <div class="modal-card">
+                        <div class="modal-header">
+                            <h3 id="bibleModalTitle">🎲 Quebra-Gelo Gerado</h3>
+                            <button class="close-modal-btn" id="closeBibleModalBtn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="verse-reference-card" id="bibleModalVerseRef">
+                                <strong>João 1:1</strong> - "No princípio era o Verbo..."
+                            </div>
+                            <div class="markdown-body mt-4" id="bibleModalContent">
+                                <!-- IA Response renders here -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" id="copyBibleModalContentBtn">📑 Copiar Conteúdo</button>
+                            <button class="btn btn-primary" id="closeBibleModalFooterBtn">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: GAMIFIED ACADEMY -->
+            <div class="view-pane" id="paneAcademia">
+                <div class="panel-header">
+                    <h2>Academia de Líderes RPG</h2>
+                    <p class="panel-subtitle">Complete as missões das trilhas verticais, acumule XP e desbloqueie créditos de IA bônus.</p>
+                </div>
+
+                <!-- RPG Academy Header / Stats -->
+                <div class="academy-stats-card">
+                    <div class="academy-avatar">🎓</div>
+                    <div class="academy-progression">
+                        <div class="level-indicator">
+                            <h3>LÍDER NÍVEL <span id="academyLevelVal">1</span></h3>
+                            <span class="xp-counter" id="academyXpVal">0 / 500 XP</span>
+                        </div>
+                        <div class="xp-bar-container">
+                            <div class="xp-bar" id="academyXpBar" style="width: 0%;"></div>
+                        </div>
+                        <p class="academy-perk-hint">Ganhe +50 XP por micro-aula concluída. A cada 500 XP você sobe de nível e ganha <strong>+5 Raios IA de bônus!</strong> ⚡</p>
+                    </div>
+                </div>
+
+                <!-- RPG Timeline paths -->
+                <div class="academy-timeline">
+                    <!-- Path 1 -->
+                    <div class="timeline-path">
+                        <div class="path-title">🛡️ Trilha 1: Crises Atuais (Foco Adolescente)</div>
+                        <div class="path-cards">
+                            <div class="lesson-card completed" data-lesson-id="1">
+                                <div class="lesson-status-icon">✓</div>
+                                <div class="lesson-details">
+                                    <h4>Lição 1.1: Ansiedade & Dopamina nas Redes</h4>
+                                    <p>Tempo de leitura: 3 min • Recompensa: +50 XP</p>
+                                </div>
+                                <div class="lesson-reward-badge">+50 XP</div>
+                            </div>
+                            <div class="lesson-card active" data-lesson-id="2">
+                                <div class="lesson-status-icon">▶</div>
+                                <div class="lesson-details">
+                                    <h4>Lição 1.2: Glitches de Identidade Digital</h4>
+                                    <p>Tempo de leitura: 3 min • Recompensa: +50 XP</p>
+                                </div>
+                                <div class="lesson-reward-badge">+50 XP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Path 2 -->
+                    <div class="timeline-path">
+                        <div class="path-title">🗣️ Trilha 2: Oratória & Palco</div>
+                        <div class="path-cards">
+                            <div class="lesson-card locked" data-lesson-id="3">
+                                <div class="lesson-status-icon">🔒</div>
+                                <div class="lesson-details">
+                                    <h4>Lição 2.1: Postura Sem Ruídos Físicos</h4>
+                                    <p>Tempo de leitura: 3 min • Recompensa: +50 XP</p>
+                                </div>
+                                <div class="lesson-reward-badge">+50 XP</div>
+                            </div>
+                            <div class="lesson-card locked" data-lesson-id="4">
+                                <div class="lesson-status-icon">🔒</div>
+                                <div class="lesson-details">
+                                    <h4>Lição 2.2: O Tom da Graça no Púlpito</h4>
+                                    <p>Tempo de leitura: 3 min • Recompensa: +50 XP</p>
+                                </div>
+                                <div class="lesson-reward-badge">+50 XP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Path 3 -->
+                    <div class="timeline-path">
+                        <div class="path-title">🧩 Trilha 3: Dinâmicas de Célula</div>
+                        <div class="path-cards">
+                            <div class="lesson-card locked" data-lesson-id="5">
+                                <div class="lesson-status-icon">🔒</div>
+                                <div class="lesson-details">
+                                    <h4>Lição 3.1: Quebrando Gelos de Aço</h4>
+                                    <p>Tempo de leitura: 3 min • Recompensa: +50 XP</p>
+                                </div>
+                                <div class="lesson-reward-badge">+50 XP</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lesson microlearning text Modal reader -->
+                <div class="modal-backdrop hidden" id="lessonReaderModal">
+                    <div class="modal-card">
+                        <div class="modal-header">
+                            <h3 id="lessonModalTitle">Micro-aula</h3>
+                            <button class="close-modal-btn" id="closeLessonModalBtn">&times;</button>
+                        </div>
+                        <div class="modal-body font-serif-reading">
+                            <div class="lesson-modal-perk-strip">🎓 Micro-capacitação de Líderes (+50 XP de recompensa)</div>
+                            <div class="lesson-article-body" id="lessonModalContent">
+                                <!-- Article text will render here -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" id="closeLessonModalFooterBtn">Fechar</button>
+                            <button class="btn btn-primary btn-pulse" id="completeLessonBtn">Concluir Treinamento 🎓</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FULLSCREEN MODAL: MODO PÚLPITO (TELEPROMPTER) -->
+    <div class="pulpit-overlay hidden" id="pulpitOverlay">
+        
+        <!-- Pulpit Top Controls -->
+        <header class="pulpit-controls">
+            <!-- Back / Close Button -->
+            <button class="pulpit-close" id="pulpitCloseBtn" title="Fechar Púlpito">
+                <span class="close-icon">&larr;</span> Sair do Púlpito
+            </button>
+
+            <!-- Text Resize -->
+            <div class="pulpit-control-group">
+                <span class="control-label font-label">Tamanho Fonte</span>
+                <button class="circle-btn" id="fontSizeDecBtn" title="Diminuir Fonte">A-</button>
+                <span class="control-value" id="fontSizeVal">32px</span>
+                <button class="circle-btn" id="fontSizeIncBtn" title="Aumentar Fonte">A+</button>
+            </div>
+
+            <!-- Auto Scroll Speed -->
+            <div class="pulpit-control-group">
+                <span class="control-label">Rolagem Automática</span>
+                <div class="speed-selector">
+                    <button class="speed-btn active" data-speed="0">OFF</button>
+                    <button class="speed-btn" data-speed="1">Lento</button>
+                    <button class="speed-btn" data-speed="2">Normal</button>
+                    <button class="speed-btn" data-speed="3">Rápido</button>
+                </div>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="pulpit-control-group">
+                <span class="control-label">Cronômetro</span>
+                <div class="timer-container">
+                    <span class="timer-display" id="pulpitTimer">15:00</span>
+                    <button class="timer-play-btn" id="pulpitTimerPlayBtn" title="Iniciar/Pausar Cronômetro">▶</button>
+                    <button class="timer-reset-btn" id="pulpitTimerResetBtn" title="Resetar Cronômetro">🔄</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Pulpit Teleprompter Body -->
+        <div class="pulpit-scroll-container" id="pulpitScrollContainer">
+            <div class="pulpit-content markdown-body" id="pulpitContent">
+                <!-- Large format sermon text will render here -->
+            </div>
+            <!-- Padding helper to allow scrolling past the end -->
+            <div class="pulpit-end-buffer"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIGURAÇÕES SUPABASE / GROQ -->
+    <div class="modal-backdrop hidden" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Infraestrutura Supabase + Groq</h3>
+                <button class="close-modal-btn" id="closeSettingsBtn">&times;</button>
+            </div>
+            
+            <!-- Settings Modal Tabs -->
+            <div class="settings-tabs">
+                <button class="settings-tab-btn active" id="tabSettingsApiBtn">🔑 Conexão API</button>
+                <button class="settings-tab-btn" id="tabSettingsAuthBtn" disabled>👤 Minha Conta (Supabase)</button>
+            </div>
+
+            <div class="modal-body">
+                
+                <!-- TAB 1: API KEYS -->
+                <div class="settings-pane active" id="paneSettingsApi">
+                    <p class="modal-description">Insira suas credenciais abaixo para ativar a IA em tempo real e o salvamento em banco. Sem elas, o app rodará no <strong>Modo Simulação</strong>.</p>
+                    
+                    <h4 class="settings-section-title">🤖 IA: Groq Cloud (Llama 3.1)</h4>
+                    <div class="input-group">
+                        <label for="setGroqKey">Groq API Key</label>
+                        <input type="password" id="setGroqKey" placeholder="gsk_...">
+                        <small class="helper-text">Armazenada localmente e de forma segura no seu navegador.</small>
+                    </div>
+                    
+                    <hr class="modal-divider">
+                    
+                    <h4 class="settings-section-title">📊 Banco de Dados: Supabase</h4>
+                    <div class="input-group">
+                        <label for="setSupabaseUrl">Supabase URL</label>
+                        <input type="text" id="setSupabaseUrl" placeholder="https://xxxxxxxxx.supabase.co">
+                    </div>
+                    <div class="input-group">
+                        <label for="setSupabaseKey">Supabase Anon Key</label>
+                        <input type="password" id="setSupabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                    </div>
+                </div>
+
+                <!-- TAB 2: SUPABASE AUTH -->
+                <div class="settings-pane" id="paneSettingsAuth">
+                    <!-- Logged Out State -->
+                    <div id="authLoggedOutState">
+                        <div class="auth-toggle-buttons">
+                            <button class="auth-toggle-btn active" id="toggleLoginBtn">Entrar</button>
+                            <button class="auth-toggle-btn" id="toggleRegisterBtn">Criar Conta</button>
+                        </div>
+
+                        <!-- Login Form -->
+                        <div class="auth-form" id="loginForm">
+                            <div class="input-group">
+                                <label for="authEmail">E-mail</label>
+                                <input type="email" id="authEmail" placeholder="lider@jovem.com">
+                            </div>
+                            <div class="input-group mt-2">
+                                <label for="authPassword">Senha</label>
+                                <input type="password" id="authPassword" placeholder="••••••••">
+                            </div>
+                            <button class="btn btn-primary mt-4" style="width:100%;" id="submitLoginBtn">Fazer Login</button>
+                        </div>
+
+                        <!-- Register Form -->
+                        <div class="auth-form hidden" id="registerForm">
+                            <div class="input-group">
+                                <label for="regFullName">Nome Completo</label>
+                                <input type="text" id="regFullName" placeholder="Gabriel Amorim">
+                            </div>
+                            <div class="input-group mt-2">
+                                <label for="regUsername">Username único</label>
+                                <input type="text" id="regUsername" placeholder="gabriel_prega">
+                            </div>
+                            <div class="input-group mt-2">
+                                <label for="regEmail">E-mail</label>
+                                <input type="email" id="regEmail" placeholder="lider@jovem.com">
+                            </div>
+                            <div class="input-group mt-2">
+                                <label for="regPassword">Senha (mín. 6 caracteres)</label>
+                                <input type="password" id="regPassword" placeholder="••••••••">
+                            </div>
+                            <button class="btn btn-primary mt-4" style="width:100%;" id="submitRegisterBtn">Cadastrar e Iniciar ⚡</button>
+                        </div>
+                    </div>
+
+                    <!-- Logged In State -->
+                    <div class="auth-logged-in-state hidden" id="authLoggedInState">
+                        <div class="user-profile-summary">
+                            <div class="profile-avatar" id="userProfileAvatar">🔥</div>
+                            <div class="profile-details">
+                                <h4 id="userProfileName">Nome do Usuário</h4>
+                                <p id="userProfileUsername">@username</p>
+                                <span class="profile-credits-badge" id="userProfileCredits">100 Créditos</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary mt-4" style="width:100%; border-color: var(--color-neon-pink); color: var(--color-neon-pink);" id="submitLogoutBtn">Sair da Conta (Logout)</button>
+                    </div>
+                </div>
+
+                <div class="settings-status-indicator mt-4" id="settingsConnectionStatus">
+                    <span class="status-bullet simulated"></span>
+                    <span class="status-text">Usando Banco Local Simulado</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="clearSettingsBtn">Resetar</button>
+                <button class="btn btn-primary" id="saveSettingsBtn">Salvar Configurações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST / SNACKBAR NOTIFICATIONS -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sparkle Particles overlay for Battle Pass credits animations -->
+    <div class="sparkles-container" id="sparklesContainer"></div>
+
+    <!-- Local Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>

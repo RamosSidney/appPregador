@@ -1,0 +1,20 @@
+{
+  "name": "app-pregador-v2",
+  "version": "2.0.0",
+  "description": "Ecossistema completo para a Versão 2.0 (Foco Jovem/Adolescente) do appPregador com Supabase e Groq.",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve",
+    "start": "npx serve"
+  },
+  "keywords": [
+    "cyber-gospel",
+    "supabase",
+    "groq",
+    "llama3",
+    "teleprompter",
+    "youth"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
