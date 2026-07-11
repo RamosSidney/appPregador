@@ -2249,7 +2249,19 @@ function handleRechargeCheckout() {
     
     console.log(`Checkout Iniciado: ${details.name} (R$ ${details.price}) via ${selectedPaymentMethod.toUpperCase()}`);
     
+    // Injetar o id do usuário do Supabase para que o Webhook possa identificar a quem adicionar os Raios
+    const userId = userProfile ? userProfile.id : 'simulado_user_123';
+    let checkoutUrl = `https://pay.kiwify.com.br/PaFqA0M?external_id=${userId}`;
+    
+    // Se o usuário estiver autenticado no Supabase, pegamos o e-mail cadastrado
+    const session = supabaseClient?.auth?.session?.();
+    const email = session?.user?.email || userProfile?.email;
+    if (email) {
+        checkoutUrl += `&email=${encodeURIComponent(email)}`;
+    }
+    
     setTimeout(() => {
-        alert(`🔥 Simulação de Checkout:\nRedirecionando para Kiwify/Asaas para comprar o "${details.name}" por R$ ${details.price} via ${selectedPaymentMethod.toUpperCase()}!\n\nNota: Após a confirmação, o webhook injetará os créditos e atualizará seu perfil automaticamente.`);
-    }, 800);
+        window.open(checkoutUrl, '_blank');
+        showToast("Redirecionado para o checkout Kiwify! 🛒", "success");
+    }, 1000);
 }
