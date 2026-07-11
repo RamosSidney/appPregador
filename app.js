@@ -37,6 +37,10 @@ let mentoriaConversations = {
 let selectedBibleVerseId = null;
 let selectedBibleText = "";
 let selectedBibleRef = "";
+
+// --- Recharge State ---
+let selectedRechargePackage = 'premium_anual';
+let selectedPaymentMethod = 'pix';
 // --- Credential Config Storage ---
 let config = {
     supabaseUrl: '',
@@ -55,11 +59,13 @@ function initDOMElements() {
         tabMentoriaBtn: document.getElementById('tabMentoriaBtn'),
         tabBibliaBtn: document.getElementById('tabBibliaBtn'),
         tabAcademiaBtn: document.getElementById('tabAcademiaBtn'),
+        tabRecargaBtn: document.getElementById('tabRecargaBtn'),
         paneGenerate: document.getElementById('paneGenerate'),
         paneLibrary: document.getElementById('paneLibrary'),
         paneMentoria: document.getElementById('paneMentoria'),
         paneBiblia: document.getElementById('paneBiblia'),
         paneAcademia: document.getElementById('paneAcademia'),
+        paneRecarga: document.getElementById('paneRecarga'),
         statusDot: document.getElementById('statusDot'),
         statusLabel: document.getElementById('statusLabel'),
         
@@ -191,7 +197,14 @@ function initDOMElements() {
         speedBtns: document.querySelectorAll('.speed-btn'),
         
         // Notify Container
-        toastContainer: document.getElementById('toastContainer')
+        toastContainer: document.getElementById('toastContainer'),
+        
+        // Recharge DOM Elements
+        rechargeBalanceCount: document.getElementById('rechargeBalanceCount'),
+        btnPayPix: document.getElementById('btnPayPix'),
+        btnPayCard: document.getElementById('btnPayCard'),
+        btnSubmitRecharge: document.getElementById('btnSubmitRecharge'),
+        submitQtyVal: document.getElementById('submitQtyVal')
     };
 }
 
@@ -673,6 +686,22 @@ function setupEventListeners() {
         const lessonId = parseInt(elements.completeLessonBtn.dataset.lessonId, 10);
         completeAcademyLesson(lessonId);
     });
+
+    // Recharge Credit listeners
+    elements.tabRecargaBtn.addEventListener('click', () => switchPane('recarga'));
+    elements.btnPayPix.addEventListener('click', () => selectPaymentMethod('pix'));
+    elements.btnPayCard.addEventListener('click', () => selectPaymentMethod('cartao'));
+    elements.btnSubmitRecharge.addEventListener('click', handleRechargeCheckout);
+    
+    // Package selection listeners
+    const rechargeCards = elements.paneRecarga.querySelectorAll('.package-card');
+    rechargeCards.forEach(card => {
+        card.addEventListener('click', () => {
+            rechargeCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectRechargePackage(card.dataset.packageId);
+        });
+    });
 }
 
 function switchPane(view) {
@@ -681,12 +710,14 @@ function switchPane(view) {
     elements.tabMentoriaBtn.classList.remove('active');
     elements.tabBibliaBtn.classList.remove('active');
     elements.tabAcademiaBtn.classList.remove('active');
+    elements.tabRecargaBtn.classList.remove('active');
     
     elements.paneGenerate.classList.remove('active');
     elements.paneLibrary.classList.remove('active');
     elements.paneMentoria.classList.remove('active');
     elements.paneBiblia.classList.remove('active');
     elements.paneAcademia.classList.remove('active');
+    elements.paneRecarga.classList.remove('active');
     
     if (view === 'generate') {
         elements.tabGenerateBtn.classList.add('active');
@@ -707,6 +738,10 @@ function switchPane(view) {
         elements.tabAcademiaBtn.classList.add('active');
         elements.paneAcademia.classList.add('active');
         renderAcademyProgress();
+    } else if (view === 'recarga') {
+        elements.tabRecargaBtn.classList.add('active');
+        elements.paneRecarga.classList.add('active');
+        renderRechargePane();
     }
 }
 
@@ -2160,3 +2195,61 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGamificationState();
     window.selectMentor = selectMentor;
 });
+
+// ==========================================================================
+// RECARGA DE CRÉDITOS (PAINEL FINANCEIRO) LOGIC
+// ==========================================================================
+
+function renderRechargePane() {
+    const credits = supabaseClient && userProfile ? userProfile.creditos : simulatedCredits;
+    elements.rechargeBalanceCount.textContent = credits;
+    
+    // Select package by default
+    selectRechargePackage(selectedRechargePackage);
+    selectPaymentMethod(selectedPaymentMethod);
+}
+
+function selectRechargePackage(packageId) {
+    selectedRechargePackage = packageId;
+    
+    const qtyMap = {
+        faisca: 30,
+        premium_anual: 100,
+        tempestade: 150
+    };
+    
+    elements.submitQtyVal.textContent = qtyMap[packageId] || 100;
+}
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    
+    elements.btnPayPix.classList.remove('active');
+    elements.btnPayCard.classList.remove('active');
+    
+    if (method === 'pix') {
+        elements.btnPayPix.classList.add('active');
+    } else {
+        elements.btnPayCard.classList.add('active');
+    }
+}
+
+function handleRechargeCheckout() {
+    if (!selectedRechargePackage) return;
+    
+    const packageDetails = {
+        faisca: { name: "Pacote Faísca", price: "29,90" },
+        premium_anual: { name: "Premium Anual", price: "197,00" },
+        tempestade: { name: "Pacote Tempestade", price: "89,90" }
+    };
+    
+    const details = packageDetails[selectedRechargePackage];
+    
+    showToast(`Redirecionando para o ambiente seguro de pagamento... ⚡`, "info");
+    
+    console.log(`Checkout Iniciado: ${details.name} (R$ ${details.price}) via ${selectedPaymentMethod.toUpperCase()}`);
+    
+    setTimeout(() => {
+        alert(`🔥 Simulação de Checkout:\nRedirecionando para Kiwify/Asaas para comprar o "${details.name}" por R$ ${details.price} via ${selectedPaymentMethod.toUpperCase()}!\n\nNota: Após a confirmação, o webhook injetará os créditos e atualizará seu perfil automaticamente.`);
+    }, 800);
+}

@@ -106,6 +106,10 @@
                     <span class="nav-icon">🎓</span>
                     <span>Academia RPG</span>
                 </button>
+                <button class="nav-item" id="tabRecargaBtn">
+                    <span class="nav-icon">⚡</span>
+                    <span>Recarga de Raios</span>
+                </button>
             </nav>
             <div class="system-status-container">
                 <div class="status-indicator">
@@ -564,6 +568,105 @@
                 </div>
             </div>
 
+        </section>
+
+        <!-- VIEW PANE 6: RECARGA DE CRÉDITOS (PAINEL FINANCEIRO) -->
+        <section class="view-pane" id="paneRecarga">
+            <div class="panel-header">
+                <h2>⚡ Recarrega de Raios IA</h2>
+                <p>Não deixe seu ministério travar. Adicione créditos para continuar gerando esboços e consultando mentores.</p>
+            </div>
+            
+            <div class="panel-body">
+                <!-- Saldo Widget -->
+                <div class="recharge-balance-strip">
+                    <span class="balance-icon">⚡</span>
+                    <span>SALDO ATUAL: <strong id="rechargeBalanceCount">14</strong> RAIOS</span>
+                </div>
+                
+                <!-- Grid de Pacotes -->
+                <div class="packages-grid">
+                    <!-- Pacote 1 -->
+                    <div class="package-card" data-package-id="faisca">
+                        <div class="package-badge">R$ 0,99 por sermão</div>
+                        <div class="package-title">Pacote Faísca</div>
+                        <div class="package-value-row">
+                            <span class="package-qty">30</span>
+                            <span class="package-unit">Raios</span>
+                        </div>
+                        <p class="package-desc">Ideal para líderes de células que buscam ideias rápidas na semana.</p>
+                        <div class="package-pricing">
+                            <span class="pricing-label">Investimento</span>
+                            <div class="pricing-value-group">
+                                <span class="pricing-term">12x de</span>
+                                <span class="pricing-price">R$ 2,49</span>
+                                <span class="pricing-cash">ou R$ 29,90 à vista</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pacote 2 (Popular) -->
+                    <div class="package-card popular-package selected" data-package-id="premium_anual">
+                        <div class="popular-ribbon">Mais Vendido</div>
+                        <div class="package-badge">Melhor Custo-Benefício</div>
+                        <div class="package-title">Premium Anual</div>
+                        <div class="package-value-row">
+                            <span class="package-qty">100</span>
+                            <span class="package-unit">Raios</span>
+                        </div>
+                        <p class="package-desc">Acesso total por 12 meses + 100 Raios de IA (Créditos em Dobro).</p>
+                        <div class="package-pricing">
+                            <span class="pricing-label">Investimento</span>
+                            <div class="pricing-value-group">
+                                <span class="pricing-term">12x de</span>
+                                <span class="pricing-price">R$ 16,42</span>
+                                <span class="pricing-cash">ou R$ 197,00 à vista</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pacote 3 -->
+                    <div class="package-card" data-package-id="tempestade">
+                        <div class="package-badge">R$ 0,59 por sermão</div>
+                        <div class="package-title">Pacote Tempestade</div>
+                        <div class="package-value-row">
+                            <span class="package-qty">150</span>
+                            <span class="package-unit">Raios</span>
+                        </div>
+                        <p class="package-desc">Recarga massiva para pregadores itinerantes de grandes eventos.</p>
+                        <div class="package-pricing">
+                            <span class="pricing-label">Investimento</span>
+                            <div class="pricing-value-group">
+                                <span class="pricing-term">12x de</span>
+                                <span class="pricing-price">R$ 7,49</span>
+                                <span class="pricing-cash">ou R$ 89,90 à vista</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagamento Form -->
+                <div class="payment-selection-card">
+                    <h3 class="payment-title">Selecione a Forma de Pagamento</h3>
+                    
+                    <div class="payment-methods-grid">
+                        <button type="button" class="pay-method-btn active" id="btnPayPix">
+                            Pix Instantâneo
+                        </button>
+                        <button type="button" class="pay-method-btn" id="btnPayCard">
+                            Cartão de Crédito
+                        </button>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary btn-recharge-submit" id="btnSubmitRecharge">
+                        Garantir meus <span id="submitQtyVal">100</span> Raios agora
+                    </button>
+                    
+                    <div class="security-badge-footer">
+                        🛡️ Ambiente seguro com criptografia de ponta e liberação imediata.
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
