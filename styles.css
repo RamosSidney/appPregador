@@ -227,6 +227,11 @@ body.cyber-theme {
     grid-template-columns: 240px 1fr;
     min-height: calc(100vh - 73px);
     width: 100%;
+    transition: grid-template-columns 0.3s ease;
+}
+
+.app-container.sidebar-collapsed {
+    grid-template-columns: 70px 1fr;
 }
 
 /* Sidebar Styling */
@@ -237,6 +242,8 @@ body.cyber-theme {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: width 0.3s ease, padding 0.3s ease;
+    overflow-x: hidden;
 }
 
 .nav-menu {
@@ -395,27 +402,17 @@ body.cyber-theme {
     margin-bottom: 0.8rem;
 }
 
-/* Horizontal scrolling chips list */
+/* Multi-line flex-wrap chips grid */
 .chips-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.6rem;
-    overflow-x: auto;
     padding: 0.3rem 0.2rem 0.8rem 0.2rem;
     margin-bottom: 1.5rem;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-}
-
-.chips-row::-webkit-scrollbar {
-    height: 4px;
-}
-
-.chips-row::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.05);
 }
 
 .chip {
-    flex: 0 0 auto;
+    flex: initial;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--color-border-glass);
     color: var(--color-text-muted);
@@ -1715,6 +1712,10 @@ body.cyber-theme {
    ========================================================================== */
 
 @media (max-width: 768px) {
+    .sidebar-toggle-row {
+        display: none !important;
+    }
+
     .app-header {
         padding: 0.8rem 1rem;
         flex-direction: column;
@@ -3258,4 +3259,68 @@ body.cyber-theme {
     border: none;
     border-radius: 10px;
     cursor: pointer;
+}
+
+/* ==========================================================================
+   COLLAPSIBLE SIDEBAR STYLE
+   ========================================================================== */
+
+.sidebar-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.collapse-sidebar-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.collapse-sidebar-btn:hover {
+    color: var(--color-neon-cyan);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Collapsed Sidebar overrides */
+.sidebar.collapsed {
+    width: 70px !important;
+    padding: 0.5rem 0.25rem !important;
+}
+
+.sidebar.collapsed .sidebar-toggle-row {
+    justify-content: center;
+}
+
+.sidebar.collapsed .nav-menu {
+    gap: 0.5rem;
+}
+
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 0.8rem;
+}
+
+.sidebar.collapsed .nav-item span:not(.nav-icon) {
+    display: none;
+}
+
+.sidebar.collapsed .system-status-container {
+    padding: 0.5rem 0.25rem;
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar.collapsed .status-label {
+    display: none;
+}
+
+.sidebar.collapsed .status-dot {
+    margin: 0;
 }

@@ -227,7 +227,13 @@ function initDOMElements() {
         adminUserSearchInput: document.getElementById('adminUserSearchInput'),
         btnAdminSearch: document.getElementById('btnAdminSearch'),
         adminSupportQueue: document.getElementById('adminSupportQueue'),
-        adminQueueEmptyState: document.getElementById('adminQueueEmptyState')
+        adminQueueEmptyState: document.getElementById('adminQueueEmptyState'),
+        
+        // Collapsible Sidebar & Dedicated Sermon visualizer
+        appSidebar: document.getElementById('appSidebar'),
+        btnCollapseSidebar: document.getElementById('btnCollapseSidebar'),
+        paneSermonReader: document.getElementById('paneSermonReader'),
+        backToGeneratorBtn: document.getElementById('backToGeneratorBtn')
     };
 }
 
@@ -433,11 +439,44 @@ function showLoggedInUI(profile) {
     elements.userProfileUsername.textContent = `@${profile.username}`;
     elements.userProfileCredits.textContent = `${profile.creditos} Créditos / Energia`;
     elements.userProfileAvatar.textContent = profile.nome_completo.charAt(0).toUpperCase();
+    
+    // Superadmin verification
+    let email = "";
+    if (supabaseClient) {
+        supabaseClient.auth.getUser().then(({ data }) => {
+            if (data && data.user) {
+                email = data.user.email;
+            }
+            const isSuperAdmin = (email && email.toLowerCase() === 'admin@pregador.com') || 
+                                (profile.username && profile.username.toLowerCase() === 'admin') || 
+                                (profile.username && profile.username.toLowerCase() === 'superadmin') || 
+                                profile.tipo_plano === 'SUPER_ADMIN';
+                                
+            if (isSuperAdmin) {
+                elements.tabAdminBtn.classList.remove('hidden');
+            } else {
+                elements.tabAdminBtn.classList.add('hidden');
+            }
+        });
+    } else {
+        const isSuperAdmin = (profile.username && profile.username.toLowerCase() === 'admin') || 
+                            (profile.username && profile.username.toLowerCase() === 'superadmin') || 
+                            profile.tipo_plano === 'SUPER_ADMIN';
+                            
+        if (isSuperAdmin) {
+            elements.tabAdminBtn.classList.remove('hidden');
+        } else {
+            elements.tabAdminBtn.classList.add('hidden');
+        }
+    }
 }
 
 function showLoggedOutUI() {
     elements.authLoggedOutState.classList.remove('hidden');
     elements.authLoggedInState.classList.add('hidden');
+    
+    // Hide Admin tab when logged out
+    elements.tabAdminBtn.classList.add('hidden');
 }
 
 // Auth Subscriptions/Triggers
@@ -774,6 +813,10 @@ function setupEventListeners() {
     // Admin Panel listeners
     elements.tabAdminBtn.addEventListener('click', () => switchPane('admin'));
     elements.btnAdminSearch.addEventListener('click', handleAdminUserSearch);
+    
+    // Collapsible Sidebar & Dedicated Sermon view listeners
+    elements.btnCollapseSidebar.addEventListener('click', toggleSidebarCollapse);
+    elements.backToGeneratorBtn.addEventListener('click', () => switchPane('generate'));
 }
 
 function switchPane(view) {
@@ -792,6 +835,7 @@ function switchPane(view) {
     elements.paneAcademia.classList.remove('active');
     elements.paneRecarga.classList.remove('active');
     elements.paneAdmin.classList.remove('active');
+    elements.paneSermonReader.classList.remove('active');
     
     if (view === 'generate') {
         elements.tabGenerateBtn.classList.add('active');
@@ -819,6 +863,8 @@ function switchPane(view) {
     } else if (view === 'admin') {
         elements.tabAdminBtn.classList.add('active');
         elements.paneAdmin.classList.add('active');
+    } else if (view === 'sermonReader') {
+        elements.paneSermonReader.classList.add('active');
     }
 }
 
@@ -956,9 +1002,8 @@ async function generateSermon() {
         const reelsScript = extractReelsScript(sermonContent);
         elements.reelsCodeContent.textContent = reelsScript;
         
-        // Show pane
-        elements.sermonOutputWrapper.classList.remove('hidden');
-        elements.sermonOutputWrapper.scrollIntoView({ behavior: 'smooth' });
+        // Switch to dedicated sermon reader view
+        switchPane('sermonReader');
         
         showToast("Mensagem gerada com sucesso! 🔥", "success");
         
@@ -1334,9 +1379,7 @@ function renderLibrary() {
             elements.insightDateVal.textContent = new Date(sermon.created_at).toLocaleDateString('pt-BR');
             
             elements.reelsCodeContent.textContent = extractReelsScript(sermon.conteudo_markdown);
-            elements.sermonOutputWrapper.classList.remove('hidden');
-            switchPane('generate');
-            elements.sermonOutputWrapper.scrollIntoView({ behavior: 'smooth' });
+            switchPane('sermonReader');
         });
         
         elements.libraryGrid.appendChild(card);
@@ -2416,3 +2459,20 @@ function handleAdminUserSearch() {
 
 // Expose admin trigger on global scope
 window.concederCreditosBonaFide = concederCreditosBonaFide;
+
+function toggleSidebarCollapse() {
+    const sidebar = elements.appSidebar;
+    const container = document.querySelector('.app-container');
+    const btn = elements.btnCollapseSidebar;
+    
+    sidebar.classList.toggle('collapsed');
+    container.classList.toggle('sidebar-collapsed');
+    
+    if (sidebar.classList.contains('collapsed')) {
+        btn.textContent = '▶';
+        btn.title = 'Expandir Menu';
+    } else {
+        btn.textContent = '◀';
+        btn.title = 'Colapsar Menu';
+    }
+}

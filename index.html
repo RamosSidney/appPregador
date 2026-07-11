@@ -84,7 +84,10 @@
     <main class="app-container">
         
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-toggle-row">
+                <button class="collapse-sidebar-btn" id="btnCollapseSidebar" title="Colapsar Menu">◀</button>
+            </div>
             <nav class="nav-menu">
                 <button class="nav-item active" id="tabGenerateBtn">
                     <span class="nav-icon">🔥</span>
@@ -110,7 +113,7 @@
                     <span class="nav-icon">⚡</span>
                     <span>Recarga de Raios</span>
                 </button>
-                <button class="nav-item" id="tabAdminBtn">
+                <button class="nav-item hidden" id="tabAdminBtn">
                     <span class="nav-icon">⚙️</span>
                     <span>Painel Admin</span>
                 </button>
@@ -175,13 +178,16 @@
                     <!-- Generate Button -->
                     <button class="btn btn-primary btn-generate" id="generateSermonBtn">
                         <span class="btn-icon">⚡</span>
-                        <span>Gerar Mensagem Viral</span>
-                    </button>
-                </div>
+            </div>
 
-                <!-- Live AI Response Screen (Layout Redesigned for V2.0) -->
-                <div class="sermon-output-wrapper hidden" id="sermonOutputWrapper">
-                    
+            <!-- VIEW 2: DEDICATED SERMON VISUALIZER -->
+            <div class="view-pane" id="paneSermonReader">
+                <div class="panel-header">
+                    <h2>Visualizador de Mensagem Viral</h2>
+                    <p class="panel-subtitle">Estude seu esboço, copie roteiros para redes sociais e ative o Modo Púlpito para ministrar no palco.</p>
+                </div>
+                
+                <div class="sermon-output-wrapper" id="sermonOutputWrapper">
                     <button class="btn-back-generator" id="backToGeneratorBtn">◄ Voltar ao Gerador</button>
                     
                     <div class="sermon-layout-grid">
@@ -249,7 +255,7 @@
                         
                     </div>
 
-                    <!-- Hidden clipboard helper block (Still exists to store extracted reels) -->
+                    <!-- Hidden clipboard helper block -->
                     <div class="hidden" id="reelsCodeContent">Script do Reels será extraído...</div>
                 </div>
             </div>
