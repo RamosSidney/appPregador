@@ -1261,6 +1261,13 @@ body.cyber-theme {
     color: var(--color-neon-green);
     text-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
     margin-right: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timer-display:hover {
+    color: var(--color-neon-cyan) !important;
+    text-shadow: var(--glow-cyan) !important;
 }
 
 .timer-display.warning {
@@ -1304,17 +1311,17 @@ body.cyber-theme {
 
 /* Overriding markdown inside pulpit mode for maximum pulpit legibility */
 .pulpit-content.markdown-body h1 {
-    font-size: 1.8em;
+    font-size: 1.40em;
     color: #FFF;
     border-bottom: 2px solid var(--color-neon-green);
     text-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
 }
 
 .pulpit-content.markdown-body h2 {
-    font-size: 1.35em;
+    font-size: 1.15em;
     color: var(--color-neon-green);
     text-shadow: 0 0 10px rgba(57, 255, 20, 0.15);
-    margin-top: 2.5rem;
+    margin-top: 1.8rem;
 }
 
 .pulpit-content.markdown-body p, 

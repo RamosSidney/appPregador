@@ -16,6 +16,7 @@ let currentSpeed = 0;    // 0 = Off, 1 = Slow, 2 = Normal, 3 = Fast
 let scrollIntervalId = null;
 let lastScrollTime = 0;
 let secondsRemaining = 900; // 15 minutes default
+let pulpitConfiguredTimeSeconds = 900; // 15 minutes default configured target
 let timerInterval = null;
 let isTimerRunning = false;
 // Simulated State (Local fallback)
@@ -750,6 +751,27 @@ function setupEventListeners() {
     // Pulpit Timer controls
     elements.pulpitTimerPlayBtn.addEventListener('click', togglePulpitTimer);
     elements.pulpitTimerResetBtn.addEventListener('click', resetPulpitTimer);
+    
+    // Configurable Pulpit Timer via clicking display
+    elements.pulpitTimer.addEventListener('click', () => {
+        if (isTimerRunning) {
+            showToast("Pausa o cronômetro antes de configurar o tempo! ⏱️", "warning");
+            return;
+        }
+        const currentMins = Math.floor(secondsRemaining / 60);
+        const newTimeStr = prompt("Configure o tempo do sermão (em minutos):", currentMins);
+        if (newTimeStr !== null) {
+            const minutes = parseInt(newTimeStr, 10);
+            if (isNaN(minutes) || minutes <= 0 || minutes > 180) {
+                showToast("Por favor, insira um tempo válido entre 1 e 180 minutos!", "error");
+                return;
+            }
+            pulpitConfiguredTimeSeconds = minutes * 60;
+            secondsRemaining = pulpitConfiguredTimeSeconds;
+            updateTimerDisplay();
+            showToast(`Tempo configurado para ${minutes} minutos! ⏱️`, "success");
+        }
+    });
 
     // Mentorship Chat listeners
     elements.backToMentorsBtn.addEventListener('click', backToMentors);
@@ -1487,6 +1509,10 @@ function openPulpitMode() {
         if (btn.dataset.speed == '0') btn.classList.add('active');
     });
     
+    // Responsive starting font size (20px on mobile, 32px on desktop)
+    const isMobile = window.innerWidth <= 768;
+    activeFontSize = isMobile ? 20 : 32;
+    
     adjustPulpitFontSize(0); // sync DOM fonts
     resetPulpitTimer();
 }
@@ -1585,7 +1611,7 @@ function pausePulpitTimer() {
 
 function resetPulpitTimer() {
     pausePulpitTimer();
-    secondsRemaining = 900; // 15 mins
+    secondsRemaining = pulpitConfiguredTimeSeconds;
     updateTimerDisplay();
 }
 
