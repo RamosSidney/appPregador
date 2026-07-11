@@ -1,5 +1,5 @@
 -- Habilitar a extensão de busca semântica/vetorial
-create extension if not exists pgvector;
+create extension if not exists vector;
 
 -- 1. PERFIS DE USUÁRIOS (LÍDERES DE ADOLESCENTES)
 create table public.perfis_jovens (
