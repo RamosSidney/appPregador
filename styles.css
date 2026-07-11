@@ -3276,10 +3276,14 @@ body.cyber-theme {
     background: transparent;
     border: none;
     color: var(--color-text-muted);
-    font-size: 0.8rem;
+    font-size: 1.2rem;
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s ease;
 }
 
@@ -3296,6 +3300,7 @@ body.cyber-theme {
 
 .sidebar.collapsed .sidebar-toggle-row {
     justify-content: center;
+    padding: 0.5rem 0 !important;
 }
 
 .sidebar.collapsed .nav-menu {

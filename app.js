@@ -2469,10 +2469,8 @@ function toggleSidebarCollapse() {
     container.classList.toggle('sidebar-collapsed');
     
     if (sidebar.classList.contains('collapsed')) {
-        btn.textContent = '▶';
         btn.title = 'Expandir Menu';
     } else {
-        btn.textContent = '◀';
         btn.title = 'Colapsar Menu';
     }
 }
