@@ -1716,6 +1716,41 @@ function renderMentorshipChatHistory() {
     elements.mentoriaChatScroll.scrollTop = elements.mentoriaChatScroll.scrollHeight;
 }
 
+async function fetchGroqMentorResponse(mentor, question) {
+    const mentorPrompts = {
+        'C.S. Lewis': `Você é o teólogo e escritor apologista C.S. Lewis. Responda a dúvida do usuário no meu estilo de escrita típico, que é caracterizado por analogias profundas e brilhantes, uso de lógica racional apurada combinada com imaginação vívida e tom de conversa amigável, britânico e intelectualmente desafiador. Escreva uma resposta curta e teologicamente rica (máximo 3 parágrafos) sem sair do personagem, focando em orientar o líder de jovens ou adolescentes que lhe perguntou.`,
+        'Charles Spurgeon': `Você é o pregador batista reformado Charles Spurgeon, conhecido como o "Príncipe dos Pregadores". Responda a dúvida teológica no meu estilo clássico de escrita: de forma eloquente, com paixão pastoral intensa, repleto de referências bíblicas, graciosidade e convicção sobre a obra da cruz. Use um tom paternal, caloroso e encorajador (máximo 3 parágrafos). Não saia do personagem.`,
+        'Dietrich Bonhoeffer': `Você é o pastor, teólogo luterano e mártir alemão Dietrich Bonhoeffer. Responda no meu estilo clássico de escrita: direto, desafiador, focado no discipulado radical, no custo do seguimento de Cristo e na importância da comunidade de fé em oposição à graça barata do mundo secular moderno (máximo 3 parágrafos). Não saia do personagem.`
+    };
+    
+    const systemPrompt = mentorPrompts[mentor] || `Você é um mentor teológico histórico. Responda com profundidade pastoral.`;
+    
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${config.groqKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: "llama-3.1-8b-instant",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: question }
+            ],
+            temperature: 0.7,
+            max_tokens: 600
+        })
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || `Erro HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+}
+
 async function submitMentorQuestion(e) {
     e.preventDefault();
     if (!selectedMentorId) return;
@@ -1756,10 +1791,17 @@ async function submitMentorQuestion(e) {
         if (!success) throw new Error("Erro de processamento de créditos.");
         
         let answer = "";
-        if (config.supabaseUrl && config.groqKey) {
+        if (config.supabaseUrl && supabaseClient && userProfile) {
             // Sincroniza via Edge Function real
             const edgeUrl = `${config.supabaseUrl}/functions/v1/pregador-core`;
-            const token = supabaseClient?.auth?.session()?.access_token || localStorage.getItem('supabase_token') || '';
+            let token = '';
+            if (supabaseClient.auth.session) {
+                token = supabaseClient.auth.session()?.access_token || '';
+            } else if (supabaseClient.auth.getSession) {
+                const { data } = await supabaseClient.auth.getSession();
+                token = data?.session?.access_token || '';
+            }
+            if (!token) token = localStorage.getItem('supabase_token') || '';
             
             const response = await fetch(edgeUrl, {
                 method: 'POST',
@@ -1778,6 +1820,9 @@ async function submitMentorQuestion(e) {
             const data = await response.json();
             if (data.error) throw new Error(data.error);
             answer = data.resultado;
+        } else if (config.groqKey) {
+            // Consulta a API do Groq diretamente com o prompt de Mentor
+            answer = await fetchGroqMentorResponse(mentorName, question);
         } else {
             // Fallback para simulador teológico offline
             answer = await simulateMentorResponse(mentorName, question);
