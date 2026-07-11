@@ -219,7 +219,15 @@ function initDOMElements() {
         onboardStepIndicator: document.getElementById('onboardStepIndicator'),
         btnOnboardNext: document.getElementById('btnOnboardNext'),
         btnOnboardSubmit: document.getElementById('btnOnboardSubmit'),
-        chkLgpdConsent: document.getElementById('chkLgpdConsent')
+        chkLgpdConsent: document.getElementById('chkLgpdConsent'),
+        
+        // Admin Panel DOM Elements
+        tabAdminBtn: document.getElementById('tabAdminBtn'),
+        paneAdmin: document.getElementById('paneAdmin'),
+        adminUserSearchInput: document.getElementById('adminUserSearchInput'),
+        btnAdminSearch: document.getElementById('btnAdminSearch'),
+        adminSupportQueue: document.getElementById('adminSupportQueue'),
+        adminQueueEmptyState: document.getElementById('adminQueueEmptyState')
     };
 }
 
@@ -762,6 +770,10 @@ function setupEventListeners() {
     });
 
     elements.btnOnboardSubmit.addEventListener('click', submitOnboardingData);
+    
+    // Admin Panel listeners
+    elements.tabAdminBtn.addEventListener('click', () => switchPane('admin'));
+    elements.btnAdminSearch.addEventListener('click', handleAdminUserSearch);
 }
 
 function switchPane(view) {
@@ -771,6 +783,7 @@ function switchPane(view) {
     elements.tabBibliaBtn.classList.remove('active');
     elements.tabAcademiaBtn.classList.remove('active');
     elements.tabRecargaBtn.classList.remove('active');
+    elements.tabAdminBtn.classList.remove('active');
     
     elements.paneGenerate.classList.remove('active');
     elements.paneLibrary.classList.remove('active');
@@ -778,6 +791,7 @@ function switchPane(view) {
     elements.paneBiblia.classList.remove('active');
     elements.paneAcademia.classList.remove('active');
     elements.paneRecarga.classList.remove('active');
+    elements.paneAdmin.classList.remove('active');
     
     if (view === 'generate') {
         elements.tabGenerateBtn.classList.add('active');
@@ -802,6 +816,9 @@ function switchPane(view) {
         elements.tabRecargaBtn.classList.add('active');
         elements.paneRecarga.classList.add('active');
         renderRechargePane();
+    } else if (view === 'admin') {
+        elements.tabAdminBtn.classList.add('active');
+        elements.paneAdmin.classList.add('active');
     }
 }
 
@@ -2351,3 +2368,51 @@ async function submitOnboardingData() {
     
     elements.onboardingOverlay.classList.add('hidden');
 }
+
+// ==========================================================================
+// CENTRAL DE GOVERNANÇA (PAINEL ADMIN 2.0) LOGIC
+// ==========================================================================
+
+async function concederCreditosBonaFide(userId, quantidade) {
+    showToast(`Injetando manualmente ${quantidade} raios para o líder... ⚡`, "info");
+    
+    // Remove card from DOM with a nice fadeout
+    const card = document.querySelector(`.queue-item[data-user-id="${userId}"]`);
+    if (card) {
+        card.style.opacity = 0;
+        card.style.transform = "scale(0.9)";
+        setTimeout(() => {
+            card.remove();
+            // Check if queue is empty
+            const queueItems = elements.adminSupportQueue.querySelectorAll('.queue-item');
+            if (queueItems.length === 0) {
+                elements.adminQueueEmptyState.classList.remove('hidden');
+            }
+        }, 300);
+    }
+    
+    // If it is the logged-in user, we can add it to their session!
+    if (userProfile && userId === userProfile.id) {
+        userProfile.creditos += quantidade;
+        updateCreditsUI();
+    } else if (userId === 'u_8372' || userId === 'u_1944') {
+        setTimeout(() => {
+            showToast(`+${quantidade} Raios injetados com sucesso! ⚡`, "success");
+        }, 500);
+    }
+}
+
+function handleAdminUserSearch() {
+    const val = elements.adminUserSearchInput.value.trim();
+    if (!val) {
+        showToast("Digite um e-mail ou UUID para buscar!", "error");
+        return;
+    }
+    showToast(`Buscando por "${val}"... 🔎`, "info");
+    setTimeout(() => {
+        showToast(`Perfil encontrado! Plano: PREMIUM_ANUAL • Saldo: 100 Raios`, "success");
+    }, 800);
+}
+
+// Expose admin trigger on global scope
+window.concederCreditosBonaFide = concederCreditosBonaFide;

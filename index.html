@@ -110,6 +110,10 @@
                     <span class="nav-icon">⚡</span>
                     <span>Recarga de Raios</span>
                 </button>
+                <button class="nav-item" id="tabAdminBtn">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Painel Admin</span>
+                </button>
             </nav>
             <div class="system-status-container">
                 <div class="status-indicator">
@@ -664,6 +668,137 @@
                     
                     <div class="security-badge-footer">
                         🛡️ Ambiente seguro com criptografia de ponta e liberação imediata.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW PANE 7: PAINEL ADMIN (CENTRAL DE GOVERNANÇA 2.0) -->
+        <section class="view-pane" id="paneAdmin">
+            <div class="panel-header">
+                <h2>⚙️ Central de Governança 2.0</h2>
+                <p>Gestão de faturamento, auditoria antifraude e controle operacional do SaaS.</p>
+            </div>
+            
+            <div class="panel-body">
+                <!-- Modos & Status -->
+                <div class="admin-status-strip">
+                    <span>Modo Administrador Geral</span>
+                    <span class="status-badge">Servidores Saudáveis</span>
+                </div>
+
+                <!-- METRICS GRID -->
+                <div class="admin-metrics-grid">
+                    <div class="metric-card border-green">
+                        <div class="metric-details">
+                            <span class="metric-title">Faturamento Mensal</span>
+                            <h3 class="metric-value">R$ 14.850,00</h3>
+                            <p class="metric-subtext">+18% vs mês passado</p>
+                        </div>
+                        <div class="metric-icon bg-green">💵</div>
+                    </div>
+                    <div class="metric-card border-cyan">
+                        <div class="metric-details">
+                            <span class="metric-title">Líderes Ativos</span>
+                            <h3 class="metric-value">1.240</h3>
+                            <p class="metric-subtext">52 novos hoje</p>
+                        </div>
+                        <div class="metric-icon bg-cyan">👥</div>
+                    </div>
+                    <div class="metric-card border-purple">
+                        <div class="metric-details">
+                            <span class="metric-title">Chamadas de IA (Groq)</span>
+                            <h3 class="metric-value">24.580</h3>
+                            <p class="metric-subtext">Custo de infra: R$ 0,00</p>
+                        </div>
+                        <div class="metric-icon bg-purple">⚡</div>
+                    </div>
+                </div>
+
+                <div class="admin-charts-grid">
+                    <!-- Column 1: Termômetro Teológico -->
+                    <div class="admin-panel-card">
+                        <h3>📈 Termômetro Teológico (Dores mais buscadas)</h3>
+                        <p class="card-subtitle mb-4">Dados baseados nas tags selecionadas pelos líderes para direcionar campanhas.</p>
+                        
+                        <div class="trends-list">
+                            <div class="trend-item">
+                                <div class="trend-header">
+                                    <span>Ansiedade / Pressão Social</span>
+                                    <span>842 buscas (68%)</span>
+                                </div>
+                                <div class="trend-bar-container">
+                                    <div class="trend-bar bg-cyan" style="width: 68%;"></div>
+                                </div>
+                            </div>
+                            <div class="trend-item">
+                                <div class="trend-header">
+                                    <span>Identidade / Cultura Pop</span>
+                                    <span>512 buscas (41%)</span>
+                                </div>
+                                <div class="trend-bar-container">
+                                    <div class="trend-bar bg-cyan" style="width: 41%;"></div>
+                                </div>
+                            </div>
+                            <div class="trend-item">
+                                <div class="trend-header">
+                                    <span>Pornografia / Pureza</span>
+                                    <span>395 buscas (31%)</span>
+                                </div>
+                                <div class="trend-bar-container">
+                                    <div class="trend-bar bg-cyan" style="width: 31%;"></div>
+                                </div>
+                            </div>
+                            <div class="trend-item">
+                                <div class="trend-header">
+                                    <span>Vocação / Futuro</span>
+                                    <span>210 buscas (16%)</span>
+                                </div>
+                                <div class="trend-bar-container">
+                                    <div class="trend-bar bg-cyan" style="width: 16%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Fila de Ouvidoria / Crédito Manual -->
+                    <div class="admin-panel-card">
+                        <h3>🛡️ Ouvidoria Operacional (Crédito Manual)</h3>
+                        <p class="card-subtitle mb-4">Aprovações de injeção manual segura via Service Role Backend.</p>
+                        
+                        <div id="adminSupportQueue" class="support-queue-list">
+                            <div class="queue-item" data-user-id="u_8372">
+                                <div class="queue-details">
+                                    <h4>Pr. Guilherme Santos <span class="user-id">(u_8372)</span></h4>
+                                    <p class="queue-reason">⚠️ Erro na aprovação do Pix (Atraso)</p>
+                                    <p class="queue-meta">guilherme@igreja.com • Saldo: 0 Raios</p>
+                                </div>
+                                <button class="btn-admin-credit" id="btnAdminCredit_u_8372">+50 Raios</button>
+                            </div>
+                            <div class="queue-item" data-user-id="u_1944">
+                                <div class="queue-details">
+                                    <h4>Lucas Oliveira (Célula) <span class="user-id">(u_1944)</span></h4>
+                                    <p class="queue-reason">⚠️ Consumiu crédito mas a luz caiu</p>
+                                    <p class="queue-meta">lucas.z@gmail.com • Saldo: 12 Raios</p>
+                                </div>
+                                <button class="btn-admin-credit" id="btnAdminCredit_u_1944">+50 Raios</button>
+                            </div>
+                        </div>
+                        <div id="adminQueueEmptyState" class="queue-empty-state hidden">
+                            <span class="check-icon">✓</span>
+                            <p>Nenhum ticket pendente. Todos os líderes operando com energia!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accounts Gestor -->
+                <div class="admin-panel-card mt-6">
+                    <h3>🔍 Gestor de Contas & Auditoria LGPD</h3>
+                    <p class="card-subtitle mb-3">Busque líderes para gerenciar planos, aplicar suspensões ou forçar exclusão (direito ao esquecimento).</p>
+                    
+                    <div class="admin-search-wrapper">
+                        <input type="text" id="adminUserSearchInput" placeholder="Digite o e-mail, UUID ou username do líder...">
+                        <button class="btn-admin-search" id="btnAdminSearch">Buscar</button>
                     </div>
                 </div>
             </div>
