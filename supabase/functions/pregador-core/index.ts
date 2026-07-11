@@ -87,16 +87,41 @@ serve(async (req) => {
       userPrompt = `Gere um esboço disruptivo.\nTEMA: ${tema}\nVIBE: ${tagVibe}\nPÚBLICO: ${publicoAlvo}\nCONTEXTO BÍBLICO:\n${contextoBiblico}`
 
     } else if (acao === 'MENTORIA_HISTORICA') {
-      const { mentor, pergunta } = payload
-      
-      const personas: Record<string, string> = {
-        'C.S. Lewis': 'Você é o avatar de C.S. Lewis. Responda usando apologética cristã de forma imaginativa, intelectual, usando metáforas literárias e foco na dor existencial e ceticismo moderno de adolescentes.',
-        'Charles Spurgeon': 'Você é o avatar de Charles Spurgeon. Responda com paixão pastoral intensa, foco na profundidade da graça, encorajamento para líderes cansados e conselhos de homilética prática.',
-        'Dietrich Bonhoeffer': 'Você é o avatar de Dietrich Bonhoeffer. Responda focando em discipulado radical, vivência em comunidade, coragem moral e o custo de seguir a Cristo em uma sociedade secularizada.'
-      }
+      const { mentor, pergunta } = payload;
 
-      systemPrompt = `${personas[mentor] || personas['C.S. Lewis']} Responda à dúvida de um líder moderno de adolescentes de forma direta, encorajadora, teológica e prática. Limite a resposta em 4 parágrafos focados na resolução.`
-      userPrompt = `Dúvida do Líder: ${pergunta}`
+      // 1. Busca trechos das obras públicas salvas na tabela de trilhas ou citações baseadas na dúvida do líder
+      // Isso traz do banco de dados o conteúdo real e fiel escrito pelos teólogos
+      const { data: trechosObras } = await supabase
+        .from('trilhas_treinamento')
+        .select('conteudo_texto, titulo')
+        .eq('categoria', 'Obras Públicas')
+        .ilike('conteudo_texto', `%${pergunta.substring(0, 10)}%`) // Busca rápida por palavra-chave
+        .limit(2);
+
+      // Estrutura os fragmentos de livros reais para injetar no cérebro da IA
+      const contextoLivrosReais = trechosObras && trechosObras.length > 0
+        ? trechosObras.map((o: any) => `[Obra: ${o.titulo}] -> "${o.conteudo_texto}"`).join('\n')
+        : "Use seus conhecimentos baseados estritamente na literatura ortodoxa original do autor.";
+
+      // 2. Personas com direcionamento de acervo bibliográfico específico
+      const personas: Record<string, string> = {
+        'C.S. Lewis': `Você é o avatar teológico de C.S. Lewis. Seu pensamento é moldado pelas obras 'Cristianismo Puro e Simples', 'O Peso da Glória' e 'A Abolição do Homem'. Responda usando apologética imaginativa, lógica afiada, analogias literárias e lidando com o ceticismo de forma intelectual.`,
+        'Charles Spurgeon': `Você é o avatar teológico de Charles Spurgeon. Seu pensamento é moldado pelo acervo de sermões do 'Tabernáculo Metropolitano' e pela obra 'Lições aos meus Alunos'. Responda com intensa paixão pastoral, foco na suficiência da graça e encorajamento prático para líderes cansados.`,
+        'Dietrich Bonhoeffer': `Você é o avatar teológico de Dietrich Bonhoeffer. Seu pensamento é moldado pelas obras 'Discipulado' e 'Vida em Comunidade'. Responda focando na ética cristã radical, centralidade de Cristo na comunidade e coragem moral.`
+      };
+
+      // 3. Prompt do Sistema Blindado contra alucinações
+      systemPrompt = `${personas[mentor] || personas['C.S. Lewis']} 
+      DIRETRIZ OBRIGATÓRIA: Para formular sua resposta ao líder de adolescentes, você deve se basear prioritariamente nos fragmentos e citações das suas obras reais fornecidos no contexto abaixo. Se usar conhecimento externo do seu treinamento, garanta que ele seja 100% fiel à sua bibliografia histórica oficial. Nunca invente citações que você não escreveu. Limite-se a 3 ou 4 parágrafos diretos e pastorais.`;
+
+      // 4. Prompt do Usuário amarrando a dúvida ao acervo
+      userPrompt = `CONTEXTO REAL DO SEU ACERVO BIBLIOGRÁFICO:
+      ${contextoLivrosReais}
+      
+      DÚVIDA DO LÍDER DE ADOLESCENTES ATUAL:
+      "${pergunta}"
+      
+      Formule sua resposta direcionada a este líder. Se aplicável, cite em qual de suas obras ou linhas de pensamento esse conselho se fundamenta.`;
     }
 
     // DISPARO DO MOTOR DA GROQ (LLAMA 3.1 70B DE GRAÇA)
