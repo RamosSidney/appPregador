@@ -806,18 +806,24 @@ async function generateSermon() {
     
     try {
         let sermonContent = "";
+        let usedEdgeFunction = false;
         
-        // 2. Decide if using actual Groq or Simulation Fallback
-        if (config.groqKey) {
+        // 2. Decide if using actual Supabase Edge Function or local Groq or Simulation Fallback
+        if (config.supabaseUrl && supabaseClient && userProfile) {
+            sermonContent = await fetchEdgeFunctionSermon(customRef, customTheme);
+            usedEdgeFunction = true;
+        } else if (config.groqKey) {
             sermonContent = await fetchGroqAIResponse(customRef, customTheme);
         } else {
             // Dynamic simulator wrapper
             sermonContent = await simulateAIResponse(customRef, customTheme);
         }
         
-        // 3. Deduct credit
-        const success = await deductCredit();
-        if (!success) throw new Error("Erro de processamento de créditos.");
+        // 3. Deduct credit (only if NOT processed by Edge Function to prevent double deduction)
+        if (!usedEdgeFunction) {
+            const success = await deductCredit();
+            if (!success) throw new Error("Erro de processamento de créditos.");
+        }
         
         // 4. Render output
         currentActiveSermon = {
@@ -851,6 +857,38 @@ async function generateSermon() {
         elements.generateSermonBtn.disabled = false;
         elements.generateSermonBtn.querySelector('span:last-child').textContent = "Gerar Mensagem Viral";
     }
+}
+
+async function fetchEdgeFunctionSermon(customRef, customTheme) {
+    const edgeUrl = `${config.supabaseUrl}/functions/v1/pregador-core`;
+    const token = supabaseClient?.auth?.session()?.access_token || localStorage.getItem('supabase_token') || '';
+    
+    const response = await fetch(edgeUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            acao: 'GERAR_SERMAO',
+            payload: {
+                tema: customTheme || selectedPainVibes.join(', '),
+                publicoAlvo: "Gen Z (13-18 anos)",
+                tagVibe: selectedPainVibes.join(', ') + (selectedPopVibes.length > 0 ? ' + ' + selectedPopVibes.join(', ') : '')
+            }
+        })
+    });
+    
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    
+    // Sync local profile credits with the value returned by the server
+    if (data.novosCreditos !== undefined && userProfile) {
+        userProfile.creditos = data.novosCreditos;
+        updateCreditsUI();
+    }
+    
+    return data.resultado;
 }
 
 async function fetchGroqAIResponse(customRef, customTheme) {
