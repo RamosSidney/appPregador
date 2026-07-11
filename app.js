@@ -9,6 +9,7 @@ let savedSermons = [];
 let selectedPainVibes = [];
 let selectedPopVibes = [];
 let currentActiveSermon = null;
+let authUserEmail = '';
 
 // Teleprompter / Pulpit state
 let activeFontSize = 32; // Default starting font size (px)
@@ -260,13 +261,22 @@ function loadConfig() {
     if (savedConfig) {
         try {
             config = JSON.parse(savedConfig);
-            elements.setGroqKey.value = config.groqKey || '';
-            elements.setSupabaseUrl.value = config.supabaseUrl || '';
-            elements.setSupabaseKey.value = config.supabaseKey || '';
         } catch (e) {
             console.error("Erro ao carregar configurações", e);
         }
     }
+    
+    // Fallback para credenciais de produção padrão
+    if (!config.supabaseUrl) {
+        config.supabaseUrl = 'https://ugdwufgqynflywqmfmus.supabase.co';
+    }
+    if (!config.supabaseKey) {
+        config.supabaseKey = 'SUA_SUPABASE_ANON_KEY_AQUI'; // Desenvolvedor substitui aqui para produção
+    }
+    
+    if (elements.setGroqKey) elements.setGroqKey.value = config.groqKey || '';
+    if (elements.setSupabaseUrl) elements.setSupabaseUrl.value = config.supabaseUrl || '';
+    if (elements.setSupabaseKey) elements.setSupabaseKey.value = config.supabaseKey || '';
     
     // Load local storage mock databases
     const savedMockSermons = localStorage.getItem('app_pregador_mock_sermons');
@@ -349,6 +359,31 @@ async function initConnection() {
     
     // Sync library after state change
     await syncSermons();
+    updateSettingsTabsVisibility();
+}
+
+function updateSettingsTabsVisibility() {
+    let isSuperAdmin = false;
+    if (userProfile) {
+        const email = authUserEmail || '';
+        isSuperAdmin = (email && email.toLowerCase() === 'admin@pregador.com') || 
+                       (userProfile.username && userProfile.username.toLowerCase() === 'admin') || 
+                       (userProfile.username && userProfile.username.toLowerCase() === 'superadmin') || 
+                       userProfile.tipo_plano === 'SUPER_ADMIN';
+    }
+    
+    // Mostra a aba de conexões API se ainda não estiver conectado ao Supabase (fase inicial de setup) OU se for Super Admin
+    if (!supabaseClient || isSuperAdmin) {
+        if (elements.tabSettingsApiBtn) elements.tabSettingsApiBtn.classList.remove('hidden');
+    } else {
+        if (elements.tabSettingsApiBtn) {
+            elements.tabSettingsApiBtn.classList.add('hidden');
+            // Se a aba ativa for a API, muda para a aba de autenticação de conta
+            if (elements.tabSettingsApiBtn.classList.contains('active')) {
+                switchSettingsModalTab('auth');
+            }
+        }
+    }
 }
 
 function activateSimulationMode() {
@@ -447,6 +482,7 @@ function showLoggedInUI(profile) {
         supabaseClient.auth.getUser().then(({ data }) => {
             if (data && data.user) {
                 email = data.user.email;
+                authUserEmail = email || "";
             }
             const isSuperAdmin = (email && email.toLowerCase() === 'admin@pregador.com') || 
                                 (profile.username && profile.username.toLowerCase() === 'admin') || 
@@ -458,6 +494,7 @@ function showLoggedInUI(profile) {
             } else {
                 elements.tabAdminBtn.classList.add('hidden');
             }
+            updateSettingsTabsVisibility();
         });
     } else {
         const isSuperAdmin = (profile.username && profile.username.toLowerCase() === 'admin') || 
@@ -469,6 +506,7 @@ function showLoggedInUI(profile) {
         } else {
             elements.tabAdminBtn.classList.add('hidden');
         }
+        updateSettingsTabsVisibility();
     }
 }
 
@@ -478,6 +516,9 @@ function showLoggedOutUI() {
     
     // Hide Admin tab when logged out
     elements.tabAdminBtn.classList.add('hidden');
+    
+    authUserEmail = "";
+    updateSettingsTabsVisibility();
 }
 
 // Auth Subscriptions/Triggers
