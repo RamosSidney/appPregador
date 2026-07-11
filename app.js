@@ -271,7 +271,7 @@ function loadConfig() {
         config.supabaseUrl = 'https://ugdwufgqynflywqmfmus.supabase.co';
     }
     if (!config.supabaseKey) {
-        config.supabaseKey = 'SUA_SUPABASE_ANON_KEY_AQUI'; // Desenvolvedor substitui aqui para produção
+        config.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZHd1ZmdxeW5mbHl3cW1mbXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDYzMTcsImV4cCI6MjA5OTMyMjMxN30.QordsszgiDzPLWDc1GK71uO9qakXU7Hi05MtqQIKFFg';
     }
     
     if (elements.setGroqKey) elements.setGroqKey.value = config.groqKey || '';
