@@ -1707,6 +1707,10 @@ body.cyber-theme {
     margin-top: 0.25rem;
 }
 
+.mobile-status-badge {
+    display: none;
+}
+
 /* ==========================================================================
    RESPONSIVE LAYOUT (MOBILE FIRST ADAPTATIONS)
    ========================================================================== */
@@ -1717,18 +1721,78 @@ body.cyber-theme {
     }
 
     .app-header {
-        padding: 0.8rem 1rem;
-        flex-direction: column;
-        gap: 0.8rem;
+        flex-direction: row !important;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem 1rem !important;
+        height: 60px !important;
+        gap: 0 !important;
+    }
+
+    .header-logo h1 {
+        font-size: 1.15rem !important;
+    }
+    
+    .header-logo .logo-icon {
+        font-size: 1.2rem !important;
     }
 
     .credits-panel {
-        width: 100%;
+        display: none !important;
+    }
+
+    .mobile-status-badge {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 6px 14px;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-left: auto;
+        margin-right: 12px;
+        color: #FFF;
+        box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.02);
+    }
+    
+    .mobile-status-badge span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .mobile-credits {
+        color: var(--color-neon-cyan);
+        text-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+    }
+
+    .mobile-level {
+        color: var(--color-neon-green);
+        text-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        padding-left: 12px;
     }
 
     .app-container {
         grid-template-columns: 1fr;
         padding-bottom: 75px; /* Evita que o conteúdo seja cortado pela barra inferior */
+    }
+
+    .sermon-layout-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+
+    .sermon-read-block {
+        max-height: none !important;
+        padding: 1.2rem !important;
+    }
+
+    .sermon-output-wrapper {
+        padding: 1.2rem !important;
+        margin-top: 1rem !important;
     }
 
     .sidebar {

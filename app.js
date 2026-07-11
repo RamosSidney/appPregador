@@ -593,6 +593,11 @@ function updateCreditsUI() {
     elements.creditsCount.textContent = currentCredits;
     elements.energyBar.style.width = `${currentCredits}%`;
     
+    const mobileCredits = document.getElementById('mobileCreditsCount');
+    if (mobileCredits) {
+        mobileCredits.textContent = currentCredits;
+    }
+    
     // Gamification colors based on credit remaining
     if (currentCredits <= 20) {
         elements.energyBar.style.background = 'linear-gradient(90deg, var(--color-neon-pink), #FF5500)';
@@ -2087,6 +2092,11 @@ function renderAcademyProgress() {
     elements.academyLevelVal.textContent = leaderLevel;
     elements.academyXpVal.textContent = `${leaderXp} / 500 XP`;
     elements.academyXpBar.style.width = `${pct}%`;
+    
+    const mobileLevel = document.getElementById('mobileLevelVal');
+    if (mobileLevel) {
+        mobileLevel.textContent = leaderLevel;
+    }
     
     // Render Timeline cards states
     const cards = elements.paneAcademia.querySelectorAll('.lesson-card');
