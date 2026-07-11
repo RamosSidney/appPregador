@@ -85,39 +85,41 @@
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="appSidebar">
-            <div class="sidebar-toggle-row">
-                <button class="collapse-sidebar-btn" id="btnCollapseSidebar" title="Colapsar Menu">☰</button>
+            <div class="sidebar-top-wrapper">
+                <div class="sidebar-toggle-row">
+                    <button class="collapse-sidebar-btn" id="btnCollapseSidebar" title="Colapsar Menu">☰</button>
+                </div>
+                <nav class="nav-menu">
+                    <button class="nav-item active" id="tabGenerateBtn">
+                        <span class="nav-icon">🔥</span>
+                        <span>Criar Mensagem</span>
+                    </button>
+                    <button class="nav-item" id="tabLibraryBtn">
+                        <span class="nav-icon">📚</span>
+                        <span>Sermões Salvos</span>
+                    </button>
+                    <button class="nav-item" id="tabMentoriaBtn">
+                        <span class="nav-icon">🤝</span>
+                        <span>Mentoria Histórica</span>
+                    </button>
+                    <button class="nav-item" id="tabBibliaBtn">
+                        <span class="nav-icon">📖</span>
+                        <span>Bíblia Nativa</span>
+                    </button>
+                    <button class="nav-item" id="tabAcademiaBtn">
+                        <span class="nav-icon">🎓</span>
+                        <span>Academia RPG</span>
+                    </button>
+                    <button class="nav-item" id="tabRecargaBtn">
+                        <span class="nav-icon">⚡</span>
+                        <span>Recarga de Raios</span>
+                    </button>
+                    <button class="nav-item hidden" id="tabAdminBtn">
+                        <span class="nav-icon">⚙️</span>
+                        <span>Painel Admin</span>
+                    </button>
+                </nav>
             </div>
-            <nav class="nav-menu">
-                <button class="nav-item active" id="tabGenerateBtn">
-                    <span class="nav-icon">🔥</span>
-                    <span>Criar Mensagem</span>
-                </button>
-                <button class="nav-item" id="tabLibraryBtn">
-                    <span class="nav-icon">📚</span>
-                    <span>Sermões Salvos</span>
-                </button>
-                <button class="nav-item" id="tabMentoriaBtn">
-                    <span class="nav-icon">🤝</span>
-                    <span>Mentoria Histórica</span>
-                </button>
-                <button class="nav-item" id="tabBibliaBtn">
-                    <span class="nav-icon">📖</span>
-                    <span>Bíblia Nativa</span>
-                </button>
-                <button class="nav-item" id="tabAcademiaBtn">
-                    <span class="nav-icon">🎓</span>
-                    <span>Academia RPG</span>
-                </button>
-                <button class="nav-item" id="tabRecargaBtn">
-                    <span class="nav-icon">⚡</span>
-                    <span>Recarga de Raios</span>
-                </button>
-                <button class="nav-item hidden" id="tabAdminBtn">
-                    <span class="nav-icon">⚙️</span>
-                    <span>Painel Admin</span>
-                </button>
-            </nav>
             <div class="system-status-container">
                 <div class="status-indicator">
                     <span class="status-dot simulated" id="statusDot"></span>

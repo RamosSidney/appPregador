@@ -1003,6 +1003,7 @@ async function generateSermon() {
         elements.reelsCodeContent.textContent = reelsScript;
         
         // Switch to dedicated sermon reader view
+        elements.sermonOutputWrapper.classList.remove('hidden');
         switchPane('sermonReader');
         
         showToast("Mensagem gerada com sucesso! 🔥", "success");
@@ -1379,6 +1380,7 @@ function renderLibrary() {
             elements.insightDateVal.textContent = new Date(sermon.created_at).toLocaleDateString('pt-BR');
             
             elements.reelsCodeContent.textContent = extractReelsScript(sermon.conteudo_markdown);
+            elements.sermonOutputWrapper.classList.remove('hidden');
             switchPane('sermonReader');
         });
         
