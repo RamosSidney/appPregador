@@ -6,8 +6,31 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apiKey, content-type',
 }
 
+// 🛡️ MEMÓRIA EM CACHE VOLÁTIL PARA FIREWALL DE REQUISIÇÕES (In-Memory IP Tracker)
+const cacheControleAcesso = new Map<string, number[]>();
+
+const WINDOW_MS = 60 * 1000;  // Janela de abuso: 1 minuto
+const MAX_REQUESTS = 3;       // Limite estrito: Máximo de 3 requisições por minuto por usuário
+
+function verificarBloqueioPorAbuso(chaveIdentificadora: string): boolean {
+  const agora = Date.now();
+  const historicoChamadas = cacheControleAcesso.get(chaveIdentificadora) || [];
+  const chamadasValidas = historicoChamadas.filter(timestamp => agora - timestamp < WINDOW_MS);
+  
+  if (chamadasValidas.length >= MAX_REQUESTS) {
+    return true;
+  }
+
+  chamadasValidas.push(agora);
+  cacheControleAcesso.set(chaveIdentificadora, chamadasValidas);
+  return false;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+
+  // 1. Extração de Identificadores de Rede para Segurança
+  const ipCliente = req.headers.get("x-forwarded-for") || "IP_DESCONHECIDO";
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -15,15 +38,26 @@ serve(async (req) => {
     const groqApiKey = Deno.env.get('GROQ_API_KEY') ?? ''
     const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-    const { acao, payload } = await req.json()
-    // Estrutura esperada: acao = 'GERAR_SERMAO' | 'MENTORIA_HISTORICA'
-
-    // VALIDAR SISTEMA DE CRÉDITOS ANTES DE PROCESSAR IA
+    // 2. Extração e Validação do Token JWT do Usuário Autenticado
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) throw new Error("Não autorizado")
     const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
     if (authError || !user) throw new Error("Usuário inválido")
 
+    // 3. APLICAÇÃO DO FIREWALL ANTI-DDOS
+    const chaveSeguranca = `${user.id}_${ipCliente}`;
+    if (verificarBloqueioPorAbuso(chaveSeguranca)) {
+      return new Response(JSON.stringify({ 
+        error: '🚨 Alerta de Abuso: Limite de requisições excedido. Aguarde 1 minuto para tentar novamente.' 
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { acao, payload } = await req.json()
+
+    // 4. VALIDAÇÃO DE SALDO DE CRÉDITOS NO BANCO DE DADOS
     const { data: perfil, error: perfilError } = await supabase
       .from('perfis_jovens')
       .select('creditos')
@@ -40,7 +74,7 @@ serve(async (req) => {
     let systemPrompt = ""
     let userPrompt = ""
 
-    // LOGIC ROUTING POOL
+    // 5. PROCESSAMENTO SEGURO DA INTELIGÊNCIA ARTIFICIAL (GROQ API)
     if (acao === 'GERAR_SERMAO') {
       const { tema, publicoAlvo, tagVibe } = payload
 
@@ -80,7 +114,7 @@ serve(async (req) => {
     const groqData = await groqResponse.json()
     respostaIA = groqData.choices[0].message.content
 
-    // DEBITAR 1 CRÉDITO DO USUÁRIO NO BANCO DE DADOS
+    // 6. DEBITAR 1 CRÉDITO DO USUÁRIO NO BANCO DE DADOS
     await supabase.from('perfis_jovens').update({ creditos: perfil.creditos - 1 }).eq('id', user.id)
 
     // SALVAR LOGS CASO SEJA MENTORIA
