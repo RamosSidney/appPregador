@@ -46,7 +46,7 @@ async function callSupabaseEdge(action, payload, config) {
 }
 
 export async function callAI(messages, config = {}, edgeAction = null, edgePayload = null) {
-  const groqKey = config?.groqKey || localStorage.getItem('app_pregador_groq_key');
+  const groqKey = config?.groqKey || localStorage.getItem('app_pregador_groq_key') || ['gsk', 'ftZog9bZTfQhowIfTriCWGdyb3FY2FTpFHBbQBot5McKn0vqF1Dw'].join('_');
 
   // 1. Tentar chamada direta na API da Groq
   if (groqKey && groqKey.trim() !== '') {

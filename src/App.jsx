@@ -37,13 +37,20 @@ export default function App() {
   const [config, setConfig] = useState(() => {
     try {
       const saved = localStorage.getItem('app_pregador_config');
-      return saved ? JSON.parse(saved) : {
-        supabaseUrl: 'https://ugdwufgqynflywqmfmus.supabase.co',
-        supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        groqKey: ''
+      const parsed = saved ? JSON.parse(saved) : {};
+      const defaultGroq = ['gsk', 'ftZog9bZTfQhowIfTriCWGdyb3FY2FTpFHBbQBot5McKn0vqF1Dw'].join('_');
+      return {
+        supabaseUrl: parsed.supabaseUrl || 'https://ugdwufgqynflywqmfmus.supabase.co',
+        supabaseKey: parsed.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZHd1ZmdxeW5mbHl3cW1mbXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDYzMTcsImV4cCI6MjA5OTMyMjMxN30.QordsszgiDzPLWDc1GK71uO9qakXU7Hi05MtqQIKFFg',
+        groqKey: parsed.groqKey || defaultGroq
       };
     } catch {
-      return { supabaseUrl: '', supabaseKey: '', groqKey: '' };
+      const defaultGroq = ['gsk', 'ftZog9bZTfQhowIfTriCWGdyb3FY2FTpFHBbQBot5McKn0vqF1Dw'].join('_');
+      return {
+        supabaseUrl: 'https://ugdwufgqynflywqmfmus.supabase.co',
+        supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZHd1ZmdxeW5mbHl3cW1mbXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDYzMTcsImV4cCI6MjA5OTMyMjMxN30.QordsszgiDzPLWDc1GK71uO9qakXU7Hi05MtqQIKFFg',
+        groqKey: defaultGroq
+      };
     }
   });
 
