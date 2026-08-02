@@ -277,6 +277,7 @@ function initializeApp() {
     initConnection();
     updateCreditsUI();
     renderLibrary();
+    loadBibleDatabase();
 }
 
 // --- Config Management ---
@@ -866,7 +867,7 @@ function setupEventListeners() {
     elements.mentoriaForm.addEventListener('submit', submitMentorQuestion);
 
     // Bible readers dropdown listeners
-    elements.bibleBookSelect.addEventListener('change', loadBibleVerseList);
+    elements.bibleBookSelect.addEventListener('change', updateBibleChapters);
     elements.bibleChapterSelect.addEventListener('change', loadBibleVerseList);
 
     // Bible Floating Context Action listeners
@@ -2008,50 +2009,82 @@ function simulateMentorResponse(mentor, question) {
 // BÍBLIA NATIVA LOGIC
 // ==========================================================================
 
-const MOCK_BIBLE_VERSES = {
-    "Mateus": {
-        "1": [
-            { num: 1, text: "Livro da geração de Jesus Cristo, filho de Davi, filho de Abraão." },
-            { num: 18, text: "Ora, o nascimento de Jesus Cristo foi assim: Estando Maria, sua mãe, desposada com José, antes de se ajuntarem, achou-se ter concebido do Espírito Santo." },
-            { num: 21, text: "E dará à luz um filho e chamarás o seu nome JESUS; porque ele salvará o seu povo dos seus pecados." }
-        ]
-    },
-    "Mateus": {
-        "5": [
-            { num: 3, text: "Bem-aventurados os pobres de espírito, porque deles é o reino dos céus;" },
-            { num: 14, text: "Vós sois a luz do mundo; não se pode esconder uma cidade edificada sobre um monte;" },
-            { num: 16, text: "Assim resplandeça a vossa luz diante dos homens, para que vejam as vossas boas obras e glorifiquem a vosso Pai, que está nos céus." }
-        ]
-    },
-    "João": {
-        "1": [
-            { num: 1, text: "No princípio era o Verbo, e o Verbo estava com Deus, e o Verbo era Deus." },
-            { num: 2, text: "Ele estava no princípio com Deus." },
-            { num: 3, text: "Todas as coisas foram feitas por ele, e sem ele nada do que foi feito se fez." },
-            { num: 4, text: "Nele estava a vida, e a vida era a luz dos homens." },
-            { num: 5, text: "E a luz resplandece nas trevas, e as trevas não a compreenderam." },
-            { num: 12, text: "Mas, a todos quantos o receberam, deu-lhes o poder de serem feitos filhos de Deus, aos que creem no seu nome;" },
-            { num: 14, text: "E o Verbo se fez carne, e habitou entre nós, e vimos a sua glória, como a glória do unigênito do Pai, cheio de graça e de verdade." }
-        ],
-        "3": [
-            { num: 16, text: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna." },
-            { num: 17, text: "Porque Deus enviou o seu Filho ao mundo, não para que condenasse o mundo, mas para que o mundo fosse salvo por ele." }
-        ]
-    },
-    "Filipenses": {
-        "4": [
-            { num: 6, text: "Não andeis ansiosos por coisa alguma; antes em tudo as vossas petições sejam conhecidas diante de Deus pela oração e súplica, com ação de graças." },
-            { num: 7, text: "E a paz de Deus, que excede todo o entendimento, guardará os vossos corações e os vossos pensamentos em Cristo Jesus." },
-            { num: 13, text: "Posso todas as coisas naquele que me fortalece." }
-        ]
-    },
-    "Romanos": {
-        "12": [
-            { num: 1, text: "Rogo-vos, pois, irmãos, pela compaixão de Deus, que apresenteis os vossos corpos em sacrifício vivo, santo e agradável a Deus, que é o vosso culto racional." },
-            { num: 2, text: "E não sede conformados com este mundo, mas sede transformados pela renovação da vossa mente, para que experimenteis qual seja a boa, agradável, e perfeita vontade de Deus." }
-        ]
+let bibleDatabase = null;
+
+async function loadBibleDatabase() {
+    try {
+        const response = await fetch('nvi.json');
+        if (!response.ok) throw new Error("Erro ao carregar o arquivo nvi.json");
+        const rawText = await response.text();
+        const cleanText = rawText.trim().replace(/^\uFEFF/, '');
+        bibleDatabase = JSON.parse(cleanText);
+        console.log("Banco de dados da Bíblia NVI carregado com sucesso!");
+        
+        populateBibleBooks();
+    } catch (e) {
+        console.error("Falha ao carregar a bíblia NVI:", e);
+        showToast("Erro ao carregar banco de dados da Bíblia NVI. Usando fallback.", "error");
     }
-};
+}
+
+function populateBibleBooks() {
+    if (!bibleDatabase || !elements.bibleBookSelect) return;
+    
+    // Guard index to restore selection if possible
+    const currentVal = elements.bibleBookSelect.value;
+    
+    elements.bibleBookSelect.innerHTML = "";
+    
+    bibleDatabase.forEach(bookData => {
+        const option = document.createElement('option');
+        option.value = bookData.name;
+        option.textContent = bookData.name;
+        
+        if (bookData.name === "João") {
+            option.selected = true;
+        }
+        
+        elements.bibleBookSelect.appendChild(option);
+    });
+    
+    if (currentVal && bibleDatabase.some(b => b.name === currentVal)) {
+        elements.bibleBookSelect.value = currentVal;
+    }
+    
+    updateBibleChapters();
+}
+
+function updateBibleChapters() {
+    if (!bibleDatabase || !elements.bibleBookSelect || !elements.bibleChapterSelect) return;
+    
+    const selectedBookName = elements.bibleBookSelect.value;
+    const bookData = bibleDatabase.find(b => b.name === selectedBookName);
+    
+    // Guard index to restore selection
+    const currentVal = elements.bibleChapterSelect.value;
+    
+    elements.bibleChapterSelect.innerHTML = "";
+    
+    if (bookData && bookData.chapters) {
+        bookData.chapters.forEach((chapter, index) => {
+            const option = document.createElement('option');
+            const chNum = (index + 1).toString();
+            option.value = chNum;
+            option.textContent = chNum;
+            elements.bibleChapterSelect.appendChild(option);
+        });
+    }
+    
+    if (currentVal && bookData && bookData.chapters && parseInt(currentVal, 10) <= bookData.chapters.length) {
+        elements.bibleChapterSelect.value = currentVal;
+    } else {
+        if (elements.bibleChapterSelect.firstChild) {
+            elements.bibleChapterSelect.selectedIndex = 0;
+        }
+    }
+    
+    loadBibleVerseList();
+}
 
 function loadBibleVerseList() {
     const book = elements.bibleBookSelect.value;
@@ -2062,16 +2095,21 @@ function loadBibleVerseList() {
     elements.bibleFloatingMenu.classList.add('hidden');
     selectedBibleVerseId = null;
     
-    // Check local mock DB
     let verses = [];
-    if (MOCK_BIBLE_VERSES[book] && MOCK_BIBLE_VERSES[book][chapter]) {
-        verses = MOCK_BIBLE_VERSES[book][chapter];
-    } else {
-        // Fallback generator for other combinations
+    
+    if (bibleDatabase) {
+        const bookData = bibleDatabase.find(b => b.name === book);
+        const chapterIdx = parseInt(chapter, 10) - 1;
+        if (bookData && bookData.chapters && bookData.chapters[chapterIdx]) {
+            verses = bookData.chapters[chapterIdx].map((text, idx) => {
+                return { num: idx + 1, text: text };
+            });
+        }
+    }
+    
+    if (verses.length === 0) {
         verses = [
-            { num: 1, text: `Passagem demonstrativa de ${book} capítulo ${chapter}, versículo 1.` },
-            { num: 2, text: `E disse o Senhor: Guardai os vossos caminhos e buscai a sabedoria eternal.` },
-            { num: 3, text: `Aquele que perseverar herdará a coroa da vida e brilhará como as estrelas no firmamento.` }
+            { num: 1, text: `Passagem indisponível ou banco de dados da Bíblia NVI não carregado para ${book} ${chapter}.` }
         ];
     }
     
