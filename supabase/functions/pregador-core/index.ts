@@ -71,8 +71,7 @@ serve(async (req) => {
     }
 
     let respostaIA = ""
-    let systemPrompt = ""
-    let userPrompt = ""
+    let messagesArray: any[] = []
 
     // 5. PROCESSAMENTO SEGURO DA INTELIGÊNCIA ARTIFICIAL (GROQ API)
     if (acao === 'GERAR_SERMAO') {
@@ -83,8 +82,9 @@ serve(async (req) => {
         ? versiculos.map((v: any) => `- ${v.livro} ${v.capitulo}:${v.versiculo} -> "${v.texto}"`).join('\n')
         : "- Filipenses 4:6 -> 'Não andeis ansiosos...'"
 
-      systemPrompt = `Você é o 'Cérebro Conectado 2.0', um teólogo especialista em Gen Z/Alpha. Traduza conceitos bíblicos em analogias modernas (Glitches, Algoritmos, Modo Foco, Skins, Feed de Notícias) sem forçar gírias corporativas. Formate estritamente em Markdown contendo: # Título Viral, ## ⚡ O Gancho Cultural, ## 🎲 Quebra-Gelo Célula, ## 📖 O Download Bíblico, ## 🎬 Roteiro Reels/Shorts, ## 🏆 O Desafio Prático da Semana.`
-      userPrompt = `Gere um esboço disruptivo.\nTEMA: ${tema}\nVIBE: ${tagVibe}\nPÚBLICO: ${publicoAlvo}\nCONTEXTO BÍBLICO:\n${contextoBiblico}`
+      const systemPrompt = `Você é o 'Cérebro Conectado 2.0', um teólogo especialista em Gen Z/Alpha. Traduza conceitos bíblicos em analogias modernas (Glitches, Algoritmos, Modo Foco, Skins, Feed de Notícias) sem forçar gírias corporativas. Formate estritamente em Markdown contendo: # Título Viral, ## ⚡ O Gancho Cultural, ## 🎲 Quebra-Gelo Célula, ## 📖 O Download Bíblico, ## 🎬 Roteiro Reels/Shorts, ## 🏆 O Desafio Prático da Semana.`
+      const userPrompt = `Gere um esboço disruptivo.\nTEMA: ${tema}\nVIBE: ${tagVibe}\nPÚBLICO: ${publicoAlvo}\nCONTEXTO BÍBLICO:\n${contextoBiblico}`
+      messagesArray = [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
 
     } else if (acao === 'MENTORIA_HISTORICA') {
       const { mentor, pergunta } = payload;
@@ -111,17 +111,22 @@ serve(async (req) => {
       };
 
       // 3. Prompt do Sistema Blindado contra alucinações
-      systemPrompt = `${personas[mentor] || personas['C.S. Lewis']} 
+      const systemPrompt = `${personas[mentor] || personas['C.S. Lewis']} 
       DIRETRIZ OBRIGATÓRIA: Para formular sua resposta ao líder de adolescentes, você deve se basear prioritariamente nos fragmentos e citações das suas obras reais fornecidos no contexto abaixo. Se usar conhecimento externo do seu treinamento, garanta que ele seja 100% fiel à sua bibliografia histórica oficial. Nunca invente citações que você não escreveu. Limite-se a 3 ou 4 parágrafos diretos e pastorais.`;
 
       // 4. Prompt do Usuário amarrando a dúvida ao acervo
-      userPrompt = `CONTEXTO REAL DO SEU ACERVO BIBLIOGRÁFICO:
+      const userPrompt = `CONTEXTO REAL DO SEU ACERVO BIBLIOGRÁFICO:
       ${contextoLivrosReais}
       
       DÚVIDA DO LÍDER DE ADOLESCENTES ATUAL:
       "${pergunta}"
       
       Formule sua resposta direcionada a este líder. Se aplicável, cite em qual de suas obras ou linhas de pensamento esse conselho se fundamenta.`;
+
+      messagesArray = [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
+    } else if (acao === 'BIBLE_CHAT_REFINE') {
+      const { systemPrompt, historico } = payload;
+      messagesArray = [{ role: 'system', content: systemPrompt }, ...historico];
     }
 
     // DISPARO DO MOTOR DA GROQ (LLAMA 3.1 70B DE GRAÇA)
@@ -130,7 +135,7 @@ serve(async (req) => {
       headers: { 'Authorization': `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'llama-3.1-70b-versatile',
-        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+        messages: messagesArray,
         temperature: 0.7,
         max_tokens: 1500
       })

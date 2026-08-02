@@ -42,11 +42,81 @@
 </head>
 <body class="cyber-theme">
 
+    <!-- FULLSCREEN AUTH SCREEN -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-card">
+            <!-- Glowing ambient lights -->
+            <div class="auth-glow cyan"></div>
+            <div class="auth-glow purple"></div>
+            
+            <div class="auth-header">
+                <span class="auth-logo-icon">⚡</span>
+                <h2>appPregador <span class="auth-logo-v2">2.0</span></h2>
+                <p class="auth-subtitle">Geração Z & Alpha</p>
+            </div>
+            
+            <!-- Auth Form Selector Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="btnSwitchLogin">Entrar</button>
+                <button class="auth-tab-btn" id="btnSwitchRegister">Criar Conta</button>
+            </div>
+            
+            <!-- Login Form Pane -->
+            <form id="formLogin" class="auth-form">
+                <div class="input-group">
+                    <label for="loginEmail">E-mail de Acesso</label>
+                    <input type="email" id="loginEmail" placeholder="pastor@exemplo.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="loginPassword">Sua Senha</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-auth-submit" id="btnSubmitLogin">
+                    <span>Acessar Ecossistema ⚡</span>
+                </button>
+            </form>
+            
+            <!-- Register Form Pane (Hidden) -->
+            <form id="formRegister" class="auth-form hidden">
+                <div class="input-group">
+                    <label for="registerName">Nome Completo</label>
+                    <input type="text" id="registerName" placeholder="Ex: Pastor Tiago Santos" required>
+                </div>
+                <div class="input-group">
+                    <label for="registerUsername">Nome de Usuário (@)</label>
+                    <input type="text" id="registerUsername" placeholder="ex: pr_tiago" required>
+                </div>
+                <div class="input-group">
+                    <label for="registerEmail">E-mail</label>
+                    <input type="email" id="registerEmail" placeholder="pastor@exemplo.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="registerPassword">Senha (mínimo 6 caracteres)</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-auth-submit" id="btnSubmitRegister">
+                    <span>Criar Minha Conta 🛡️</span>
+                </button>
+            </form>
+            
+            <!-- Simulator / Guest Mode Bypass -->
+            <div class="auth-divider">
+                <span>ou</span>
+            </div>
+            <button class="btn btn-secondary btn-guest-bypass" id="btnGuestBypass">
+                <span>Entrar em Modo Simulação 📲</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Header / Navbar -->
-    <header class="app-header">
+    <header class="app-header hidden" id="appHeader">
         <div class="header-logo">
             <span class="logo-icon">⚡</span>
-            <h1>appPregador <span class="logo-v2">2.0</span></h1>
+            <div class="logo-text-group">
+                <h1>appPregador <span class="logo-v2">2.0</span></h1>
+                <p class="logo-subtitle">Geração Z & Alpha</p>
+            </div>
         </div>
         
         <!-- Gamified Battle Pass Credit Panel -->
@@ -66,8 +136,8 @@
                 </div>
                 <div class="xp-progress-container">
                     <div class="xp-progress-bar" id="xpProgressBar" style="width: 0%;"></div>
-                </div>
             </div>
+        </div>
         <!-- Mobile compact status badge (Gemini premium style) -->
         <div class="mobile-status-badge" id="mobileStatusBadge">
             <span class="mobile-credits" title="Raios de Energia IA">⚡ <span id="mobileCreditsCount">100</span></span>
@@ -85,7 +155,7 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="app-container">
+    <main class="app-container hidden" id="appContainer">
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="appSidebar">
@@ -407,33 +477,68 @@
                 <!-- Floating Context Menu for Text Selection / Verse click -->
                 <div class="bible-floating-menu hidden" id="bibleFloatingMenu">
                     <span class="selection-arrow"></span>
-                    <button class="floating-menu-btn btn-cyan" id="btnGenIcebreaker">
-                        <span>🎲 Gerar Quebra-Gelo</span>
-                    </button>
-                    <button class="floating-menu-btn btn-purple" id="btnTranslateGenZ">
-                        <span>💡 Traduzir Gen Z</span>
-                    </button>
+                    
+                    <!-- Color Picker Section -->
+                    <div class="floating-color-picker">
+                        <button class="color-dot dot-green" data-color="green" title="Destacar Verde"></button>
+                        <button class="color-dot dot-blue" data-color="blue" title="Destacar Azul"></button>
+                        <button class="color-dot dot-yellow" data-color="yellow" title="Destacar Amarelo"></button>
+                        <button class="color-dot dot-pink" data-color="pink" title="Destacar Rosa"></button>
+                        <button class="color-dot dot-clear" data-color="clear" title="Remover Destaque">❌</button>
+                    </div>
+                    
+                    <div class="floating-menu-divider"></div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="floating-menu-actions">
+                        <button class="floating-menu-action-btn" id="btnBibleCopy" title="Copiar Versículo">
+                            <span class="btn-icon">📋</span>
+                            <span class="btn-lbl">Copiar</span>
+                        </button>
+                        <button class="floating-menu-action-btn" id="btnBibleShare" title="Compartilhar Versículo">
+                            <span class="btn-icon">🔗</span>
+                            <span class="btn-lbl">Compartilhar</span>
+                        </button>
+                        <button class="floating-menu-action-btn btn-cyan" id="btnGenIcebreaker">
+                            <span class="btn-icon">🎲</span>
+                            <span class="btn-lbl">Quebra-Gelo</span>
+                        </button>
+                        <button class="floating-menu-action-btn btn-purple" id="btnTranslateGenZ">
+                            <span class="btn-icon">👾</span>
+                            <span class="btn-lbl">Traduzir Gen Z</span>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Bible Action Output Modal -->
-                <div class="modal-backdrop hidden" id="bibleActionModal">
-                    <div class="modal-card">
-                        <div class="modal-header">
-                            <h3 id="bibleModalTitle">🎲 Quebra-Gelo Gerado</h3>
-                            <button class="close-modal-btn" id="closeBibleModalBtn">&times;</button>
+                <!-- Bible Action Fullscreen Panel (Borda Infinita) -->
+                <div class="bible-action-panel hidden" id="bibleActionModal">
+                    <!-- Header -->
+                    <div class="bible-panel-header">
+                        <button class="panel-back-btn" id="closeBibleModalBtn">
+                            <span class="back-icon">←</span> Voltar para a Bíblia
+                        </button>
+                        <h3 id="bibleModalTitle">🎲 Quebra-Gelo Gerado</h3>
+                    </div>
+                    
+                    <!-- Chat View Area (Scrollable) -->
+                    <div class="bible-panel-body">
+                        <!-- Verse box quote -->
+                        <div class="bible-verse-quote-box" id="bibleModalVerseRef">
+                            <!-- selected verse text -->
                         </div>
-                        <div class="modal-body">
-                            <div class="verse-reference-card" id="bibleModalVerseRef">
-                                <strong>João 1:1</strong> - "No princípio era o Verbo..."
-                            </div>
-                            <div class="markdown-body mt-4" id="bibleModalContent">
-                                <!-- IA Response renders here -->
-                            </div>
+                        
+                        <!-- Chat Conversation History -->
+                        <div class="bible-chat-history" id="bibleChatHistory">
+                            <!-- AI response bubbles go here -->
                         </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" id="copyBibleModalContentBtn">📑 Copiar Conteúdo</button>
-                            <button class="btn btn-primary" id="closeBibleModalFooterBtn">Fechar</button>
-                        </div>
+                    </div>
+                    
+                    <!-- Refine Chat Input Bar -->
+                    <div class="bible-panel-chat-input-bar">
+                        <input type="text" id="bibleChatInput" placeholder="Peça mais detalhes, mude a vibe ou altere a resposta..." />
+                        <button class="btn btn-primary" id="btnBibleSendChat">
+                            <span>Enviar 🚀</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -869,48 +974,6 @@
 
                 <!-- TAB 2: SUPABASE AUTH -->
                 <div class="settings-pane" id="paneSettingsAuth">
-                    <!-- Logged Out State -->
-                    <div id="authLoggedOutState">
-                        <div class="auth-toggle-buttons">
-                            <button class="auth-toggle-btn active" id="toggleLoginBtn">Entrar</button>
-                            <button class="auth-toggle-btn" id="toggleRegisterBtn">Criar Conta</button>
-                        </div>
-
-                        <!-- Login Form -->
-                        <div class="auth-form" id="loginForm">
-                            <div class="input-group">
-                                <label for="authEmail">E-mail</label>
-                                <input type="email" id="authEmail" placeholder="lider@jovem.com">
-                            </div>
-                            <div class="input-group mt-2">
-                                <label for="authPassword">Senha</label>
-                                <input type="password" id="authPassword" placeholder="••••••••">
-                            </div>
-                            <button class="btn btn-primary mt-4" style="width:100%;" id="submitLoginBtn">Fazer Login</button>
-                        </div>
-
-                        <!-- Register Form -->
-                        <div class="auth-form hidden" id="registerForm">
-                            <div class="input-group">
-                                <label for="regFullName">Nome Completo</label>
-                                <input type="text" id="regFullName" placeholder="Gabriel Amorim">
-                            </div>
-                            <div class="input-group mt-2">
-                                <label for="regUsername">Username único</label>
-                                <input type="text" id="regUsername" placeholder="gabriel_prega">
-                            </div>
-                            <div class="input-group mt-2">
-                                <label for="regEmail">E-mail</label>
-                                <input type="email" id="regEmail" placeholder="lider@jovem.com">
-                            </div>
-                            <div class="input-group mt-2">
-                                <label for="regPassword">Senha (mín. 6 caracteres)</label>
-                                <input type="password" id="regPassword" placeholder="••••••••">
-                            </div>
-                            <button class="btn btn-primary mt-4" style="width:100%;" id="submitRegisterBtn">Cadastrar e Iniciar ⚡</button>
-                        </div>
-                    </div>
-
                     <!-- Logged In State -->
                     <div class="auth-logged-in-state hidden" id="authLoggedInState">
                         <div class="user-profile-summary">
@@ -922,6 +985,11 @@
                             </div>
                         </div>
                         <button class="btn btn-secondary mt-4" style="width:100%; border-color: var(--color-neon-pink); color: var(--color-neon-pink);" id="submitLogoutBtn">Sair da Conta (Logout)</button>
+                    </div>
+                    <!-- Logged Out / Simulation State -->
+                    <div class="auth-logged-out-state" id="authSettingsLoggedOutState">
+                        <p class="text-center text-muted mb-4" style="text-align: center; color: var(--color-text-dim); margin-bottom: 1.5rem;">Você está navegando no <strong>Modo Simulação local</strong>.</p>
+                        <button class="btn btn-primary" style="width:100%;" id="btnSettingsOpenAuth">Fazer Login / Criar Conta ⚡</button>
                     </div>
                 </div>
 

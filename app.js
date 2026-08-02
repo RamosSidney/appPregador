@@ -40,6 +40,21 @@ let selectedBibleVerseId = null;
 let selectedBibleText = "";
 let selectedBibleRef = "";
 
+let bibleHighlights = {};
+try {
+    const saved = localStorage.getItem('app_pregador_bible_highlights');
+    if (saved) bibleHighlights = JSON.parse(saved);
+} catch (e) {
+    bibleHighlights = {};
+}
+
+let bibleChatSession = {
+    actionType: '', // 'quebra-gelo' or 'traducao'
+    verseRef: '',
+    verseText: '',
+    messages: [] // [{role: 'user'|'assistant', content: string}]
+};
+
 // --- Recharge State ---
 let selectedRechargePackage = 'premium_anual';
 let selectedPaymentMethod = 'pix';
@@ -90,20 +105,27 @@ function initDOMElements() {
         paneSettingsApi: document.getElementById('paneSettingsApi'),
         paneSettingsAuth: document.getElementById('paneSettingsAuth'),
 
-        // Settings Auth Forms
-        toggleLoginBtn: document.getElementById('toggleLoginBtn'),
-        toggleRegisterBtn: document.getElementById('toggleRegisterBtn'),
-        loginForm: document.getElementById('loginForm'),
-        registerForm: document.getElementById('registerForm'),
-        authEmail: document.getElementById('authEmail'),
-        authPassword: document.getElementById('authPassword'),
-        submitLoginBtn: document.getElementById('submitLoginBtn'),
-        regFullName: document.getElementById('regFullName'),
-        regUsername: document.getElementById('regUsername'),
-        regEmail: document.getElementById('regEmail'),
-        regPassword: document.getElementById('regPassword'),
-        submitRegisterBtn: document.getElementById('submitRegisterBtn'),
-        authLoggedOutState: document.getElementById('authLoggedOutState'),
+        // Fullscreen Login Screen
+        authScreen: document.getElementById('authScreen'),
+        appHeader: document.getElementById('appHeader'),
+        appContainer: document.getElementById('appContainer'),
+        btnSwitchLogin: document.getElementById('btnSwitchLogin'),
+        btnSwitchRegister: document.getElementById('btnSwitchRegister'),
+        formLogin: document.getElementById('formLogin'),
+        formRegister: document.getElementById('formRegister'),
+        btnGuestBypass: document.getElementById('btnGuestBypass'),
+        loginEmail: document.getElementById('loginEmail'),
+        loginPassword: document.getElementById('loginPassword'),
+        registerName: document.getElementById('registerName'),
+        registerUsername: document.getElementById('registerUsername'),
+        registerEmail: document.getElementById('registerEmail'),
+        registerPassword: document.getElementById('registerPassword'),
+        btnSubmitLogin: document.getElementById('btnSubmitLogin'),
+        btnSubmitRegister: document.getElementById('btnSubmitRegister'),
+        btnSettingsOpenAuth: document.getElementById('btnSettingsOpenAuth'),
+
+        // Settings Account State
+        authSettingsLoggedOutState: document.getElementById('authSettingsLoggedOutState'),
         authLoggedInState: document.getElementById('authLoggedInState'),
         userProfileAvatar: document.getElementById('userProfileAvatar'),
         userProfileName: document.getElementById('userProfileName'),
@@ -170,13 +192,15 @@ function initDOMElements() {
         bibleFloatingMenu: document.getElementById('bibleFloatingMenu'),
         btnGenIcebreaker: document.getElementById('btnGenIcebreaker'),
         btnTranslateGenZ: document.getElementById('btnTranslateGenZ'),
+        btnBibleCopy: document.getElementById('btnBibleCopy'),
+        btnBibleShare: document.getElementById('btnBibleShare'),
         bibleActionModal: document.getElementById('bibleActionModal'),
         bibleModalTitle: document.getElementById('bibleModalTitle'),
         bibleModalVerseRef: document.getElementById('bibleModalVerseRef'),
-        bibleModalContent: document.getElementById('bibleModalContent'),
+        bibleChatHistory: document.getElementById('bibleChatHistory'),
+        bibleChatInput: document.getElementById('bibleChatInput'),
+        btnBibleSendChat: document.getElementById('btnBibleSendChat'),
         closeBibleModalBtn: document.getElementById('closeBibleModalBtn'),
-        copyBibleModalContentBtn: document.getElementById('copyBibleModalContentBtn'),
-        closeBibleModalFooterBtn: document.getElementById('closeBibleModalFooterBtn'),
 
         // Academy RPG DOM Elements
         academyLevelVal: document.getElementById('academyLevelVal'),
@@ -344,17 +368,21 @@ async function initConnection() {
 
             if (session) {
                 await loadUserProfile(session.user.id);
+                hideAuthScreen();
             } else {
                 userProfile = null;
                 showLoggedOutUI();
+                showAuthScreen();
             }
         } catch (err) {
             console.error("Erro de conexão com o Supabase:", err);
             showToast("Falha de conexão com o Supabase. Modo Simulação ativo.", "error");
             activateSimulationMode();
+            showAuthScreen();
         }
     } else {
         activateSimulationMode();
+        showAuthScreen();
     }
     
     // Sync library after state change
@@ -468,8 +496,8 @@ async function loadUserProfile(userId) {
 }
 
 function showLoggedInUI(profile) {
-    elements.authLoggedOutState.classList.add('hidden');
-    elements.authLoggedInState.classList.remove('hidden');
+    if (elements.authSettingsLoggedOutState) elements.authSettingsLoggedOutState.classList.add('hidden');
+    if (elements.authLoggedInState) elements.authLoggedInState.classList.remove('hidden');
     
     elements.userProfileName.textContent = profile.nome_completo;
     elements.userProfileUsername.textContent = `@${profile.username}`;
@@ -511,8 +539,8 @@ function showLoggedInUI(profile) {
 }
 
 function showLoggedOutUI() {
-    elements.authLoggedOutState.classList.remove('hidden');
-    elements.authLoggedInState.classList.add('hidden');
+    if (elements.authSettingsLoggedOutState) elements.authSettingsLoggedOutState.classList.remove('hidden');
+    if (elements.authLoggedInState) elements.authLoggedInState.classList.add('hidden');
     
     // Hide Admin tab when logged out
     elements.tabAdminBtn.classList.add('hidden');
@@ -523,16 +551,17 @@ function showLoggedOutUI() {
 
 // Auth Subscriptions/Triggers
 async function handleLogin() {
-    const email = elements.authEmail.value.trim();
-    const password = elements.authPassword.value;
+    const email = elements.loginEmail.value.trim();
+    const password = elements.loginPassword.value;
     
     if (!email || !password) {
         showToast("Preencha todos os campos!", "error");
         return;
     }
     
-    elements.submitLoginBtn.disabled = true;
-    elements.submitLoginBtn.textContent = "Autenticando...";
+    elements.btnSubmitLogin.disabled = true;
+    const originalText = elements.btnSubmitLogin.innerHTML;
+    elements.btnSubmitLogin.innerHTML = "<span>Autenticando...</span>";
     
     try {
         const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -541,20 +570,22 @@ async function handleLogin() {
         if (data.session) {
             await loadUserProfile(data.session.user.id);
             syncSermons();
+            hideAuthScreen();
+            showToast("Acesso autorizado!", "success");
         }
     } catch (err) {
         showToast(err.message, "error");
     } finally {
-        elements.submitLoginBtn.disabled = false;
-        elements.submitLoginBtn.textContent = "Fazer Login";
+        elements.btnSubmitLogin.disabled = false;
+        elements.btnSubmitLogin.innerHTML = originalText;
     }
 }
 
 async function handleRegister() {
-    const fullName = elements.regFullName.value.trim();
-    const username = elements.regUsername.value.trim();
-    const email = elements.regEmail.value.trim();
-    const password = elements.regPassword.value;
+    const fullName = elements.registerName.value.trim();
+    const username = elements.registerUsername.value.trim();
+    const email = elements.registerEmail.value.trim();
+    const password = elements.registerPassword.value;
     
     if (!fullName || !username || !email || !password) {
         showToast("Preencha todos os campos obrigatórios!", "error");
@@ -566,8 +597,9 @@ async function handleRegister() {
         return;
     }
     
-    elements.submitRegisterBtn.disabled = true;
-    elements.submitRegisterBtn.textContent = "Criando Conta...";
+    elements.btnSubmitRegister.disabled = true;
+    const originalText = elements.btnSubmitRegister.innerHTML;
+    elements.btnSubmitRegister.innerHTML = "<span>Criando Conta...</span>";
     
     try {
         // 1. Sign up user
@@ -595,28 +627,38 @@ async function handleRegister() {
             showToast("Cadastro concluído com sucesso!", "success");
             await loadUserProfile(data.user.id);
             syncSermons();
+            hideAuthScreen();
         }
     } catch (err) {
         showToast(err.message, "error");
     } finally {
-        elements.submitRegisterBtn.disabled = false;
-        elements.submitRegisterBtn.textContent = "Cadastrar e Iniciar ⚡";
+        elements.btnSubmitRegister.disabled = false;
+        elements.btnSubmitRegister.innerHTML = originalText;
     }
 }
 
 async function handleLogout() {
     try {
-        const { error } = await supabaseClient.auth.signOut();
-        if (error) throw error;
+        if (supabaseClient) {
+            const { error } = await supabaseClient.auth.signOut();
+            if (error) throw error;
+        }
         
         userProfile = null;
         showLoggedOutUI();
         updateCreditsUI();
         syncSermons();
+        showAuthScreen();
         showToast("Logout efetuado!", "success");
     } catch (err) {
         showToast(err.message, "error");
     }
+}
+
+function handleGuestBypass() {
+    activateSimulationMode();
+    hideAuthScreen();
+    showToast("Entrando em Modo Simulação Local! Seus dados serão mantidos no navegador.", "success");
 }
 
 // --- Credits System & Animations ---
@@ -734,11 +776,16 @@ function setupEventListeners() {
     elements.tabSettingsApiBtn.addEventListener('click', () => switchSettingsModalTab('api'));
     elements.tabSettingsAuthBtn.addEventListener('click', () => switchSettingsModalTab('auth'));
     
-    // Auth Modal form toggles
-    elements.toggleLoginBtn.addEventListener('click', () => toggleAuthForm('login'));
-    elements.toggleRegisterBtn.addEventListener('click', () => toggleAuthForm('register'));
-    elements.submitLoginBtn.addEventListener('click', handleLogin);
-    elements.submitRegisterBtn.addEventListener('click', handleRegister);
+    // Fullscreen Auth Screen Listeners
+    elements.btnSwitchLogin.addEventListener('click', () => switchAuthTab('login'));
+    elements.btnSwitchRegister.addEventListener('click', () => switchAuthTab('register'));
+    elements.formLogin.addEventListener('submit', (e) => { e.preventDefault(); handleLogin(); });
+    elements.formRegister.addEventListener('submit', (e) => { e.preventDefault(); handleRegister(); });
+    elements.btnGuestBypass.addEventListener('click', handleGuestBypass);
+    elements.btnSettingsOpenAuth.addEventListener('click', () => {
+        closeSettingsModal();
+        showAuthScreen();
+    });
     elements.submitLogoutBtn.addEventListener('click', handleLogout);
     
     // Vibe Chips (Mutually select & limit selection to 2 pain, 2 pop tags)
@@ -825,9 +872,28 @@ function setupEventListeners() {
     // Bible Floating Context Action listeners
     elements.btnGenIcebreaker.addEventListener('click', () => triggerBibleAction('quebra-gelo'));
     elements.btnTranslateGenZ.addEventListener('click', () => triggerBibleAction('traducao'));
-    elements.closeBibleModalBtn.addEventListener('click', () => elements.bibleActionModal.classList.add('hidden'));
-    elements.closeBibleModalFooterBtn.addEventListener('click', () => elements.bibleActionModal.classList.add('hidden'));
-    elements.copyBibleModalContentBtn.addEventListener('click', copyBibleModalContent);
+    elements.btnBibleCopy.addEventListener('click', copySelectedVerse);
+    elements.btnBibleShare.addEventListener('click', shareSelectedVerse);
+    elements.btnBibleSendChat.addEventListener('click', submitBibleChatRefine);
+    elements.bibleChatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitBibleChatRefine();
+        }
+    });
+    elements.closeBibleModalBtn.addEventListener('click', () => {
+        elements.bibleActionModal.classList.add('hidden');
+    });
+    
+    // Bible color dots highlighting
+    const colorDots = elements.bibleFloatingMenu.querySelectorAll('.color-dot');
+    colorDots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            const color = dot.dataset.color;
+            applyHighlight(color);
+            elements.bibleFloatingMenu.classList.add('hidden');
+        });
+    });
 
     // Academy RPG listeners
     elements.closeLessonModalBtn.addEventListener('click', () => elements.lessonReaderModal.classList.add('hidden'));
@@ -993,19 +1059,31 @@ function switchSettingsModalTab(tab) {
     }
 }
 
-function toggleAuthForm(mode) {
-    elements.toggleLoginBtn.classList.remove('active');
-    elements.toggleRegisterBtn.classList.remove('active');
-    elements.loginForm.classList.add('hidden');
-    elements.registerForm.classList.add('hidden');
+function switchAuthTab(mode) {
+    elements.btnSwitchLogin.classList.remove('active');
+    elements.btnSwitchRegister.classList.remove('active');
+    elements.formLogin.classList.add('hidden');
+    elements.formRegister.classList.add('hidden');
     
     if (mode === 'login') {
-        elements.toggleLoginBtn.classList.add('active');
-        elements.loginForm.classList.remove('hidden');
+        elements.btnSwitchLogin.classList.add('active');
+        elements.formLogin.classList.remove('hidden');
     } else {
-        elements.toggleRegisterBtn.classList.add('active');
-        elements.registerForm.classList.remove('hidden');
+        elements.btnSwitchRegister.classList.add('active');
+        elements.formRegister.classList.remove('hidden');
     }
+}
+
+function showAuthScreen() {
+    if (elements.authScreen) elements.authScreen.classList.remove('hidden');
+    if (elements.appHeader) elements.appHeader.classList.add('hidden');
+    if (elements.appContainer) elements.appContainer.classList.add('hidden');
+}
+
+function hideAuthScreen() {
+    if (elements.authScreen) elements.authScreen.classList.add('hidden');
+    if (elements.appHeader) elements.appHeader.classList.remove('hidden');
+    if (elements.appContainer) elements.appContainer.classList.remove('hidden');
 }
 
 // --- Sermon Generator Logic (Groq API vs Dynamic Simulation) ---
@@ -1999,10 +2077,16 @@ function loadBibleVerseList() {
     
     verses.forEach(v => {
         const row = document.createElement('div');
+        const ref = `${book} ${chapter}:${v.num}`;
+        
         row.className = "bible-verse-row";
+        if (bibleHighlights[ref]) {
+            row.classList.add(`highlight-${bibleHighlights[ref]}`);
+        }
+        
         row.dataset.verseNum = v.num;
         row.dataset.verseText = v.text;
-        row.dataset.verseRef = `${book} ${chapter}:${v.num}`;
+        row.dataset.verseRef = ref;
         
         row.innerHTML = `
             <span class="bible-verse-num">${v.num}</span>
@@ -2047,25 +2131,149 @@ document.addEventListener('click', (e) => {
     }
 });
 
-async function triggerBibleAction(actionType) {
-    if (!selectedBibleVerseId) return;
+function applyHighlight(color) {
+    if (!selectedBibleRef) {
+        showToast("Selecione um versículo primeiro!", "warning");
+        return;
+    }
     
-    elements.bibleFloatingMenu.classList.add('hidden');
+    // Find row in DOM
+    const row = elements.bibleVersesList.querySelector(`.bible-verse-row[data-verse-ref="${selectedBibleRef}"]`);
+    if (!row) return;
     
-    // Set titles
-    const modalTitle = actionType === 'quebra-gelo' ? "🎲 Quebra-Gelo Gerado" : "💡 Tradução Gen Z / Alpha";
-    elements.bibleModalTitle.textContent = modalTitle;
-    elements.bibleModalVerseRef.innerHTML = `<strong>${selectedBibleRef}</strong> - "${selectedBibleText}"`;
+    // Remove previous highlight colors
+    row.classList.remove('highlight-green', 'highlight-blue', 'highlight-yellow', 'highlight-pink');
     
-    // Show Modal
-    elements.bibleActionModal.classList.remove('hidden');
-    elements.bibleModalContent.innerHTML = `<div class="mentor-loading-indicator"><span class="spinner">⏳</span> Processando sabedoria teológica para jovens...</div>`;
+    if (color === 'clear') {
+        delete bibleHighlights[selectedBibleRef];
+        showToast("Destaque removido!", "success");
+    } else {
+        row.classList.add(`highlight-${color}`);
+        bibleHighlights[selectedBibleRef] = color;
+        showToast("Versículo destacado!", "success");
+    }
     
+    localStorage.setItem('app_pregador_bible_highlights', JSON.stringify(bibleHighlights));
+}
+
+function copySelectedVerse() {
+    if (!selectedBibleRef || !selectedBibleText) {
+        showToast("Selecione um versículo primeiro!", "warning");
+        return;
+    }
+    const textToCopy = `"${selectedBibleText}" (${selectedBibleRef})`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        showToast("Versículo copiado! 📋", "success");
+    }).catch(err => {
+        console.error(err);
+        showToast("Erro ao copiar versículo.", "error");
+    });
+}
+
+function shareSelectedVerse() {
+    if (!selectedBibleRef || !selectedBibleText) {
+        showToast("Selecione um versículo primeiro!", "warning");
+        return;
+    }
+    const shareText = `*Lente Bíblica appPregador 2.0* ⚡\n\n"${selectedBibleText}"\n(_${selectedBibleRef}_)`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'appPregador 2.0',
+            text: shareText
+        }).catch(err => {
+            console.log("Compartilhamento cancelado ou falhou", err);
+        });
+    } else {
+        // Fallback to copying share link/text
+        navigator.clipboard.writeText(shareText).then(() => {
+            showToast("Mensagem de compartilhamento copiada! Envie no WhatsApp ou redes 📲", "success");
+        }).catch(() => {
+            showToast("Erro ao compartilhar.", "error");
+        });
+    }
+}
+
+async function fetchDirectGroqBibleChat(systemPrompt, history) {
+    const messages = [{ role: 'system', content: systemPrompt }, ...history];
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${config.groqKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: "llama-3.1-8b-instant",
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 1200
+        })
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || `Erro HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+}
+
+function renderBibleChatHistory() {
+    elements.bibleChatHistory.innerHTML = "";
+    
+    bibleChatSession.messages.forEach((msg, index) => {
+        // Skip the very first user message which is just the verse reference context setup
+        if (index === 0 && msg.role === 'user') return;
+        
+        const bubble = document.createElement('div');
+        bubble.className = `bible-chat-bubble ${msg.role === 'assistant' ? 'ai' : 'user'}`;
+        
+        const author = msg.role === 'assistant' ? 'Teólogo IA' : 'Você';
+        bubble.innerHTML = `
+            <div class="bubble-meta">${author}</div>
+            <div class="bubble-text">${marked.parse(msg.content)}</div>
+        `;
+        
+        elements.bibleChatHistory.appendChild(bubble);
+    });
+    
+    // Scroll to bottom
+    elements.bibleActionModal.querySelector('.bible-panel-body').scrollTop = 
+        elements.bibleActionModal.querySelector('.bible-panel-body').scrollHeight;
+}
+
+async function submitBibleChatRefine() {
+    const text = elements.bibleChatInput.value.trim();
+    if (!text) return;
+    
+    elements.bibleChatInput.value = "";
+    
+    // Append user message
+    bibleChatSession.messages.push({ role: 'user', content: text });
+    renderBibleChatHistory();
+    
+    // Append loading bubble
+    const loadingBubble = document.createElement('div');
+    loadingBubble.className = "bible-chat-bubble ai";
+    loadingBubble.id = "bibleActionRefineLoading";
+    loadingBubble.innerHTML = `
+        <div class="bubble-meta">Teólogo IA</div>
+        <div class="bubble-text">
+            <span class="spinner">⏳</span> Analisando seu feedback...
+        </div>
+    `;
+    elements.bibleChatHistory.appendChild(loadingBubble);
+    
+    // Scroll to bottom
+    elements.bibleActionModal.querySelector('.bible-panel-body').scrollTop = 
+        elements.bibleActionModal.querySelector('.bible-panel-body').scrollHeight;
+        
     // Check credits
     const creditsLeft = supabaseClient && userProfile ? userProfile.creditos : simulatedCredits;
     if (creditsLeft <= 0) {
         showToast("Raios esgotados!", "error");
-        elements.bibleModalContent.innerHTML = "⚠️ Raios insuficientes para processamento de IA. Por favor, resete ou carregue mais créditos.";
+        loadingBubble.innerHTML = `⚠️ Raios insuficientes para processamento de IA. Por favor, resete ou adquira mais no painel.`;
         return;
     }
     
@@ -2075,12 +2283,20 @@ async function triggerBibleAction(actionType) {
         
         let promptResult = "";
         
-        if (config.supabaseUrl && config.groqKey) {
-            // Real fetch via Edge Function Deno Endpoint
-            const edgeUrl = `${config.supabaseUrl}/functions/v1/pregador-core`;
-            const token = supabaseClient?.auth?.session()?.access_token || localStorage.getItem('supabase_token') || '';
+        const systemPrompt = bibleChatSession.actionType === 'quebra-gelo' 
+            ? `Você é um líder de jovens super criativo e teologicamente sólido. Crie dinâmicas de quebra-gelo (células) baseadas no versículo. Linguagem moderna Gen Z/Alpha, mas natural, autêntica e sem forçar gírias excessivas.`
+            : `Você é um tradutor especialista em linguagem da Geração Z e Alpha, explicando de forma autêntica e natural o versículo, usando analogias do cotidiano digital de forma orgânica, sem parecer forçado.`;
             
-            const payloadAction = actionType === 'quebra-gelo' ? 'GERAR_SERMAO' : 'MENTORIA_HISTORICA';
+        if (config.supabaseUrl && supabaseClient && userProfile) {
+            const edgeUrl = `${config.supabaseUrl}/functions/v1/pregador-core`;
+            let token = '';
+            if (supabaseClient.auth.session) {
+                token = supabaseClient.auth.session()?.access_token || '';
+            } else if (supabaseClient.auth.getSession) {
+                const { data } = await supabaseClient.auth.getSession();
+                token = data?.session?.access_token || '';
+            }
+            if (!token) token = localStorage.getItem('supabase_token') || '';
             
             const response = await fetch(edgeUrl, {
                 method: 'POST',
@@ -2089,28 +2305,131 @@ async function triggerBibleAction(actionType) {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    acao: 'GERAR_SERMAO', // Polymorphic call tailored for Bible lens
+                    acao: 'BIBLE_CHAT_REFINE',
                     payload: {
-                        tema: `${actionType === 'quebra-gelo' ? 'Quebra-gelo para' : 'Explique em linguagem jovem o versiculo'} ${selectedBibleRef}`,
-                        publicoAlvo: "Gen Z (13-18 anos)",
-                        tagVibe: "Conexão Real"
+                        systemPrompt: systemPrompt,
+                        historico: bibleChatSession.messages
                     }
                 })
             });
             const data = await response.json();
             if (data.error) throw new Error(data.error);
             promptResult = data.resultado;
+        } else if (config.groqKey) {
+            promptResult = await fetchDirectGroqBibleChat(systemPrompt, bibleChatSession.messages);
         } else {
-            // Local mockup generator
+            promptResult = `[Modo Simulação] Entendi sua solicitação sobre "${text}". Aqui está um detalhamento com linguagem Gen Z natural: "É basicamente o que explicamos antes, mas focado na consistência do seu testemunho digital. Sem lag mental."`;
+        }
+        
+        // Remove loading bubble
+        loadingBubble.remove();
+        
+        // Save assistant response
+        bibleChatSession.messages.push({ role: 'assistant', content: promptResult });
+        renderBibleChatHistory();
+        
+    } catch (e) {
+        console.error(e);
+        loadingBubble.innerHTML = `⚠️ Ocorreu um erro ao processar sua solicitação: ${e.message}`;
+    }
+}
+
+async function triggerBibleAction(actionType) {
+    if (!selectedBibleVerseId) return;
+    
+    elements.bibleFloatingMenu.classList.add('hidden');
+    
+    // Set titles
+    const panelTitle = actionType === 'quebra-gelo' ? "🎲 Quebra-Gelo Gerado" : "💡 Tradução Gen Z / Alpha";
+    elements.bibleModalTitle.textContent = panelTitle;
+    elements.bibleModalVerseRef.innerHTML = `<strong>${selectedBibleRef}</strong> - "${selectedBibleText}"`;
+    
+    // Initialize session
+    bibleChatSession.actionType = actionType;
+    bibleChatSession.verseRef = selectedBibleRef;
+    bibleChatSession.verseText = selectedBibleText;
+    bibleChatSession.messages = [];
+    
+    // Show Modal (Full-screen panel)
+    elements.bibleActionModal.classList.remove('hidden');
+    
+    // Clear chat input & history
+    elements.bibleChatInput.value = "";
+    elements.bibleChatHistory.innerHTML = `
+        <div class="bible-chat-bubble ai" id="bibleActionLoadingBubble">
+            <div class="bubble-meta">Teólogo IA</div>
+            <div class="bubble-text">
+                <span class="spinner">⏳</span> Processando sabedoria teológica para jovens...
+            </div>
+        </div>
+    `;
+    
+    // Check credits
+    const creditsLeft = supabaseClient && userProfile ? userProfile.creditos : simulatedCredits;
+    if (creditsLeft <= 0) {
+        showToast("Raios esgotados!", "error");
+        const loading = document.getElementById('bibleActionLoadingBubble');
+        if (loading) loading.innerHTML = `⚠️ Raios insuficientes para processamento de IA. Por favor, resete ou adquira mais no painel.`;
+        return;
+    }
+    
+    try {
+        const success = await deductCredit();
+        if (!success) throw new Error("Erro de processamento de créditos.");
+        
+        let promptResult = "";
+        
+        const systemPrompt = actionType === 'quebra-gelo' 
+            ? `Você é um líder de jovens super criativo e teologicamente sólido. Crie dinâmicas de quebra-gelo (células) baseadas no versículo. Linguagem moderna Gen Z/Alpha, mas natural, autêntica e sem forçar gírias excessivas.`
+            : `Você é um tradutor especialista em linguagem da Geração Z e Alpha, explicando de forma autêntica e natural o versículo, usando analogias do cotidiano digital de forma orgânica, sem parecer forçado.`;
+        
+        const userPrompt = `Versículo: ${selectedBibleRef} -> "${selectedBibleText}"`;
+        
+        if (config.supabaseUrl && supabaseClient && userProfile) {
+            const edgeUrl = `${config.supabaseUrl}/functions/v1/pregador-core`;
+            let token = '';
+            if (supabaseClient.auth.session) {
+                token = supabaseClient.auth.session()?.access_token || '';
+            } else if (supabaseClient.auth.getSession) {
+                const { data } = await supabaseClient.auth.getSession();
+                token = data?.session?.access_token || '';
+            }
+            if (!token) token = localStorage.getItem('supabase_token') || '';
+            
+            const response = await fetch(edgeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    acao: 'BIBLE_CHAT_REFINE',
+                    payload: {
+                        systemPrompt: systemPrompt,
+                        historico: [{ role: 'user', content: userPrompt }]
+                    }
+                })
+            });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            promptResult = data.resultado;
+        } else if (config.groqKey) {
+            promptResult = await fetchDirectGroqBibleChat(systemPrompt, [{ role: 'user', content: userPrompt }]);
+        } else {
             promptResult = await simulateBibleAction(actionType, selectedBibleRef, selectedBibleText);
         }
         
-        elements.bibleModalContent.innerHTML = marked.parse(promptResult);
+        bibleChatSession.messages.push({ role: 'user', content: userPrompt });
+        bibleChatSession.messages.push({ role: 'assistant', content: promptResult });
+        
+        renderBibleChatHistory();
         showToast("Sucesso no Processamento de Lente Bíblica! ⚡", "success");
     } catch (err) {
         console.error(err);
         const fallback = await simulateBibleAction(actionType, selectedBibleRef, selectedBibleText);
-        elements.bibleModalContent.innerHTML = marked.parse(fallback);
+        bibleChatSession.messages.push({ role: 'user', content: `Versículo: ${selectedBibleRef}` });
+        bibleChatSession.messages.push({ role: 'assistant', content: fallback });
+        renderBibleChatHistory();
     }
 }
 
@@ -2139,15 +2458,6 @@ function simulateBibleAction(actionType, verseRef, verseText) {
             }
             resolve(md);
         }, 1500);
-    });
-}
-
-function copyBibleModalContent() {
-    const text = elements.bibleModalContent.textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        showToast("Conteúdo da Bíblia copiado para área de transferência! 🔥", "success");
-    }).catch(() => {
-        showToast("Erro ao copiar.", "error");
     });
 }
 
