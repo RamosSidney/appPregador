@@ -431,8 +431,8 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       {/* Fullscreen Refinement Chat Panel (Borda Infinita) */}
       <AnimatePresence>
         {isPanelOpen && (
-          <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900/40">
+          <div className="fixed inset-0 z-[100] bg-slate-950/98 backdrop-blur-2xl flex flex-col h-screen w-screen overflow-hidden">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-white/10 bg-slate-900/90 shrink-0">
               <button
                 onClick={() => setIsPanelOpen(false)}
                 className="flex items-center gap-2 text-cyan-400 hover:text-white text-sm font-bold"
@@ -442,9 +442,10 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               <h3 className="text-base font-extrabold text-white">{panelTitle}</h3>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 max-w-3xl w-full mx-auto space-y-4">
-              <div className="p-4 rounded-xl bg-slate-900/60 border-l-4 border-l-purple-500 border border-white/5 text-xs text-slate-400 leading-relaxed">
-                <strong>{selectedVerseRef}</strong> — "{selectedVerseText}"
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-3xl w-full mx-auto space-y-4 pb-28">
+              <div className="p-4 rounded-xl bg-slate-900/80 border-l-4 border-l-purple-500 border border-white/10 text-xs sm:text-sm text-slate-300 leading-relaxed shadow-lg">
+                <strong className="font-extrabold text-purple-400 block mb-1">{selectedVerseRef}</strong>
+                "{selectedVerseText}"
               </div>
 
               {chatMessages.map((msg, index) => {
@@ -455,10 +456,10 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[85%] p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+                      className={`max-w-[90%] sm:max-w-[85%] p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                         msg.role === 'user'
-                          ? 'bg-purple-600 text-white rounded-br-none shadow-lg'
-                          : 'bg-slate-900 border border-white/10 text-slate-200 rounded-bl-none'
+                          ? 'bg-purple-600 text-white rounded-br-none shadow-lg shadow-purple-950/40'
+                          : 'bg-slate-900 border border-white/10 text-slate-200 rounded-bl-none shadow-md'
                       }`}
                     >
                       <div className="font-extrabold text-[10px] uppercase tracking-wider mb-1 text-cyan-400">
@@ -477,25 +478,25 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                 <div className="flex justify-start">
                   <div className="p-4 rounded-2xl bg-slate-900 border border-white/10 text-slate-400 text-xs flex items-center gap-2">
                     <Sparkles className="w-4 h-4 animate-spin text-purple-400" />
-                    <span>Processando sabedoria teológica para jovens...</span>
+                    <span>Aprofundando contexto histórico e referências cruzadas...</span>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="p-4 border-t border-white/10 bg-slate-900/90 max-w-3xl w-full mx-auto">
+            <div className="p-4 border-t border-white/10 bg-slate-950 shrink-0 max-w-3xl w-full mx-auto">
               <form onSubmit={handleSendChatRefine} className="flex gap-2">
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Peça mais detalhes, mude a vibe ou altere a resposta..."
-                  className="flex-1 bg-slate-950/80 border border-white/10 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  placeholder="Peça mais detalhes, contexto extra ou referências cruzadas..."
+                  className="flex-1 bg-slate-900 border border-white/15 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !chatInput.trim()}
-                  className="px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm flex items-center justify-center"
+                  className="px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm flex items-center justify-center shadow-lg transition-all"
                 >
                   <Send className="w-4 h-4" />
                 </button>

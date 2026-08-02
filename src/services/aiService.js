@@ -103,12 +103,36 @@ export async function generateSermonAI({ painVibes, popVibes, customRef, customT
 export async function generateBibleLensAI({ verseRef, verseText, actionType, config }) {
   let systemPrompt = '';
   if (actionType === 'quebra-gelo') {
-    systemPrompt = `Você é um líder de jovens e teólogo especialista em dinâmicas de grupo (células) para Gen Z e Alpha. Crie uma dinâmica prática e marcante baseada no versículo fornecido. Formate em Markdown limpo contendo: ### 🎲 Dinâmica de Célula, **Objetivo**, **Passo a Passo Prático**, e **Perguntas para Reflexão**.`;
+    systemPrompt = `Você é um teólogo e líder de jovens especialista em dinâmicas de grupo (células) para a Geração Z e Alpha. Sua missão é criar um estudo com dinâmica prática e profunda baseada no versículo fornecido.
+
+Formate a resposta obrigatoriamente em Markdown rico e detalhado contendo:
+# 🎲 Quebra-Gelo & Estudo de Célula: ${verseRef}
+## 🎯 Objetivo Espiritual
+## 🛠️ Passo a Passo da Dinâmica
+## 🏛️ Contexto Teológico Rápido
+## 🔗 Referências Cruzadas (Cross-References)
+## 💬 3 Perguntas de Conexão Profunda`;
   } else {
-    systemPrompt = `Você é um tradutor cultural teológico especializado na Geração Z e Alpha. Pegue o versículo bíblico fornecido e crie uma tradução livre autêntica usando metáforas digitais modernas (algoritmos, lag, firmware, skins, modo foco, feed), mantendo total fidelidade teológica ao sentido original. Formate em Markdown limpo.`;
+    systemPrompt = `Você é um exegeta, teólogo e tradutor cultural especializado na Geração Z e Alpha. Sua missão é realizar um estudo bíblico completo, profundo e enriquecedor a partir do versículo fornecido.
+
+Formate a resposta obrigatoriamente em Markdown rico e detalhado com as seguintes seções estruturadas:
+
+# 💡 Tradução & Estudo Profundo (Gen Z / Alpha)
+
+## 🏛️ Contexto Histórico & Teológico
+[Explique quem escreveu, para quem, em que época/contexto cultural e qual a verdade teológica central com riqueza de detalhes.]
+
+## ⚡ Tradução Livre & Metáforas Digitais
+[Traduza o versículo usando metáforas culturais modernas e autênticas (algoritmos, lag, firmware, skins, modo foco, feed de notícias), mantendo 100% de fidelidade ao sentido teológico original.]
+
+## 🔗 Referências Cruzadas (Cross-References)
+[Forneça de 3 a 4 versículos bíblicos relacionados que aprofundam o mesmo tema, com a citação do texto e explicação da conexão teológica.]
+
+## 🎯 Aplicação Prática no Dia a Dia & Feed
+[3 passos práticos para aplicar essa verdade na vida cotidiana, nas redes sociais e nos relacionamentos.]`;
   }
 
-  const userPrompt = `Versículo: ${verseRef} -> "${verseText}"`;
+  const userPrompt = `Analise e detalhe o versículo: ${verseRef} -> "${verseText}"`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
