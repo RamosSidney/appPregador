@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Send, ArrowLeft, MessageSquare, BookOpen, Sparkles, User, RefreshCw } from 'lucide-react';
 import { marked } from 'marked';
+import { mentorChatAI } from '../services/aiService.js';
 
-export default function MentorshipRoom({ onDeductCredit, userCredits }) {
+export default function MentorshipRoom({ onDeductCredit, userCredits, config, onOpenSettings }) {
   const [selectedMentor, setSelectedMentor] = useState(null); // null or mentor object
   const [searchQuery, setSearchQuery] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
@@ -54,7 +55,7 @@ export default function MentorshipRoom({ onDeductCredit, userCredits }) {
     setChatMessages([
       {
         role: 'assistant',
-        content: `Saudações na graça! Sou o avatar de **${mentor.name}**. Como posso ajudar no seu ministério de jovens hoje?`
+        content: `Saudações na graça! Sou o avatar teológico de **${mentor.name}**. Como posso auxiliar o seu ministério com conselhos e teologia prática hoje?`
       }
     ]);
   };
@@ -75,25 +76,19 @@ export default function MentorshipRoom({ onDeductCredit, userCredits }) {
     setIsLoading(true);
 
     try {
+      const aiReply = await mentorChatAI({
+        mentor: selectedMentor,
+        history: newHistory,
+        config
+      });
+
       await onDeductCredit();
 
-      // Simulated responses for mentors
-      setTimeout(() => {
-        let answer = '';
-        if (selectedMentor.id === 'lewis') {
-          answer = `Em resposta à sua dúvida sobre *"${question}"*:\n\nNo livro *Cristianismo Puro e Simples*, aprendemos que o orgulho e a comparação são o maior obstáculo da vida espiritual. "O orgulho não obtém prazer em possuir algo, mas apenas em possuir mais do que o próximo." Encoraje seus jovens a não buscarem validação nos algoritmos do mundo, mas sim a se renderem inteiramente a Cristo.`;
-        } else if (selectedMentor.id === 'spurgeon') {
-          answer = `Meu jovem irmão, sobre *"${question}"*:\n\nNos meus dias no Tabernáculo Metropolitano, costumava dizer aos meus alunos: "Aquele que prega a graça deve primeiro ter o coração quebrantado por ela." Quando seus liderados parecerem cansados ou apáticos, não lhes dê regras rígidas; mostre-lhes a beleza insuperável da Cruz e o amor de Deus que renova todas as forças.`;
-        } else {
-          answer = `Sobre *"${question}"*:\n\nEm *Discipulado*, enfatizo que a graça barata é o inimigo mortal de nossa igreja. Graça barata é a pregação do perdão sem arrependimento. O discipulado autêntico exige coragem e vida em comunidade real. Ajude seus adolescentes a vivenciarem o evangelho prático no dia a dia.`;
-        }
-
-        setChatMessages([...newHistory, { role: 'assistant', content: answer }]);
-        setIsLoading(false);
-      }, 1200);
-
+      setChatMessages([...newHistory, { role: 'assistant', content: aiReply }]);
     } catch (err) {
-      console.error(err);
+      alert(err.message || "Erro ao consultar o mentor.");
+      if (onOpenSettings) onOpenSettings();
+    } finally {
       setIsLoading(false);
     }
   };

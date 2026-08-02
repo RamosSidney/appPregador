@@ -9,10 +9,11 @@ import RPGLeaderAcademy from './components/RPGLeaderAcademy.jsx';
 import BibleReader from './components/BibleReader.jsx';
 import PulpitMode from './components/PulpitMode.jsx';
 import SettingsModal from './components/SettingsModal.jsx';
+import { generateSermonAI } from './services/aiService.js';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentView, setCurrentView] = useState('generator'); // 'generator' | 'saved' | 'mentorship' | 'bible' | 'rpg'
+  const [currentView, setCurrentView] = useState('generator');
   const [pulpitSermon, setPulpitSermon] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -99,7 +100,7 @@ export default function App() {
     setUserCredits(prev => Math.min(100, prev + amount));
   };
 
-  // Sermon Generation Engine
+  // Sermon Generation Engine (Real AI Call)
   const handleGenerateSermon = async ({ painVibes, popVibes, customRef, customTheme }) => {
     if (userCredits <= 0) {
       alert("Créditos de Raios zerados!");
@@ -107,53 +108,37 @@ export default function App() {
     }
 
     setIsGenerating(true);
-    await handleDeductCredit();
 
-    // Call API or Fallback simulation
-    setTimeout(() => {
-      const pain = painVibes[0] || 'Ansiedade';
-      const pop = customRef || popVibes[0] || 'TikTok Algorithm';
-      const theme = customTheme || 'Superação';
+    try {
+      const sermonContent = await generateSermonAI({
+        painVibes,
+        popVibes,
+        customRef,
+        customTheme,
+        config
+      });
 
-      const content = `
-# ⚡ ${theme}: O Reset do Algoritmo da Sua Mente
+      await handleDeductCredit();
 
-## 🎬 O Gancho Cultural
-Imagine seu feed do TikTok entulhado de vídeos repetitivos sobre **${pain}**. Paulo nos avisa que a cultura tenta empacotar nossa mente no mesmo padrão. Mas o Evangelho de Cristo é o verdadeiro reset de firmware!
-
-## 📖 O Download Bíblico
-> *"E não vos conformeis com este mundo, mas transformai-vos pela renovação da vossa mente..."* (Romanos 12:2)
-
-Para vencer **${pain}**, usando a analogia de **${pop}**, você não pode aceitar a skin padronizada que o mundo te vende. Você foi criado com especificações originais por Deus.
-
-## 🏆 O Desafio Prático da Semana
-Desinstale 1 aplicativo que gera ansiedade durante 3 dias e dedique esse tempo à oração e comunidade.
-      `;
-
-      const reelsScript = `
-🎥 ROTEIRO DE REELS (30 SEGUNDOS)
-[00:00-00:05] CENA: Olhando para a tela do celular.
-VOZ: "Sua mente tá travando com ${pain}?"
-[00:05-00:15] CENA: Corta para texto em tela com Romanos 12:2.
-VOZ: "Assim como ${pop}, o mundo quer empacotar sua mente. Mas Deus te deu o reset!"
-[00:15-00:30] CENA: Apontando para a câmera com sorriso.
-VOZ: "Desconecte do feed do medo e conecte no Criador hoje!"
-      `;
+      const theme = customTheme || painVibes[0] || 'Mensagem Disruptiva';
 
       const newSermon = {
         id: Date.now().toString(),
-        title: `${theme}: ${pain}`,
-        vibe: pain.split(' ')[0],
-        content,
-        reelsScript,
+        title: `${theme}`,
+        vibe: painVibes[0] || 'GenZ',
+        content: sermonContent,
         createdAt: new Date().toLocaleDateString('pt-BR'),
         isFavorite: false
       };
 
       setGeneratedSermon(newSermon);
-      setIsGenerating(false);
       handleAddXp(20);
-    }, 1500);
+    } catch (err) {
+      alert(err.message || "Erro ao conectar com a Inteligência Artificial.");
+      setIsSettingsOpen(true);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSaveSermon = (sermon) => {
@@ -232,6 +217,8 @@ VOZ: "Desconecte do feed do medo e conecte no Criador hoje!"
           <MentorshipRoom
             userCredits={userCredits}
             onDeductCredit={handleDeductCredit}
+            config={config}
+            onOpenSettings={() => setIsSettingsOpen(true)}
           />
         )}
 
@@ -239,6 +226,8 @@ VOZ: "Desconecte do feed do medo e conecte no Criador hoje!"
           <BibleReader
             userCredits={userCredits}
             onDeductCredit={handleDeductCredit}
+            config={config}
+            onOpenSettings={() => setIsSettingsOpen(true)}
           />
         )}
 

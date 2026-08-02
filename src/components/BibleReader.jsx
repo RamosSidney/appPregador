@@ -5,14 +5,15 @@ import {
   ChevronLeft, ChevronRight, Play, Pause, Volume2, Search, Type, Sliders
 } from 'lucide-react';
 import { marked } from 'marked';
+import { generateBibleLensAI, refineBibleChatAI } from '../services/aiService.js';
 
-export default function BibleReader({ userCredits, onDeductCredit }) {
+export default function BibleReader({ userCredits, onDeductCredit, config, onOpenSettings }) {
   const [bibleDatabase, setBibleDatabase] = useState(null);
   const [selectedBook, setSelectedBook] = useState('João');
   const [selectedChapter, setSelectedChapter] = useState('1');
   const [versesList, setVersesList] = useState([]);
   const [fontSerif, setFontSerif] = useState(true);
-  const [fontSize, setFontSize] = useState(18); // px
+  const [fontSize, setFontSize] = useState(18);
 
   // Verse Selection / Highlight State
   const [selectedVerseRef, setSelectedVerseRef] = useState(null);
@@ -27,7 +28,7 @@ export default function BibleReader({ userCredits, onDeductCredit }) {
     }
   });
 
-  // Audio Narration State (SpeechSynthesis API)
+  // Audio Narration State
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const synthRef = useRef(null);
 
@@ -92,7 +93,6 @@ export default function BibleReader({ userCredits, onDeductCredit }) {
     if (chNum > 1) {
       setSelectedChapter((chNum - 1).toString());
     } else {
-      // Go to previous book if available
       const currentBookIdx = bibleDatabase?.findIndex(b => b.name === selectedBook);
       if (currentBookIdx > 0) {
         const prevBook = bibleDatabase[currentBookIdx - 1];
@@ -107,7 +107,6 @@ export default function BibleReader({ userCredits, onDeductCredit }) {
     if (chNum < chapterOptionsCount) {
       setSelectedChapter((chNum + 1).toString());
     } else {
-      // Go to next book if available
       const currentBookIdx = bibleDatabase?.findIndex(b => b.name === selectedBook);
       if (currentBookIdx < (bibleDatabase?.length || 0) - 1) {
         const nextBook = bibleDatabase[currentBookIdx + 1];
@@ -189,6 +188,7 @@ export default function BibleReader({ userCredits, onDeductCredit }) {
     setMenuPosition(null);
   };
 
+  // Trigger Real AI Action
   const handleTriggerAction = async (type) => {
     if (!selectedVerseRef) return;
     setMenuPosition(null);
@@ -203,26 +203,28 @@ export default function BibleReader({ userCredits, onDeductCredit }) {
     setIsLoading(true);
 
     try {
+      const aiReply = await generateBibleLensAI({
+        verseRef: selectedVerseRef,
+        verseText: selectedVerseText,
+        actionType: type,
+        config
+      });
+
       await onDeductCredit();
-      setTimeout(() => {
-        let initialReply = '';
-        if (type === 'quebra-gelo') {
-          initialReply = `### 🎲 Dinâmica de Célula: "Reset de Cache"\n**Conexão Temática com ${selectedVerseRef}**\n\n* **Objetivo:** Mostrar como acumulamos sentimentos desnecessários na mente e como precisamos esvaziar a mente para receber o novo de Deus.\n* **Como Executar:**\n  1. Peça para cada jovem listar frustrações da semana em um papel.\n  2. Leiam ${selectedVerseRef} em voz alta.\n  3. Virar o copo ou rasgar o papel declarando o reset de firmware espiritual.\n* **Pergunta Gancho:** "Qual o maior arquivo temporário de ansiedade que você precisa desinstalar hoje?"`;
-        } else {
-          initialReply = `### 💡 Tradução Simplificada (Lente Gen Z / Alpha)\n**Descodificando ${selectedVerseRef}**\n\n* **Texto Original:** *"${selectedVerseText}"*\n* **Tradução para o Feed:** "Não deixe a cultura do algoritmo mundial empacotar a sua mente nos layouts prontos deles. Faça uma atualização de firmware completa com o Espírito Santo para testar o código original que é bom e perfeito."\n* **Gancho Analógico:** É como usar um template pronto do PowerPoint que todo mundo já viu. Paulo convida a criar o seu próprio design baseado no Criador.`;
-        }
-        setChatMessages([
-          { role: 'user', content: promptUser },
-          { role: 'assistant', content: initialReply }
-        ]);
-        setIsLoading(false);
-      }, 1400);
+
+      setChatMessages([
+        { role: 'user', content: promptUser },
+        { role: 'assistant', content: aiReply }
+      ]);
     } catch (err) {
-      console.error(err);
+      alert(err.message || "Erro ao gerar resposta com IA.");
+      if (onOpenSettings) onOpenSettings();
+    } finally {
       setIsLoading(false);
     }
   };
 
+  // Send Follow-up Chat Refinement with Real AI
   const handleSendChatRefine = async (e) => {
     e.preventDefault();
     if (!chatInput.trim() || isLoading) return;
@@ -234,14 +236,23 @@ export default function BibleReader({ userCredits, onDeductCredit }) {
     setIsLoading(true);
 
     try {
+      let sysPrompt = actionType === 'quebra-gelo'
+        ? `Você é um líder de jovens e teólogo especialista em dinâmicas de grupo para Gen Z e Alpha.`
+        : `Você é um tradutor cultural teológico especializado na Geração Z e Alpha.`;
+
+      const aiReply = await refineBibleChatAI({
+        systemPrompt: sysPrompt,
+        history: newHistory,
+        config
+      });
+
       await onDeductCredit();
-      setTimeout(() => {
-        const refineReply = `[Refinamento IA] Entendi perfeitamente sua solicitação sobre *"${userText}"*!\n\nAqui está o ajuste com linguagem mais autêntica para adolescentes:\n\n> "No dia a dia da escola e das redes, a consistência do seu testemunho digital fala mais alto do que qualquer discurso. Sem lag espiritual!"`;
-        setChatMessages([...newHistory, { role: 'assistant', content: refineReply }]);
-        setIsLoading(false);
-      }, 1200);
+
+      setChatMessages([...newHistory, { role: 'assistant', content: aiReply }]);
     } catch (err) {
-      console.error(err);
+      alert(err.message || "Erro ao refinar chat com IA.");
+      if (onOpenSettings) onOpenSettings();
+    } finally {
       setIsLoading(false);
     }
   };
