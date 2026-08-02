@@ -7,6 +7,7 @@ export default function SermonGenerator({
   onGenerate,
   onSaveSermon,
   onOpenPulpit,
+  onPlayAudio,
   userCredits,
   isGenerating,
   generatedSermon
@@ -203,6 +204,16 @@ export default function SermonGenerator({
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-bold transition-all"
                     >
                       <Bookmark className="w-3.5 h-3.5" /> Salvar
+                    </button>
+                    <button
+                      onClick={() => onPlayAudio({
+                        title: generatedSermon.title,
+                        subtitle: 'Narração de Esboço',
+                        content: generatedSermon.content
+                      })}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600/30 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-bold transition-all"
+                    >
+                      🎙️ Ouvir
                     </button>
                     <button
                       onClick={() => onOpenPulpit(generatedSermon)}

@@ -7,6 +7,7 @@ export default function SavedSermons({
   onToggleFavorite,
   onDeleteSermon,
   onOpenPulpit,
+  onPlayAudio,
   onNavigateToGenerator
 }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -162,6 +163,17 @@ export default function SavedSermons({
                       title="Copiar Texto"
                     >
                       <Copy className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => onPlayAudio({
+                        title: sermon.title,
+                        subtitle: 'Sermão Salvo',
+                        content: sermon.content
+                      })}
+                      className="p-2 rounded-lg bg-cyan-600/20 border border-cyan-500/30 text-cyan-300 hover:text-white text-xs font-bold transition-all"
+                      title="Ouvir Narração de Áudio"
+                    >
+                      🎙️
                     </button>
                     <button
                       onClick={() => onOpenPulpit(sermon)}

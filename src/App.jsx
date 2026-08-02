@@ -9,7 +9,10 @@ import RPGLeaderAcademy from './components/RPGLeaderAcademy.jsx';
 import BibleReader from './components/BibleReader.jsx';
 import PulpitMode from './components/PulpitMode.jsx';
 import SettingsModal from './components/SettingsModal.jsx';
+import AudioPlayerBar from './components/audio/AudioPlayerBar.jsx';
+import VoiceInteractionModal from './components/audio/VoiceInteractionModal.jsx';
 import { generateSermonAI } from './services/aiService.js';
+import { audioService } from './services/audioService.js';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,6 +25,16 @@ export default function App() {
   const [userLevel, setUserLevel] = useState(1);
   const [userXp, setUserXp] = useState(0);
   const [userProfile, setUserProfile] = useState(null);
+
+  // Audio Global State
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
+
+  // Voice Chat Modal State
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [voiceMentor, setVoiceMentor] = useState(null);
 
   // Saved Sermons State
   const [savedSermons, setSavedSermons] = useState(() => {
@@ -105,6 +118,46 @@ export default function App() {
 
   const handleAddCredits = (amount) => {
     setUserCredits(prev => Math.min(100, prev + amount));
+  };
+
+  // Audio Handlers
+  const handlePlayTrack = ({ title, subtitle, content }) => {
+    setCurrentTrack({ title, subtitle, content });
+    setAudioProgress(0);
+    setIsPlayingAudio(true);
+
+    audioService.speak(content, {
+      rate: playbackRate,
+      onProgress: (p) => setAudioProgress(p),
+      onEnd: () => setIsPlayingAudio(false),
+      onError: () => setIsPlayingAudio(false)
+    });
+  };
+
+  const handleTogglePlayAudio = () => {
+    if (isPlayingAudio) {
+      audioService.pause();
+      setIsPlayingAudio(false);
+    } else {
+      audioService.resume();
+      setIsPlayingAudio(true);
+    }
+  };
+
+  const handleChangeAudioRate = (newRate) => {
+    setPlaybackRate(newRate);
+    audioService.setRate(newRate);
+  };
+
+  const handleCloseAudio = () => {
+    audioService.stop();
+    setCurrentTrack(null);
+    setIsPlayingAudio(false);
+  };
+
+  const handleStartVoiceChat = (mentor) => {
+    setVoiceMentor(mentor);
+    setIsVoiceModalOpen(true);
   };
 
   // Sermon Generation Engine (Real AI Call)
@@ -204,6 +257,7 @@ export default function App() {
             onGenerate={handleGenerateSermon}
             onSaveSermon={handleSaveSermon}
             onOpenPulpit={(s) => setPulpitSermon(s)}
+            onPlayAudio={handlePlayTrack}
             userCredits={userCredits}
             isGenerating={isGenerating}
             generatedSermon={generatedSermon}
@@ -216,6 +270,7 @@ export default function App() {
             onToggleFavorite={handleToggleFavorite}
             onDeleteSermon={handleDeleteSermon}
             onOpenPulpit={(s) => setPulpitSermon(s)}
+            onPlayAudio={handlePlayTrack}
             onNavigateToGenerator={() => setCurrentView('generator')}
           />
         )}
@@ -226,6 +281,7 @@ export default function App() {
             onDeductCredit={handleDeductCredit}
             config={config}
             onOpenSettings={() => setIsSettingsOpen(true)}
+            onStartVoiceChat={handleStartVoiceChat}
           />
         )}
 
@@ -235,6 +291,7 @@ export default function App() {
             onDeductCredit={handleDeductCredit}
             config={config}
             onOpenSettings={() => setIsSettingsOpen(true)}
+            onPlayAudio={handlePlayTrack}
           />
         )}
 
@@ -264,6 +321,26 @@ export default function App() {
         onSaveConfig={handleSaveConfig}
         onLogout={handleLogout}
         userProfile={userProfile}
+      />
+
+      {/* Persistent Mini Audio Player Bar */}
+      <AudioPlayerBar
+        currentTrack={currentTrack}
+        isPlaying={isPlayingAudio}
+        progress={audioProgress}
+        playbackRate={playbackRate}
+        onTogglePlay={handleTogglePlayAudio}
+        onChangeRate={handleChangeAudioRate}
+        onClose={handleCloseAudio}
+      />
+
+      {/* Voice Interaction Call Modal */}
+      <VoiceInteractionModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        mentor={voiceMentor}
+        config={config}
+        onDeductCredit={handleDeductCredit}
       />
 
       {/* Floating Bottom Nav Dock */}
