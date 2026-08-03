@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Sparkles, ShieldCheck, Sword } from 'lucide-react';
 
 const MESSAGES = [
-  "Preparando seu ambiente de crescimento...",
-  "Fortalecendo conexões e alinhando propósito...",
-  "Pronto para impactar a nova geração!"
+  "Conectando aprendizado, crescimento e propósito...",
+  "Carregando ambiente de alta performance para comunicadores...",
+  "Preparando o seu próximo nível de impacto!"
 ];
 
 export default function RPGTransitionLoader({ onComplete }) {
@@ -46,18 +46,18 @@ export default function RPGTransitionLoader({ onComplete }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.4, ease: 'easeOut' } }}
-      className="fixed inset-0 z-50 bg-[#0B0F19]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 selection:bg-purple-500 overflow-hidden"
+      exit={{ opacity: 0, transition: { duration: 0.3, ease: 'easeOut' } }}
+      className="fixed inset-0 z-50 bg-[#0B0F19] backdrop-blur-md flex flex-col items-center justify-center p-6 selection:bg-purple-500 overflow-hidden"
     >
       {/* Ambient Pulsing Orbs: Purple #8B5CF6 to Cyan #06B6D4 */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-gradient-to-tr from-purple-600/25 to-cyan-500/20 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-cyan-500/20 rounded-full blur-[120px] pointer-events-none animate-pulse-fast" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-gradient-to-tr from-purple-600/20 to-cyan-500/20 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-1/4 right-1/4 w-[320px] h-[320px] bg-cyan-500/15 rounded-full blur-[120px] pointer-events-none animate-pulse-fast" />
 
-      {/* Cyber Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b12_1px,transparent_1px),linear-gradient(to_bottom,#1e293b12_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md text-center flex flex-col items-center">
-        {/* Animated Central Emblem */}
+        {/* Animated Central Logo Box */}
         <div className="relative mb-8 flex items-center justify-center">
           <motion.div
             animate={{ rotate: 360 }}
@@ -83,12 +83,12 @@ export default function RPGTransitionLoader({ onComplete }) {
           transition={{ duration: 0.4 }}
           className="mb-6"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/60 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/60 border border-purple-500/30 text-purple-300 text-xs font-extrabold uppercase tracking-wider mb-2">
             <Sword className="w-3.5 h-3.5 text-cyan-400" />
             <span>Academia RPG de Comunicadores</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Treinamento de <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-amber-400 bg-clip-text text-transparent">Alto Impacto</span>
+            Ambiente de <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-amber-400 bg-clip-text text-transparent">Alta Performance</span>
           </h2>
         </motion.div>
 
@@ -101,7 +101,7 @@ export default function RPGTransitionLoader({ onComplete }) {
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
               transition={{ duration: 0.3 }}
-              className="text-base sm:text-lg font-semibold text-slate-200 text-center tracking-wide flex items-center justify-center gap-2"
+              className="text-sm sm:text-base font-semibold text-slate-200 text-center tracking-wide flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
               <span>{MESSAGES[messageIndex]}</span>
