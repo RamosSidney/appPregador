@@ -275,7 +275,7 @@ export default function App() {
       />
 
       {/* Main View Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+      <main className={`flex-1 w-full mx-auto ${currentView === 'rpg' ? 'p-0 max-w-full' : 'max-w-7xl p-4 sm:p-6 lg:p-8'}`}>
         {currentView === 'generator' && (
           <SermonGenerator
             onGenerate={handleGenerateSermon}

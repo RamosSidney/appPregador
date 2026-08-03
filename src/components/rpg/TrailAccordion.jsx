@@ -54,14 +54,14 @@ export default function TrailAccordion({
 
   return (
     <div
-      className={`rounded-3xl border transition-all duration-300 overflow-hidden ${
+      className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
         isTrailCompleted
-          ? 'bg-slate-900/90 border-emerald-500/40 shadow-lg shadow-emerald-950/20'
+          ? 'bg-[#0F172A]/90 border-emerald-500/40 shadow-lg'
           : completedCount > 0
-          ? 'bg-[#0F172A]/90 border-amber-500/30 hover:border-amber-500/50 shadow-xl'
+          ? 'bg-[#0F172A]/90 border-amber-500/30 shadow-lg'
           : isUnlocked
-          ? 'bg-[#0F172A]/85 backdrop-blur-xl border-slate-800 hover:border-purple-500/40 shadow-xl'
-          : 'bg-slate-950/70 border-slate-900 opacity-90'
+          ? 'bg-[#0F172A]/80 border-slate-800/90 hover:border-purple-500/40 shadow-lg'
+          : 'bg-slate-950/60 border-slate-900 opacity-90'
       }`}
     >
       {/* Accordion Collapsed Header Bar */}
@@ -98,7 +98,7 @@ export default function TrailAccordion({
             <span className="text-cyan-400">{completedCount}/{totalModules}</span> Módulos
           </div>
 
-          {/* Status Badge according to WCAG contrast standards */}
+          {/* Status Badge */}
           {isTrailCompleted ? (
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-black flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Concluída
@@ -128,7 +128,7 @@ export default function TrailAccordion({
         </div>
       </div>
 
-      {/* Expanded Body: Works for BOTH unlocked AND locked trails */}
+      {/* Expanded Body */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -136,10 +136,10 @@ export default function TrailAccordion({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="border-t border-slate-800 bg-slate-950/60 p-4 sm:p-6 space-y-6"
+            className="border-t border-slate-800/80 bg-slate-950/60 p-4 sm:p-5 space-y-5"
           >
-            {/* Trail Subtitle & Reward Badge Card */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 p-4 rounded-2xl border border-slate-800/90">
+            {/* Subtitle & Badge Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-800/90">
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
                 {trail.subtitle}
               </p>
@@ -163,12 +163,12 @@ export default function TrailAccordion({
               </div>
             </div>
 
-            {/* Locked Trail Explanatory Banner */}
+            {/* Locked Trail Banner */}
             {!isUnlocked && (
-              <div className="p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-center gap-3 text-xs text-amber-300">
+              <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center gap-3 text-xs text-amber-300">
                 <Lock className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>
-                  <strong className="text-amber-200">Trilha em Modo Exploratório:</strong> Você pode visualizar e ler toda a ementa de módulos e exemplos práticos abaixo. Para responder aos quizzes desta trilha, conclua os pré-requisitos anteriores.
+                  <strong className="text-amber-200">Trilha em Modo Exploratório:</strong> Você pode visualizar a ementa de módulos e clicar em "Explorar Lição" para ler. Para jogar os Quizzes, conclua as etapas anteriores.
                 </span>
               </div>
             )}
@@ -177,12 +177,11 @@ export default function TrailAccordion({
             <div className="space-y-3">
               <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <Eye className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Ementa & Módulos da Trilha ({totalModules} Lições)</span>
+                <span>Ementa da Trilha ({totalModules} Módulos)</span>
               </h4>
 
               {trail.modules.map((mod, idx) => {
                 const isModCompleted = completedModules.includes(mod.id);
-                // Module is unlocked if the trail itself is unlocked and either it's the first module or the previous module is completed
                 const isModUnlocked = isUnlocked && (idx === 0 || completedModules.includes(trail.modules[idx - 1].id));
 
                 return (
@@ -201,7 +200,7 @@ export default function TrailAccordion({
             {/* Boss Fight Section */}
             <div className="pt-2 border-t border-slate-800/80">
               <div
-                className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 ${
+                className={`p-4 sm:p-5 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-4 ${
                   isBossFightCompleted
                     ? 'bg-emerald-950/30 border-emerald-500/40'
                     : isBossFightUnlocked
@@ -232,7 +231,7 @@ export default function TrailAccordion({
                         ? 'Insígnia Conquistada! Você dominou o conteúdo desta trilha.'
                         : isBossFightUnlocked
                         ? 'Desafio final liberado! Responda às perguntas para ganhar a Insígnia e +100 XP.'
-                        : 'Conclua todos os módulos da trilha para liberar a Avaliação Geral.'}
+                        : 'Conclua os 3 módulos para liberar a Avaliação Geral.'}
                     </p>
                   </div>
                 </div>
