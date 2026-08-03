@@ -46,6 +46,15 @@
   padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
 }
 
+/* Hide scrollbars for smooth sliding tab navigation on mobile */
+.scrollbar-none, .no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 /* Glassmorphism & Cyberpunk card utilities */
 .glass-panel {
   background: rgba(15, 23, 42, 0.75);

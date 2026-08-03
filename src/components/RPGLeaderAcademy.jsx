@@ -8,13 +8,26 @@ import TrailAccordion from './rpg/TrailAccordion';
 import ModuleContentModal from './rpg/ModuleContentModal';
 import QuizRunner from './rpg/QuizRunner';
 
-export default function RPGLeaderAcademy({ userLevel, userXp, onAddXp, onAddCredits }) {
+export default function RPGLeaderAcademy({
+  userLevel,
+  userXp,
+  onAddXp,
+  onAddCredits,
+  onLessonStateChange
+}) {
   // 3-Second Transition State
   const [showTransition, setShowTransition] = useState(true);
 
   // Active Modals / Full Screen Overlays
   const [activeModuleReader, setActiveModuleReader] = useState(null); // { module, trail, isUnlocked, isCompleted }
   const [activeQuiz, setActiveQuiz] = useState(null); // { title, questions, xpReward, isBossFight, targetId }
+
+  // Notify parent App whether a full-screen lesson/quiz is open to hide Bottom Nav
+  useEffect(() => {
+    if (onLessonStateChange) {
+      onLessonStateChange(!!activeModuleReader || !!activeQuiz);
+    }
+  }, [activeModuleReader, activeQuiz, onLessonStateChange]);
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -147,7 +160,7 @@ export default function RPGLeaderAcademy({ userLevel, userXp, onAddXp, onAddCred
         )}
       </AnimatePresence>
 
-      {/* Edge-to-Edge Compact Header */}
+      {/* Edge-to-Edge Compact Header Slim */}
       <AcademyHeader
         userLevel={userLevel}
         userXp={userXp}
@@ -157,9 +170,9 @@ export default function RPGLeaderAcademy({ userLevel, userXp, onAddXp, onAddCred
       />
 
       {/* Main Fluid Content Container */}
-      <div className="max-w-[1200px] w-full mx-auto px-4 py-4 sm:px-6 space-y-5">
+      <div className="max-w-[1200px] w-full mx-auto px-3 sm:px-6 py-3 space-y-4">
         {/* Search, Filter & Layout View Switcher Bar */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-slate-900/80 border border-slate-800/80 p-3 rounded-2xl shadow-lg backdrop-blur-xl">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-2xl shadow-lg backdrop-blur-xl">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -173,7 +186,7 @@ export default function RPGLeaderAcademy({ userLevel, userXp, onAddXp, onAddCred
           </div>
 
           {/* Categories Pills & View Switcher */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 justify-between sm:justify-end">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar shrink-0 justify-between sm:justify-end">
             <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
               {categories.slice(0, 4).map(cat => (
                 <button
@@ -216,10 +229,10 @@ export default function RPGLeaderAcademy({ userLevel, userXp, onAddXp, onAddCred
         </div>
 
         {/* Trails Registry Section */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-purple-400" />
+              <BookOpen className="w-4.5 h-4.5 text-purple-400" />
               <span>Trilhas de Aprendizado</span>
             </h2>
             <span className="text-xs font-bold text-slate-400">
@@ -239,7 +252,7 @@ export default function RPGLeaderAcademy({ userLevel, userXp, onAddXp, onAddCred
               </button>
             </div>
           ) : (
-            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
+            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}>
               {filteredTrails.map((trail) => {
                 const trailIndex = ACADEMY_TRAILS.findIndex(t => t.id === trail.id);
                 const isUnlocked = trailIndex === 0 || completedModules.some(mId => mId.startsWith(ACADEMY_TRAILS[trailIndex - 1].id.slice(0, 2)));

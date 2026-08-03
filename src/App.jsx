@@ -22,6 +22,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState('generator');
   const [pulpitSermon, setPulpitSermon] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLessonOpen, setIsLessonOpen] = useState(false);
 
   // User States
   const [userCredits, setUserCredits] = useState(100);
@@ -325,6 +326,7 @@ export default function App() {
             userXp={userXp}
             onAddXp={handleAddXp}
             onAddCredits={handleAddCredits}
+            onLessonStateChange={setIsLessonOpen}
           />
         )}
       </main>
@@ -367,11 +369,13 @@ export default function App() {
         onDeductCredit={handleDeductCredit}
       />
 
-      {/* Floating Bottom Nav Dock */}
-      <FloatingNav
-        activeTab={currentView}
-        setActiveTab={setCurrentView}
-      />
+      {/* Floating Bottom Nav Dock (Hidden when full-screen lesson overlay is open) */}
+      {!isLessonOpen && (
+        <FloatingNav
+          activeTab={currentView}
+          setActiveTab={setCurrentView}
+        />
+      )}
     </div>
   );
 }
