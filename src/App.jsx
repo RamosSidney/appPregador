@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import Header from './components/Header.jsx';
 import FloatingNav from './components/FloatingNav.jsx';
 import AuthScreen from './components/AuthScreen.jsx';
+import TransitionLoader from './components/TransitionLoader.jsx';
 import SermonGenerator from './components/SermonGenerator.jsx';
 import SavedSermons from './components/SavedSermons.jsx';
 import MentorshipRoom from './components/MentorshipRoom.jsx';
@@ -16,6 +18,7 @@ import { audioService } from './services/audioService.js';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentView, setCurrentView] = useState('generator');
   const [pulpitSermon, setPulpitSermon] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -79,23 +82,30 @@ export default function App() {
   // Auth Handlers
   const handleLogin = (credentials) => {
     setUserProfile({ nome: 'Pregador Z', username: 'lider_z' });
-    setIsAuthenticated(true);
+    setIsTransitioning(true);
   };
 
   const handleRegister = (data) => {
-    setUserProfile({ nome: data.name, username: data.username });
-    setIsAuthenticated(true);
+    setUserProfile({ nome: data.name || 'Pregador Z', username: data.username || 'lider_z' });
+    setIsTransitioning(true);
   };
 
   const handleGuestBypass = () => {
     setUserProfile(null);
+    setIsTransitioning(true);
+  };
+
+  const handleTransitionComplete = () => {
+    setIsTransitioning(false);
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setIsTransitioning(false);
     setUserProfile(null);
   };
+
 
   // Credit & XP Handlers
   const handleDeductCredit = async () => {
@@ -229,16 +239,30 @@ export default function App() {
     alert("Configurações salvas!");
   };
 
-  // If not authenticated, render AuthScreen
-  if (!isAuthenticated) {
+  // Authentication and Transition Loader Orchester
+  if (!isAuthenticated || isTransitioning) {
     return (
-      <AuthScreen
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-        onGuestBypass={handleGuestBypass}
-      />
+      <>
+        <AnimatePresence mode="wait">
+          {isTransitioning && (
+            <TransitionLoader
+              key="transition-loader"
+              onComplete={handleTransitionComplete}
+            />
+          )}
+        </AnimatePresence>
+
+        {!isAuthenticated && !isTransitioning && (
+          <AuthScreen
+            onLogin={handleLogin}
+            onRegister={handleRegister}
+            onGuestBypass={handleGuestBypass}
+          />
+        )}
+      </>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-dark-space text-slate-100 flex flex-col selection:bg-purple-500 selection:text-white">
