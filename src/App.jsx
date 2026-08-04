@@ -132,6 +132,9 @@ export default function App() {
   };
 
   // Audio Handlers
+  const [voiceStyle, setVoiceStyle] = useState('pastor');
+  const [voiceName, setVoiceName] = useState(null);
+
   const handlePlayTrack = ({ title, subtitle, content }) => {
     setCurrentTrack({ title, subtitle, content });
     setAudioProgress(0);
@@ -139,10 +142,42 @@ export default function App() {
 
     audioService.speak(content, {
       rate: playbackRate,
+      style: voiceStyle,
+      voiceName: voiceName,
       onProgress: (p) => setAudioProgress(p),
       onEnd: () => setIsPlayingAudio(false),
       onError: () => setIsPlayingAudio(false)
     });
+  };
+
+  const handleChangeVoiceStyle = (newStyle) => {
+    setVoiceStyle(newStyle);
+    if (currentTrack) {
+      audioService.speak(currentTrack.content, {
+        rate: playbackRate,
+        style: newStyle,
+        voiceName: voiceName,
+        onProgress: (p) => setAudioProgress(p),
+        onEnd: () => setIsPlayingAudio(false),
+        onError: () => setIsPlayingAudio(false)
+      });
+      setIsPlayingAudio(true);
+    }
+  };
+
+  const handleChangeVoiceName = (newName) => {
+    setVoiceName(newName);
+    if (currentTrack) {
+      audioService.speak(currentTrack.content, {
+        rate: playbackRate,
+        style: voiceStyle,
+        voiceName: newName,
+        onProgress: (p) => setAudioProgress(p),
+        onEnd: () => setIsPlayingAudio(false),
+        onError: () => setIsPlayingAudio(false)
+      });
+      setIsPlayingAudio(true);
+    }
   };
 
   const handleTogglePlayAudio = () => {
@@ -359,6 +394,10 @@ export default function App() {
         onTogglePlay={handleTogglePlayAudio}
         onChangeRate={handleChangeAudioRate}
         onClose={handleCloseAudio}
+        currentVoiceStyle={voiceStyle}
+        currentVoiceName={voiceName}
+        onChangeVoiceStyle={handleChangeVoiceStyle}
+        onChangeVoiceName={handleChangeVoiceName}
       />
 
       {/* Voice Interaction Call Modal */}

@@ -8,20 +8,39 @@ class AudioService {
     this.isPlaying = false;
     this.isListening = false;
     this.currentRate = 1.0;
+    this.voicesList = [];
+
+    if (this.synth) {
+      this.loadVoices();
+      if (typeof window !== 'undefined' && window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = () => this.loadVoices();
+      }
+    }
   }
 
-  // =========================================================================
-  // 1. TEXT-TO-SPEECH (TTS)
-  // =========================================================================
+  loadVoices() {
+    if (!this.synth) return [];
+    const rawVoices = this.synth.getVoices();
+    const ptVoices = rawVoices.filter(v => v.lang.toLowerCase().includes('pt'));
+    this.voicesList = ptVoices.length > 0 ? ptVoices : rawVoices;
+    return this.voicesList;
+  }
 
-  speak(text, { rate = 1.0, onProgress, onEnd, onError } = {}) {
+  getAvailableVoices() {
+    if (!this.voicesList || this.voicesList.length === 0) {
+      this.loadVoices();
+    }
+    return this.voicesList;
+  }
+
+  speak(text, { rate = 1.0, voiceName = null, style = 'pastor', pitch = 1.0, onProgress, onEnd, onError } = {}) {
     if (!this.synth) {
       console.warn("Web SpeechSynthesis não suportado neste navegador.");
       if (onError) onError(new Error("Navegador não suporta áudio de voz."));
       return;
     }
 
-    this.stop(); // Stop any previous speech
+    this.stop();
     this.currentRate = rate;
 
     // Clean Markdown tags for natural speech
@@ -33,13 +52,48 @@ class AudioService {
 
     this.utterance = new SpeechSynthesisUtterance(cleanText);
     this.utterance.lang = 'pt-BR';
-    this.utterance.rate = rate;
 
-    // Try selecting a natural pt-BR voice if available
-    const voices = this.synth.getVoices();
-    const ptVoice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt_BR'));
-    if (ptVoice) {
-      this.utterance.voice = ptVoice;
+    // Apply Voice Style Presets
+    let adjustedRate = rate;
+    let adjustedPitch = pitch;
+
+    if (style === 'pastor') {
+      adjustedRate = rate * 0.95;
+      adjustedPitch = 0.9;
+    } else if (style === 'mentora') {
+      adjustedRate = rate * 0.95;
+      adjustedPitch = 1.15;
+    } else if (style === 'genz') {
+      adjustedRate = rate * 1.15;
+      adjustedPitch = 1.0;
+    } else if (style === 'devocional') {
+      adjustedRate = rate * 0.85;
+      adjustedPitch = 0.85;
+    }
+
+    this.utterance.rate = Math.max(0.5, Math.min(2.0, adjustedRate));
+    this.utterance.pitch = Math.max(0.5, Math.min(2.0, adjustedPitch));
+
+    // Try finding specified voice by name or select natural pt-BR voice
+    const voices = this.getAvailableVoices();
+    let selectedVoiceObj = null;
+
+    if (voiceName) {
+      selectedVoiceObj = voices.find(v => v.name === voiceName);
+    }
+
+    if (!selectedVoiceObj && style === 'mentora') {
+      selectedVoiceObj = voices.find(v => /female|feminina|francisca|luciana|helena|maria|joana|zira/i.test(v.name));
+    } else if (!selectedVoiceObj && style === 'pastor') {
+      selectedVoiceObj = voices.find(v => /male|masculin|antonio|felipe|daniel|ricardo|humberto/i.test(v.name));
+    }
+
+    if (!selectedVoiceObj) {
+      selectedVoiceObj = voices.find(v => v.lang.toLowerCase().includes('pt-br') || v.lang.toLowerCase().includes('pt_br')) || voices[0];
+    }
+
+    if (selectedVoiceObj) {
+      this.utterance.voice = selectedVoiceObj;
     }
 
     let charCount = 0;
@@ -93,10 +147,6 @@ class AudioService {
     }
   }
 
-  // =========================================================================
-  // 2. SPEECH-TO-TEXT (STT - RECONHECIMENTO DE VOZ)
-  // =========================================================================
-
   startListening({ onResult, onEnd, onError }) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -149,7 +199,9 @@ class AudioService {
     if (this.recognition) {
       try {
         this.recognition.stop();
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
       this.isListening = false;
     }
   }
