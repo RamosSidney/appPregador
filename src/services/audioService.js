@@ -1,5 +1,19 @@
 // Audio Service: Web Speech Synthesis (TTS) & Web Speech Recognition (STT) for pt-BR
 
+export const cleanTextForSpeech = (text) => {
+  if (!text) return '';
+  return text
+    // Remove Emojis e Símbolos Unicode
+    .replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '')
+    // Remove marcadores de Markdown (*, #, _, ~, `, >, -, etc.)
+    .replace(/[*#_~`>-]/g, ' ')
+    // Remove URLs e links Markdown
+    .replace(/\[.*?\]\(.*?\)/g, '')
+    // Remove múltiplos espaços
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 class AudioService {
   constructor() {
     this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -43,12 +57,8 @@ class AudioService {
     this.stop();
     this.currentRate = rate;
 
-    // Clean Markdown tags for natural speech
-    const cleanText = text
-      .replace(/#{1,6}\s?/g, '')
-      .replace(/[*_`]/g, '')
-      .replace(/\[.*?\]\(.*?\)/g, '')
-      .trim();
+    // Clean Markdown tags, Emojis and Unicode symbols for natural speech
+    const cleanText = cleanTextForSpeech(text);
 
     this.utterance = new SpeechSynthesisUtterance(cleanText);
     this.utterance.lang = 'pt-BR';
