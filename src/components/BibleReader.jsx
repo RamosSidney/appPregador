@@ -147,7 +147,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     }
   };
 
-  // Audio Player Narration
+  // Audio Player Narration (Reads text cleanly WITHOUT reciting verse numbers)
   const toggleAudioNarration = () => {
     if (!window.speechSynthesis) {
       alert("Navegador não suporta reprodução de áudio TTS.");
@@ -159,8 +159,9 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       setIsPlayingAudio(false);
     } else {
       window.speechSynthesis.cancel();
-      const chapterText = versesList.map(v => `${v.num}. ${v.text}`).join(' ');
-      const utterance = new SpeechSynthesisUtterance(`${selectedBook} capítulo ${selectedChapter}. ${chapterText}`);
+      // Join verse texts without verse numbers as requested
+      const chapterText = versesList.map(v => v.text).join(' ');
+      const utterance = new SpeechSynthesisUtterance(`${selectedBook}, capítulo ${selectedChapter}. ${chapterText}`);
       utterance.lang = 'pt-BR';
       utterance.rate = 0.95;
 
@@ -302,52 +303,66 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
   };
 
   return (
-    <div className="space-y-6 pb-28 relative max-w-4xl mx-auto" onClick={() => setMenuPosition(null)}>
-      {/* Top Header Bar - Strict Single Line Layout */}
-      <div className="bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-2.5 sm:p-3.5 shadow-2xl sticky top-16 sm:top-20 z-30 overflow-x-auto scrollbar-none no-scrollbar">
-        <div className="flex items-center justify-between gap-2 min-w-max w-full">
-          {/* Left Group: Book & Chapter Selectors */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Book Dropdown Pill */}
+    <div className="space-y-4 pb-28 relative max-w-4xl mx-auto" onClick={() => setMenuPosition(null)}>
+      {/* Top Header Bar - Strict Single Line Layout with Compact Selectors & Audio Next to Chapter */}
+      <div className="bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-2 sm:p-3 shadow-2xl sticky top-16 sm:top-20 z-30 overflow-x-auto scrollbar-none no-scrollbar">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2 min-w-max w-full">
+          {/* Left Group: Book & Chapter Selectors + Audio Button + NVI */}
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            {/* Book Dropdown Pill (Compact Size) */}
             <div className="relative">
               <select
                 value={selectedBook}
                 onChange={(e) => setSelectedBook(e.target.value)}
-                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full px-3 py-1.5 text-xs font-extrabold text-white appearance-none pr-7 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full px-2.5 py-1 text-[11px] sm:text-xs font-extrabold text-white appearance-none pr-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
               >
                 {bibleDatabase?.map((b) => (
                   <option key={b.name} value={b.name}>{b.name}</option>
                 ))}
               </select>
-              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] pointer-events-none">▼</span>
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[8px] pointer-events-none">▼</span>
             </div>
 
-            {/* Chapter Selector Pill */}
+            {/* Chapter Selector Pill (Numbers only, no "Cap." word) */}
             <div className="relative">
               <select
                 value={selectedChapter}
                 onChange={(e) => setSelectedChapter(e.target.value)}
-                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full px-3 py-1.5 text-xs font-extrabold text-white appearance-none pr-7 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full px-2.5 py-1 text-[11px] sm:text-xs font-extrabold text-white appearance-none pr-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
               >
                 {Array.from({ length: chapterOptionsCount }, (_, i) => i + 1).map((ch) => (
-                  <option key={ch} value={ch.toString()}>Cap. {ch}</option>
+                  <option key={ch} value={ch.toString()}>{ch}</option>
                 ))}
               </select>
-              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] pointer-events-none">▼</span>
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[8px] pointer-events-none">▼</span>
             </div>
 
-            <span className="px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px] font-black tracking-wider uppercase">
+            {/* Audio TTS Button Right After Chapter */}
+            <button
+              onClick={toggleAudioNarration}
+              className={`p-1.5 sm:p-2 rounded-full border transition-all ${
+                isPlayingAudio
+                  ? 'bg-amber-500/20 border-amber-400 text-amber-400 animate-pulse'
+                  : 'bg-slate-950/60 border-white/10 text-slate-400 hover:text-white'
+              }`}
+              title={isPlayingAudio ? 'Pausar Áudio' : 'Ouvir Capítulo'}
+            >
+              <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+
+            {/* NVI Tag */}
+            <span className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px] font-black uppercase">
               NVI
             </span>
           </div>
 
-          {/* Right Group: Font Size Controls, Font Family & TTS Audio */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          {/* Right Group: Font Size Controls & Font Family */}
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             {/* Font Size Controls */}
             <div className="flex items-center bg-slate-950/80 border border-white/10 rounded-full p-0.5">
               <button
                 onClick={handleDecreaseFontSize}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-all text-xs font-extrabold"
+                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-all text-xs font-extrabold"
                 title="Diminuir Fonte (A-)"
               >
                 A-
@@ -357,7 +372,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               </span>
               <button
                 onClick={handleIncreaseFontSize}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-all text-xs font-extrabold"
+                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-all text-xs font-extrabold"
                 title="Aumentar Fonte (A+)"
               >
                 A+
@@ -367,7 +382,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
             {/* Font Family (Serif/Sans) Toggle */}
             <button
               onClick={() => setFontSerif(!fontSerif)}
-              className={`px-2.5 py-1.5 rounded-full border transition-all text-xs font-extrabold flex items-center gap-1 ${
+              className={`px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full border transition-all text-xs font-extrabold flex items-center gap-1 ${
                 fontSerif
                   ? 'bg-purple-600/20 border-purple-500/40 text-purple-300 font-serif'
                   : 'bg-slate-950/80 border-white/10 text-slate-300 font-sans'
@@ -377,29 +392,8 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               <Type className="w-3.5 h-3.5" />
               <span className="hidden sm:inline text-[11px]">{fontSerif ? 'Serif' : 'Sans'}</span>
             </button>
-
-            {/* Audio TTS Button */}
-            <button
-              onClick={toggleAudioNarration}
-              className={`p-2 rounded-full border transition-all ${
-                isPlayingAudio
-                  ? 'bg-amber-500/20 border-amber-400 text-amber-400 animate-pulse'
-                  : 'bg-slate-950/60 border-white/10 text-slate-400 hover:text-white'
-              }`}
-              title={isPlayingAudio ? 'Pausar Áudio' : 'Ouvir Capítulo'}
-            >
-              <Volume2 className="w-4 h-4" />
-            </button>
           </div>
         </div>
-      </div>
-
-      {/* Chapter Title Subtitle Header */}
-      <div className="px-2 pt-1">
-        <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
-          <span>{selectedBook} {selectedChapter}</span>
-        </h2>
-        <p className="text-xs text-slate-400 mt-1">Toque em qualquer versículo para abrir opções ou toque novamente para desmarcar.</p>
       </div>
 
       {/* Bible Reading Continuous Flow Container (Sans or Serif) */}

@@ -1,11 +1,9 @@
 import React from 'react';
-import { Zap, Settings, Star, Shield, Award } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
-export default function Header({ userCredits, userLevel, userXp, onOpenSettings }) {
+export default function Header({ userCredits }) {
   const maxCredits = 100;
-  const maxXp = 500;
   const energyPercent = Math.min(100, Math.max(0, (userCredits / maxCredits) * 100));
-  const xpPercent = Math.min(100, Math.max(0, (userXp / maxXp) * 100));
 
   return (
     <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 px-4 py-3 transition-all duration-300">
@@ -28,9 +26,8 @@ export default function Header({ userCredits, userLevel, userXp, onOpenSettings 
           </div>
         </div>
 
-        {/* Battle Pass Energy & XP Panel */}
-        <div className="hidden md:flex items-center gap-6 bg-slate-900/70 border border-white/10 rounded-xl px-4 py-2 shadow-inner">
-          {/* Energy Bar */}
+        {/* Energy Panel (Desktop) */}
+        <div className="hidden md:flex items-center gap-4 bg-slate-900/70 border border-white/10 rounded-xl px-4 py-2 shadow-inner">
           <div className="flex flex-col gap-1 w-36">
             <div className="flex items-center justify-between text-[11px] font-bold">
               <span className="text-amber-400 flex items-center gap-1">
@@ -45,45 +42,14 @@ export default function Header({ userCredits, userLevel, userXp, onOpenSettings 
               />
             </div>
           </div>
-
-          <div className="h-8 w-[1px] bg-white/10" />
-
-          {/* XP Bar */}
-          <div className="flex flex-col gap-1 w-36">
-            <div className="flex items-center justify-between text-[11px] font-bold">
-              <span className="text-purple-400 flex items-center gap-1">
-                <Award className="w-3 h-3" /> LÍDER LVL {userLevel}
-              </span>
-              <span className="text-slate-300">{userXp} / 500 XP</span>
-            </div>
-            <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden p-[1px] border border-white/5">
-              <div
-                className="h-full bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]"
-                style={{ width: `${xpPercent}%` }}
-              />
-            </div>
-          </div>
         </div>
 
-        {/* Mobile Quick Status Badge */}
-        <div className="flex md:hidden items-center gap-2 bg-slate-900/80 border border-white/10 rounded-lg px-2.5 py-1.5">
+        {/* Mobile Quick Raios Badge */}
+        <div className="flex md:hidden items-center gap-1.5 bg-slate-900/80 border border-white/10 rounded-lg px-2.5 py-1.5">
           <span className="flex items-center gap-1 text-xs font-bold text-amber-400">
-            <Zap className="w-3.5 h-3.5 fill-amber-400" /> {userCredits}
-          </span>
-          <span className="text-white/20">|</span>
-          <span className="flex items-center gap-1 text-xs font-bold text-purple-400">
-            <Star className="w-3.5 h-3.5 fill-purple-400" /> Lvl {userLevel}
+            <Zap className="w-3.5 h-3.5 fill-amber-400" /> {userCredits} RAIOS
           </span>
         </div>
-
-        {/* Actions / Settings */}
-        <button
-          onClick={onOpenSettings}
-          className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white transition-all duration-200 active:scale-95 shadow-md"
-          title="Configurações"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
       </div>
     </header>
   );
