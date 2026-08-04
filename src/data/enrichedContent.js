@@ -84,31 +84,85 @@ export const ENRICHED_MODULE_EXAMPLES = {
     }
   },
 
-  // Gen Z
+  // Gen Z - Trilha 2
   'gz-mod-1': {
     sermonIllustration: {
       title: "A Crise da Tela Espelhada (Validação vs Identidade)",
-      story: "Uma jovem passava 4 horas por dia editando fotos para parecer impecável. Em um acampamento sem sinal de celular, ela chorou ao perceber que ninguém ali a julgava. Ela descobriu que o Criador já a havia aprovado na cruz sem filtros.",
+      story: "Um jovem universitário mantinha dois perfis: nas redes digitais, imagens impecáveis e alegres; em seu quarto, uma profunda ansiedade por ter que performar uma vida perfeita para evitar o cancelamento. Em um grupo pequeno de mentoria sincera, um líder experiente compartilhou suas próprias batalhas e fraquezas. O jovem caiu em prantos ao perceber que não precisava de máscaras, pois o Criador ama a verdade no íntimo (Salmo 51:6) e o aprovou incondicionalmente na Cruz.",
       outline: [
-        "1. A ditadura do algoritmo: Buscar aprovação humana exaure a alma.",
-        "2. A Cruz como espelho real: Você é amado antes de produzir qualquer conteúdo.",
-        "3. Vivendo em liberdade: Trocar a busca por likes pela presença de Deus."
+        "1. A ditadura do algoritmo: Buscar aprovação humana contínua exaure o coração.",
+        "2. A Cruz como espelho real: Você é amado e aceito antes de produzir qualquer resultado.",
+        "3. Viver em liberdade: Trocar a busca compulsiva por curtidas pelo descanso na presença de Deus."
       ]
     },
     openingHooks: [
-      "📲 'Se o seu tempo de tela falasse sobre quem você realmente é, o que ele diria?'",
-      "🔥 'Por que a gente se sente tão cansado mesmo quando passa o dia inteiro parado olhando pro celular?'",
-      "💔 'Você já sentiu que está cercado de seguidores, mas totalmente sozinho no seu quarto?'"
+      "📲 'Se o seu tempo de tela e as suas pesquisas secretas no celular falassem sobre quem você é no escuro, o que eles diriam?'",
+      "🔥 'Por que a nossa geração se sente tão exausta mentalmente, mesmo quando passa o dia inteiro sentada olhando pro celular?'",
+      "💔 'Você já esteve em um ambiente cheio de amigos e seguidores, mas deitou na cama à noite sentindo um vazio profundo no peito?'"
     ],
     genZMetaphors: [
-      "☁️ 'Cloud Sync': A nossa mente precisa sincronizar com a mente de Cristo diariamente.",
-      "⚠️ 'Algoritmo de Feed': O que você alimenta no seu coração é o que a sua vida vai sugerir.",
-      "🔄 'Recalculando Rota': O arrependimento bíblico é como um GPS recalculando o caminho certo."
+      "☁️ 'Cloud Sync': A nossa mente precisa sincronizar diariamente com a mente de Cristo (Romanos 12:2).",
+      "⚠️ 'Algoritmo de Feed': O que você consome e alimenta no secreto é o que a sua vida vai sugerir nas decisões diárias.",
+      "🔄 'Recalculando Rota (Arrependimento)': O arrepender-se não é acusação ou cancelamento; é Deus recalculando o seu caminho para a paz."
     ],
     communicationGuide: {
-      tone: "Autêntico, empático, sem tom moralista ou acusatório.",
-      bodyLanguage: "Postura aberta, contato visual direto e sem pedestal.",
-      callToAction: "Momento de entrega sincera no altar: desligar o ruído e ouvir o Pai."
+      tone: "Autêntico, empático, sem tom moralista ou pose de pedestal religioso.",
+      bodyLanguage: "Postura aberta, sem barreiras físicas, contato visual direto e transparente.",
+      callToAction: "Momento de entrega sincera no altar: desligar o ruído virtual e ouvir a voz do Pai."
+    }
+  },
+
+  'gz-mod-2': {
+    sermonIllustration: {
+      title: "O Discurso no Areópago de Atenas (Atos 17) & Os Poetas Modernos",
+      story: "Ao chegar na intelectual e secularizada Atenas, o apóstolo Paulo não começou apontando o dedo nem condenando a cultura local. Ele passeou pela cidade, observou a arte, leu os poetas gregos e usou um altar dedicado ao 'Deus Desconhecido' para iniciar um diálogo. Ele usou a própria literatura dos ateniense para apresentar Jesus. Da mesma forma, comunicar com a Gen Z exige entender a cultura, usar pontes narrativas e transmitir o Evangelho sem jargões indecifráveis.",
+      outline: [
+        "1. Observar antes de julgar: Compreender as dores e anseios revelados na cultura pop.",
+        "2. Pontes culturais: Utilizar filmes, artes e dilemas modernos para expor a sede da alma.",
+        "3. O clímax do Evangelho: Apresentar a ressurreição e a esperança inabalável em Cristo."
+      ]
+    },
+    openingHooks: [
+      "🎬 'Já reparou como as maiores bilheterias de cinema tratam da busca por um redentor ou por alguém que se entrega pelos outros? Essa sede é real...'",
+      "💬 'E se o maior obstáculo para os jovens entenderem a Bíblia hoje não for a mensagem da Cruz, mas os jargões religiosos que a gente usa?'",
+      "🎯 'Você já se perguntou por que tanta gente rejeita a religião institucional, mas fica fascinada quando conhece a pessoa de Jesus Cristo?'"
+    ],
+    genZMetaphors: [
+      "📡 'Transmissão em HD sem Ruído': Pregar para a Gen Z exige remover jargões religiosos arcaicos para transmitir o Evangelho com clareza cristalina.",
+      "🧩 'Match Perfeito': As perguntas sobre propósito e justiça que a Gen Z faz encontram o único encaixe perfeito na pessoa de Jesus.",
+      "🛡️ 'Firewall Apologético': A apologética bíblica responde com mansidão (1 Pedro 3:15) às maiores objeções da juventude."
+    ],
+    communicationGuide: {
+      tone: "Persuasivo, articulado, aberto ao diálogo e intelectualmente honesto.",
+      bodyLanguage: "Gesticulação precisa, uso de recursos visuais e olhar direto na plateia.",
+      callToAction: "Desafio de reflexão: 'Que ponte de verdade você vai construir esta semana no seu trabalho ou faculdade?'"
+    }
+  },
+
+  'gz-mod-3': {
+    sermonIllustration: {
+      title: "Da Cadeira do Auditório para o Canteiro de Obras do Reino",
+      story: "Um jovem talentoso frequentava os cultos há 2 anos, mas sentia que a igreja era apenas um 'show' onde ele assistia da plateia. Ele quase abandonou tudo por falta de propósito. Um mentor experiente o convidou para liderar uma equipe de ação social na comunidade local. Ao colocar a mão na massa, servir pessoas em extrema vulnerabilidade e liderar seus pares, a fé do jovem se tornou viva, inabalável e contagiante.",
+      outline: [
+        "1. O perigo do cristianismo espectador: Consumir cultos sem servir estagna a fé.",
+        "2. Ativação de dons e protagonismo: Cada jovem tem um chamado único no Corpo de Cristo.",
+        "3. Legado real: Mudar a comunidade através do serviço amoroso e da mentoria de novos líderes."
+      ]
+    },
+    openingHooks: [
+      "🛠️ 'Você quer passar a sua juventude assistindo à história dos outros ou quer ser o protagonista que Deus chamou para construir o Reino?'",
+      "💡 'Qual é o talento ou paixão que você tem nas mãos hoje que poderia transformar a vida de alguém esta semana?'",
+      "🚀 'Sabe qual é a diferença entre uma comunidade que retém os jovens e uma que os perde? O espaço real para eles liderarem!'"
+    ],
+    genZMetaphors: [
+      "🏗️ 'Modo Construtor': Deixar de ser um mero consumidor de cultos para virar um construtor ativo da comunidade cristã.",
+      "🤝 '1 a 1 de Mentoria': Caminhar lado a lado com um mentor experiente, sem pedestal e com transparência total.",
+      "🌐 'Rede de Impacto Social': A fé praticada em ações sociais (Tiago 2:18) gera um testemunho inegável diante do mundo."
+    ],
+    communicationGuide: {
+      tone: "Desafiador, motivador, tom de mestre e convocatório.",
+      bodyLanguage: "Firmeza, braços abertos para convocar a equipe, expressão inspiradora.",
+      callToAction: "Convocação para engajamento em células e equipes de projetos sociais."
     }
   }
 };

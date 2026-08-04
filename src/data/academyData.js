@@ -468,7 +468,7 @@ export const ACADEMY_TRAILS = [
   {
     id: 'gen-z',
     title: 'Trilha 2: Gen Z',
-    subtitle: 'Autenticidade, Desconstrução e Evangelismo para a Juventude Conectada',
+    subtitle: 'Autenticidade, Desconstrução, Saúde Mental e Evangelismo para a Juventude Conectada',
     category: 'Gerações & Cultura',
     badge: '⚡ Insígnia Disruptive Leader',
     icon: 'Zap',
@@ -476,19 +476,21 @@ export const ACADEMY_TRAILS = [
     modules: [
       {
         id: 'gz-mod-1',
-        title: 'Módulo 1: Conhecendo a Gen Z',
-        subtitle: 'Cultura do cancelamento, busca por autenticidade e pós-verdade',
+        title: 'Módulo 1: O Perfil da Geração Z',
+        subtitle: 'Radar anti-fake, busca por pertencimento, saúde mental e ansiedade',
         xp: 50,
         contextoPratico: `
-          <h3>🔥 A Geração do Radar Anti-Fake</h3>
-          <p>A Geração Z (nascidos entre 1995 e 2010) possui um radar apuradíssimo contra hipocrisia e discursos ensaiados. Eles vivem em um mundo marcado por pós-verdade, ansiedade por perfomance e medo constante do pertencimento superficial (FOMO).</p>
-          <p><strong>Bases Bíblicas:</strong> "Amo a verdade no íntimo..." (Salmo 51:6). A Gen Z não quer ver líderes perfeitos que fingem não ter lutas; eles querem ver líderes vulneráveis que encontram a graça de Deus em meio às imperfeições.</p>
+          <h3>🔥 A Geração do Radar Anti-Fake & Autenticidade Radical</h3>
+          <p>A <strong>Geração Z</strong> (nascidos entre 1997 e 2012) possui um radar apurado contra hipocrisia, performances ensaiadas e discursos de perfeição inalcançável. Vivem em uma era de hiperconectividade marcada por ansiedade, medo de cancelamento e busca constante por pertencimento autêntico.</p>
+          <p><strong>Saúde Mental & Ansiedade por Performance:</strong> É a geração com maiores índices de estresse e solidão conectada. As mídias geram cobrança contínua por validação externa, e a igreja deve surgir como um refúgio acolhedor de descanso na graça de Deus.</p>
+          <p><strong>Bases Bíblicas:</strong> <em>"Tu amas a verdade no íntimo..."</em> (Salmo 51:6). A Gen Z não se conecta com líderes impecáveis que fingem não ter lutas; eles buscam líderes vulneráveis e honestos que encontram a misericórdia de Deus em meio às fragilidades humanas.</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação no Púlpito & Redes</h3>
+          <h3>💡 Aplicação no Púlpito & Mentoria de Jovens</h3>
           <ul>
-            <li><strong>Transparência no Palco:</strong> Compartilhe suas próprias falhas e o processo de restauração divina em vez de se colocar como super-herói.</li>
-            <li><strong>Espaço para Dúvidas:</strong> Crie um ambiente onde dúvidas teológicas sejam acolhidas sem julgamento ou condenação.</li>
+            <li><strong>Vulnerabilidade no Palco:</strong> Compartilhe lutas pessoais e processos de restauração divina em vez de se colocar como super-herói espiritual.</li>
+            <li><strong>Espaço Seguro para Dúvidas:</strong> Acolher questionamentos morais e intelectuais sem condenação ou julgamento (1 Pedro 3:15).</li>
+            <li><strong>Descanso na Graça de Deus:</strong> Ensinar que o valor do jovem está salvo na Cruz, imune a aprovações ou "dislikes" virtuais.</li>
           </ul>
         `,
         quiz: [
@@ -519,7 +521,7 @@ export const ACADEMY_TRAILS = [
             options: [
               "Condenando quem faz perguntas difíceis",
               "Acolhendo as dúvidas com empatia e guiando com respostas fundamentadas na Bíblia",
-              "Ignorando as perguntas e mudando o tema",
+              "Ignorar as perguntas e mudar o tema",
               "Expulsando a pessoa do grupo"
             ],
             correctIndex: 1,
@@ -606,19 +608,21 @@ export const ACADEMY_TRAILS = [
       },
       {
         id: 'gz-mod-2',
-        title: 'Módulo 2: Conectando com a Gen Z',
-        subtitle: 'Pontes culturais sem perder a essência inegociável do Evangelho',
+        title: 'Módulo 2: Pregação e Conteúdo para a Gen Z',
+        subtitle: 'Linguagem sem jargões, Apologética Cultural e o método de Paulo em Atenas (Atos 17)',
         xp: 50,
         contextoPratico: `
-          <h3>🌐 O Método de Paulo em Atenas (Atos 17)</h3>
-          <p>Quando o apóstolo Paulo pregou no Areópago de Atenas, ele não começou condenando os poetas e filósofos locais. Ele citou a cultura deles ("Como também alguns dos vossos poetas disseram...") para criar uma ponte e apresentar o Deus Desconhecido.</p>
-          <p><strong>A Arte da Contextualização:</strong> Contextualizar não é negociar a doutrina; é vestir a mensagem eterna com as roupas culturais da época para que seja compreendida com clareza.</p>
+          <h3>🌐 O Método de Paulo em Atenas (Atos 17) & Apologética Cultural</h3>
+          <p>Quando o apóstolo Paulo pregou no Areópago de Atenas, ele não começou atacando a cultura local. Ele leu os poetas gregos e usou um altar ao <em>"Deus Desconhecido"</em> para criar uma ponte direta de comunicação e apresentar a ressurreição em Cristo.</p>
+          <p><strong>Remoção de Jargões Religiocentrados:</strong> Pregar para a Gen Z exige traduzir conceitos teológicos complexos para uma linguagem transparente, sem termos arcaicos que afastam os desacostumados com o ambiente de igreja.</p>
+          <p><strong>A Arte da Contextualização:</strong> Contextualizar não é negociar a doutrina; é vestir a mensagem eterna com clareza cultural para que o Evangelho seja compreendido com todo o seu poder.</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação Prática no Evangelismo</h3>
+          <h3>💡 Aplicação Prática na Pregação & Redes</h3>
           <ul>
-            <li><strong>Análise de Tendências:</strong> Use músicas, filmes ou séries em alta para iniciar diálogos sobre os anseios da alma.</li>
-            <li><strong>Raciocínio Apologético Leve:</strong> Responda às objeções morais e intelectuais com mansidão e respeito (1 Pedro 3:15).</li>
+            <li><strong>Pontes Narrativas com Filmes e Séries:</strong> Utilize obras da cultura pop para expor os anseios universais da alma que só encontram saciedade em Jesus.</li>
+            <li><strong>Apologética Dialogal (1 Pedro 3:15):</strong> Responder às objeções morais, científicas e intelectuais com mansidão, fundamento bíblico e profundo respeito.</li>
+            <li><strong>Micro-Pregações para Redes:</strong> Vídeos curtos de 60 segundos focados em uma única verdade bíblica impactante com aplicação imediata.</li>
           </ul>
         `,
         quiz: [
@@ -736,19 +740,21 @@ export const ACADEMY_TRAILS = [
       },
       {
         id: 'gz-mod-3',
-        title: 'Módulo 3: Liderando a Gen Z',
-        subtitle: 'Criando novos líderes de impacto, discipulado e engajamento orgânico',
+        title: 'Módulo 3: Mentoria e Discipulado da Gen Z',
+        subtitle: 'De consumidor a construtor do Reino, mentoria 1 a 1 e protagonismo social',
         xp: 50,
         contextoPratico: `
           <h3>🚀 De Consumidores a Construtores do Reino</h3>
-          <p>Muitos jovens abandonam a igreja porque foram tratados como meros espectadores em um auditório. A Gen Z quer protagonismo. Eles querem colocar a mão na massa, liderar células, produzir artes, servir a comunidade e sentir que são parte de uma missão maior que eles mesmos.</p>
-          <p><strong>Princípio da Delegação com Cobertura:</strong> Dar responsabilidade real com acompanhamento de mentoria gera amadurecimento acelerado.</p>
+          <p>Muitos jovens abandonam a igreja porque foram tratados como meros espectadores em um auditório. A Gen Z exige protagonismo. Eles querem colocar a mão na massa, liderar células, produzir arte, servir em ações sociais e sentir que fazem parte de uma missão transformadora.</p>
+          <p><strong>Mentoria Relacional 1 a 1:</strong> O discipulado da Gen Z acontece no caminhar conjunto. Conversas individuais de escuta ativa criam um ambiente confidencial para vencer lutas reais e alinhar hábitos com a fé.</p>
+          <p><strong>Fé em Ação & Justiça Social Cristã:</strong> A fé cristã se torna irresistível quando se traduz em atos práticos de generosidade e compaixão (Tiago 2:18).</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação na Liderança de Jovens</h3>
+          <h3>💡 Aplicação Prática na Liderança de Jovens</h3>
           <ul>
-            <li><strong>Equipes de Ação:</strong> Crie projetos sociais e de mídias liderados 100% por jovens da Gen Z com suporte de mentores adultos.</li>
-            <li><strong>Cultura de Feedback:</strong> Realize conversas de alinhamento com escuta ativa antes de apontar correções.</li>
+            <li><strong>Delegação com Cobertura Pastoral:</strong> Entregar projetos reais (mídias, células, projetos de rua) com autonomia para o jovem criar e suporte de mentores adultos.</li>
+            <li><strong>Escuta Ativa & Mentoria Confidencial:</strong> Espaço regular para o jovem falar sobre suas emoções e dúvidas sem medo de retaliação.</li>
+            <li><strong>Cultura de Feedback Encorajador:</strong> Celebrar cada vitória e alinhar erros com amor e orientação bíblica.</li>
           </ul>
         `,
         quiz: [
