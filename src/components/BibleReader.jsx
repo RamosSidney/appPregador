@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { marked } from 'marked';
 import { generateBibleLensAI, refineBibleChatAI } from '../services/aiService.js';
+import { audioService } from '../services/audioService.js';
 
 export default function BibleReader({ userCredits, onDeductCredit, config, onOpenSettings }) {
   const [bibleDatabase, setBibleDatabase] = useState(null);
@@ -498,8 +499,6 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
           </button>
         </div>
       </div>
-
-import { audioService } from '../services/audioService.js';
 
       {/* 100% Fullscreen Refinement Chat Panel (Borda Infinita #0B0E14) */}
       <AnimatePresence>
