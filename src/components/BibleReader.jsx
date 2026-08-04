@@ -499,92 +499,167 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
         </div>
       </div>
 
-      {/* Fullscreen Refinement Chat Panel (Borda Infinita #0B0E14) */}
+import { audioService } from '../services/audioService.js';
+
+      {/* 100% Fullscreen Refinement Chat Panel (Borda Infinita #0B0E14) */}
       <AnimatePresence>
         {isPanelOpen && (
-          <div className="fixed inset-0 z-[100] bg-[#0B0E14] flex flex-col h-screen w-screen overflow-hidden m-0 p-0 border-none">
-            {/* Top Bar */}
-            <div className="flex items-center justify-between px-4 sm:px-8 py-3.5 border-b border-white/10 bg-slate-900/90 backdrop-blur-xl shrink-0">
+          <div className="fixed inset-0 z-[100] bg-[#0b0d17] text-slate-100 flex flex-col h-screen w-screen overflow-hidden font-sans selection:bg-cyan-500 selection:text-slate-950">
+            
+            {/* 1. HEADER FIXO COM NAVEGAÇÃO E BADGE */}
+            <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-950/80 border-b border-slate-800/80 px-4 py-3 flex items-center justify-between shrink-0">
               <button
                 onClick={() => setIsPanelOpen(false)}
-                className="min-w-[44px] min-h-[44px] px-3.5 rounded-xl bg-slate-950/80 border border-white/15 text-cyan-400 hover:text-white hover:border-cyan-400 text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md cursor-pointer"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 text-xs font-medium transition-all min-h-[44px] cursor-pointer"
+                aria-label="Voltar para a Bíblia"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Voltar para a Bíblia</span>
               </button>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <h3 className="text-sm sm:text-base font-black text-white">{panelTitle}</h3>
+              
+              <div className="flex items-center gap-2 bg-purple-950/40 border border-purple-500/30 px-3 py-1.5 rounded-full">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs font-semibold text-purple-300">Tradução Gen Z / Alpha</span>
               </div>
-            </div>
+            </header>
 
-            {/* Scrollable Body Container */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-8 max-w-4xl w-full mx-auto space-y-6 pb-28">
-              {/* Selected Verse Highlight Card */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-950/60 via-slate-900 to-slate-900 border border-purple-500/30 text-xs sm:text-sm text-slate-200 leading-relaxed shadow-xl">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-extrabold text-xs border border-purple-500/30">
+            {/* 2. CONTEÚDO PRINCIPAL (FOCO DE LEITURA RESPONSIVO) */}
+            <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-6 flex flex-col gap-6 overflow-y-auto pb-36">
+              
+              {/* CARD DO VERSÍCULO BÍBLICO */}
+              <section className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-slate-900 to-slate-900/60 border border-slate-800 p-5 sm:p-6 shadow-xl">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-semibold">
                     {selectedVerseRef}
                   </span>
-                  <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">NVI</span>
+                  <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">NVI</span>
                 </div>
-                <p className="italic text-white text-sm sm:text-base font-serif font-medium leading-relaxed">
+                <blockquote className="font-serif text-base md:text-lg text-slate-200 leading-relaxed italic border-l-2 border-purple-500 pl-4 my-2">
                   "{selectedVerseText}"
-                </p>
-              </div>
+                </blockquote>
+              </section>
 
-              {/* Chat Message Stream */}
+              {/* CHAT MESSAGES STREAM */}
               {chatMessages.map((msg, index) => {
                 if (index === 0 && msg.role === 'user') return null;
                 return (
-                  <div key={index} className="w-full bg-slate-900/80 border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl space-y-3">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-2">
-                      <span className="text-xs font-black uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-                        <Sparkles className="w-4 h-4 text-amber-400" />
-                        {msg.role === 'user' ? 'Sua Dúvida / Pergunta' : 'Estudo & Tradução Teológica IA'}
-                      </span>
-                      <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-                        Gen Z & Alpha Edition
-                      </span>
+                  <article key={index} className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 md:p-6 shadow-2xl flex flex-col gap-4 relative overflow-hidden">
+                    {/* Glowing Accent Top Line */}
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 via-cyan-400 to-amber-400" />
+
+                    {/* HEADER DO CARD IA */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-cyan-400 text-lg">✨</span>
+                        <h1 className="text-sm font-bold tracking-wide text-slate-100 uppercase">
+                          {msg.role === 'user' ? 'Sua Dúvida' : 'Estudo & Tradução Teológica IA'}
+                        </h1>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {msg.role === 'assistant' && (
+                          <button
+                            onClick={() => {
+                              if (isPlayingAudio) {
+                                audioService.stop();
+                                setIsPlayingAudio(false);
+                              } else {
+                                audioService.speak(msg.content, {
+                                  rate: 1.0,
+                                  style: 'genz',
+                                  onEnd: () => setIsPlayingAudio(false),
+                                  onError: () => setIsPlayingAudio(false)
+                                });
+                                setIsPlayingAudio(true);
+                              }
+                            }}
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border min-h-[36px] cursor-pointer ${
+                              isPlayingAudio
+                                ? 'bg-amber-500/20 border-amber-400 text-amber-400 animate-pulse'
+                                : 'bg-slate-950 border-cyan-500/40 text-cyan-300 hover:text-white hover:bg-slate-800'
+                            }`}
+                            title="Ouvir Tradução por Áudio"
+                            aria-label="Ouvir Tradução por Áudio"
+                          >
+                            <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                            <span>{isPlayingAudio ? 'Pausar' : 'Ouvir Tradução'}</span>
+                          </button>
+                        )}
+
+                        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
+                          Gen Z & Alpha Edition
+                        </span>
+                      </div>
                     </div>
 
+                    {/* MARKDOWN PROSE CONTENT */}
                     <div
-                      className="prose prose-invert max-w-none text-slate-100 text-xs sm:text-sm sm:text-base leading-relaxed space-y-4 prose-h1:text-xl sm:prose-h1:text-2xl prose-h1:font-black prose-h1:text-purple-300 prose-h2:text-lg sm:prose-h2:text-xl prose-h2:font-extrabold prose-h2:text-cyan-300 prose-h3:text-amber-400 prose-strong:text-amber-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-400 prose-blockquote:bg-cyan-500/10 prose-blockquote:p-4 prose-blockquote:rounded-r-xl prose-li:marker:text-purple-400"
+                      className="prose prose-invert max-w-none text-slate-200 text-sm md:text-base leading-relaxed space-y-4 prose-h1:text-xl sm:prose-h1:text-2xl prose-h1:font-black prose-h1:text-purple-300 prose-h2:text-base sm:prose-h2:text-lg prose-h2:font-extrabold prose-h2:text-cyan-300 prose-h3:text-amber-400 prose-strong:text-amber-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-400 prose-blockquote:bg-purple-950/20 prose-blockquote:p-4 prose-blockquote:rounded-r-xl prose-li:marker:text-purple-400"
                       dangerouslySetInnerHTML={{ __html: marked.parse(msg.content || '') }}
                     />
-                  </div>
+                  </article>
                 );
               })}
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="p-4 rounded-2xl bg-slate-900 border border-white/10 text-slate-300 text-xs sm:text-sm flex items-center gap-3 shadow-lg">
+                  <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 text-xs sm:text-sm flex items-center gap-3 shadow-lg">
                     <Sparkles className="w-5 h-5 animate-spin text-purple-400" />
                     <span>Conectando exegese bíblica a metáforas da Geração Z e Alpha...</span>
                   </div>
                 </div>
               )}
+            </main>
+
+            {/* 3. FLOATING STICKY INPUT BAR (COM SUGESTÕES DE PROMPT E ACESSIBILIDADE) */}
+            <div className="fixed bottom-0 left-0 right-0 z-30 px-4 py-3 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/80">
+              <div className="max-w-3xl mx-auto space-y-2">
+                {/* Prompt Suggestion Chips */}
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none no-scrollbar pb-1 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setChatInput("Me dê mais 3 metáforas digitais para jovens...")}
+                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-cyan-300 whitespace-nowrap transition-all"
+                  >
+                    ✨ Mais metáforas digitais
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChatInput("Como posso aplicar esse versículo na célula ou grupo de jovens?")}
+                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-purple-300 whitespace-nowrap transition-all"
+                  >
+                    💡 Aplicação para a Célula
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChatInput("Quais referências cruzadas adicionais explicam este tema?")}
+                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300 whitespace-nowrap transition-all"
+                  >
+                    📜 Mais referências bíblicas
+                  </button>
+                </div>
+
+                {/* Input Form */}
+                <form onSubmit={handleSendChatRefine} className="relative flex items-center shadow-2xl">
+                  <input 
+                    type="text" 
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Peça mais exemplos, contexto extra ou metáforas..." 
+                    className="w-full bg-slate-900/90 backdrop-blur-md text-slate-100 placeholder-slate-500 text-sm rounded-full pl-5 pr-12 py-3 border border-slate-700/80 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={isLoading || !chatInput.trim()}
+                    aria-label="Enviar pergunta"
+                    className="absolute right-1.5 p-2.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
             </div>
 
-            {/* Input Bar at Footer */}
-            <div className="p-4 border-t border-white/10 bg-slate-950 shrink-0 max-w-4xl w-full mx-auto">
-              <form onSubmit={handleSendChatRefine} className="flex gap-2">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Peça mais exemplos, contexto extra ou metáforas..."
-                  className="flex-1 bg-slate-900 border border-white/15 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                />
-                <button
-                  type="submit"
-                  disabled={isLoading || !chatInput.trim()}
-                  className="px-5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-extrabold text-sm flex items-center justify-center shadow-lg transition-all"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
-            </div>
           </div>
         )}
       </AnimatePresence>
