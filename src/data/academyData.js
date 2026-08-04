@@ -945,7 +945,8 @@ export const ACADEMY_TRAILS = [
         xp: 50,
         contextoPratico: `
           <h3>📜 O Deus que Se Fez Próximo</h3>
-          <p>Jesus Cristo não é apenas o centro da fé cristã, mas o homem que dividiu a história em <em>antes</em> e <em>depois</em>. Ele habitou entre nós não em palácios, mas em uma manjedoura humilde em Belém (Lucas 2). Em João 1:14 (<em>"O Verbo se fez carne..."</em>), vemos o Deus Todo-Poderoso vestindo a nossa humanidade para nos resgatar.</p>
+          <p>Jesus de Nazaré não é apenas a figura mais influente da história humana — Aquele que dividiu o calendário em antes e depois — mas é o <strong>Filho do Deus Vivo</strong>, o <strong>Salvador do Mundo</strong>, o <strong>Ungido (o Cristo)</strong> e o <strong>Enviado do Pai</strong>, a revelação máxima do amor, da graça e da verdade do Pai para a humanidade (João 1:14 / Mateus 16:16 / 1 João 4:14).</p>
+          <p>Ele habitou entre nós não em palácios, mas em uma manjedoura humilde em Belém (Lucas 2). Em João 1:14 (<em>"O Verbo se fez carne e habitou entre nós..."</em>), vemos o Criador Todo-Poderoso vestindo a nossa humanidade para nos resgatar e reconciliar o homem com Deus.</p>
           <p><strong>O Ministério Terreno de Compaixão:</strong> Jesus pisou na poeira das estradas, curou leprosos, devolveu a visão aos cegos, acolheu publicanos e valorizou os marginalizados. Seu ministério uniu poder milagroso com profunda sensibilidade humana.</p>
           <p><strong>A Cruz Vicária e a Ressurreição Gloriosa:</strong> Na cruz (Isaías 53 / 2 Coríntios 5:19), Jesus tomou sobre Si nossas culpas e venceu a dívida do pecado. Ao terceiro dia, ressuscitou vitorioso sobre a morte, garantindo esperança eterna a todo aquele que nEle crê.</p>
         `,

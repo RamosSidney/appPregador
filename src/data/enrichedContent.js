@@ -170,11 +170,11 @@ export const ENRICHED_MODULE_EXAMPLES = {
   'jl-mod-1': {
     sermonIllustration: {
       title: "O Pão da Vida na Poeira da Galileia",
-      story: "Certo rei poderoso desejava conhecer as reais aflições do seu povo. Ele não mandou emissários ou decretos reais; despiu-se dos mantos de seda, vestiu trajes de camponês e foi morar entre os pobres. Ele sentiu a mesma fome, o mesmo frio e a mesma dor. Foi exatamente isso que Deus fez em Jesus Cristo: João 1:14 nos diz que o Verbo se fez carne e armou Sua tenda entre nós. Ele não apenas nos olhou lá do alto; Ele veio pisar na nossa poeira para nos salvar.",
+      story: "Jesus de Nazaré não é apenas a figura mais influente da história humana — Aquele que dividiu o calendário em antes e depois — mas é o Filho do Deus Vivo, o Salvador do Mundo, o Ungido (Cristo) e o Enviado do Pai, a revelação máxima do amor, da graça e da verdade do Pai para a humanidade. Certo rei poderoso desejava conhecer as reais aflições do seu povo. Ele não mandou apenas emissários ou decretos; despiu-se dos mantos reais, vestiu trajes de camponês e foi morar entre os necessitados. Foi exatamente isso que Deus fez em Jesus Cristo: João 1:14 declara que o Verbo se fez carne e habitou entre nós para nos salvar e nos reconciliar com o Pai.",
       outline: [
-        "1. A Encarnação: Deus se tornando próximo e humano em Jesus.",
-        "2. A Cruz Vicária: O amor gracioso que tomou o nosso lugar no Julgamento.",
-        "3. A Ressurreição: O fato histórico que garantiu a vitória sobre a morte."
+        "1. A Declaração Bíblica: Jesus como Filho do Deus Vivo, Salvador, Ungido e Enviado.",
+        "2. A Encarnação: Deus se tornando próximo e humano em Jesus Cristo.",
+        "3. A Cruz Vicária e a Ressurreição: A vitória sobre a morte que garante nossa salvação eterna."
       ]
     },
     openingHooks: [
