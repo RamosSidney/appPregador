@@ -13,19 +13,20 @@ export const ACADEMY_TRAILS = [
       {
         id: 'ga-mod-1',
         title: 'Módulo 1: Conhecendo a Gen Alpha',
-        subtitle: 'Comportamento, consumo visual e linguagem na infância hiperdigital',
+        subtitle: 'Perfil cognitivo, nativos hiperdigitais, a busca por pertencimento e os desafios da fé',
         xp: 50,
         contextoPratico: `
-          <h3>📱 A Primeira Geração 100% Digital</h3>
-          <p>A Geração Alpha (nascidos a partir de 2010) é a primeira a viver totalmente imersa em telas sensíveis ao toque, inteligência artificial e plataformas imersivas como Roblox e Minecraft. O tempo de atenção deles é altamente visual, ágil e estimulado por gamificação.</p>
-          <p><strong>Bases Teológicas & Psicológicas:</strong> "Instrui a criança no caminho em que deve andar..." (Provérbios 22:6). Crianças da Gen Alpha não aprendem por monólogos expositivos secos; elas aprendem por experiência narrativa e aprendizado prático (Learning by Doing).</p>
+          <h3>📱 A Primeira Geração 100% Digital & Hiperconectada</h3>
+          <p>A <strong>Geração Alpha</strong> (nascidos a partir de 2010 até 2024+) é a primeira a viver totalmente imersa em telas touch, inteligência artificial, Roblox e Minecraft desde o berço. Para eles, a tecnologia não é uma ferramenta externa, mas a própria linguagem e ecossistema em que sua visão de mundo é construída.</p>
+          <p><strong>Desafios de Dopamina & Saúde Emocional:</strong> A exposição contínua a feeds algorítmicos gera sobrecarga de estímulos, ansiedade precoce e uma busca constante por validação. O tempo de atenção deles é seletivo e rápido (avaliado nos primeiros 5 a 8 segundos).</p>
+          <p><strong>Bases Teológicas & Psicológicas:</strong> <em>"Instrui a criança no caminho em que deve andar..."</em> (Provérbios 22:6). A Gen Alpha não aprende por monólogos expositivos estáticos; eles aprendem por experiência narrativa, sensorial e aprendizado prático (<em>Learning by Doing</em>).</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação no Púlpito Infantil & Conteúdo</h3>
+          <h3>💡 Aplicação no Púlpito Infantil & Ensino</h3>
           <ul>
-            <li><strong>Ganchos Visuais Rápidos:</strong> Comece lições com elementos reais (objetos do dia a dia, ilusões de ótica ou metáforas visuais).</li>
-            <li><strong>Linguagem Gamificada:</strong> Use conceitos como 'missões', 'conquistas' e 'poderes da fé' em vez de vocabulário arcaico.</li>
-            <li><strong>Micro-histórias:</strong> Mantenha histórias bíblicas divididas em blocos curtos de 3 a 5 minutos.</li>
+            <li><strong>Ganchos Visuais de 5 Segundos:</strong> Inicie lições com um objeto concreto, pergunta provocadora ou elemento de curiosidade para capturar a atenção imediata.</li>
+            <li><strong>Apologética Precoce e Espaço para Dúvidas:</strong> A Gen Alpha faz perguntas profundas cedo (ex: <em>"Por que Deus permite o mal?"</em>). A dúvida deve ser acolhida como ponto de partida para a descoberta bíblica, nunca punida.</li>
+            <li><strong>Afirmação de Identidade:</strong> Ensinar que o valor da criança está fundamentado no amor incondicional da Cruz, salvaguardando seu coração contra as métricas de likes das redes.</li>
           </ul>
         `,
         quiz: [
@@ -66,7 +67,7 @@ export const ACADEMY_TRAILS = [
             question: "Para prender a atenção da Gen Alpha nos primeiros minutos de um ensino, qual recurso é mais eficaz?",
             options: [
               "Fazer uma introdução teórica de 15 minutos sem mudar o tom de voz",
-              "Apresentar um elemento visual concreto ou objeto que desperte curiosidade",
+              "Apresentar um elemento visual concreto ou objeto que desperte curiosidade nos primeiros 5 a 8 segundos",
               "Pedir que fiquem em silêncio absoluto sem dar explicação",
               "Ler uma lista extensa de nomes genealógicos"
             ],
@@ -99,7 +100,7 @@ export const ACADEMY_TRAILS = [
             question: "Qual é a duração ideal recomendada para cada bloco narrativo com a Gen Alpha?",
             options: [
               "30 a 45 minutos contínuos",
-              "3 a 5 minutos dinâmicos intercalados com interação",
+              "3 a 5 minutos dinâmicos intercalados com interação e perguntas",
               "2 horas diretas",
               "Apenas 5 segundos"
             ],
@@ -144,18 +145,20 @@ export const ACADEMY_TRAILS = [
       {
         id: 'ga-mod-2',
         title: 'Módulo 2: Conectando com a Gen Alpha',
-        subtitle: 'Pontes de comunicação através de histórias interativas e jogos',
+        subtitle: 'Storytelling transmídia, gamificação da fé e o método de blocos curtos (3 a 5 min)',
         xp: 50,
         contextoPratico: `
-          <h3>🎮 Storytelling Interativo & Métodos Narrativos</h3>
-          <p>Para conectar com a Gen Alpha, o comunicador precisa dominar a arte do Storytelling Transmídia. Jesus usou parábolas usando sementes, redes de pesca e moedas – elementos cotidianos do século I. Hoje, nossas parábolas usam elementos do universo digital e do cotidiano moderno.</p>
-          <p><strong>Cultura de Empatia:</strong> Em vez de rotular os jogos virtuais como inimigos, o líder inteligente utiliza os princípios dos jogos (missões coletivas, superação de desafios e cooperação) para ensinar valores bíblicos.</p>
+          <h3>🎮 Storytelling Transmídia & Parábolas Modernas</h3>
+          <p>Para conectar com a Gen Alpha, o comunicador domina o <strong>Storytelling Transmídia</strong>. Jesus ensinou através de parábolas usando sementes, redes de pesca e moedas – elementos cotidianos do século I. Hoje, conectamos verdades eternas utilizando princípios do universo digital e do cotidiano moderno.</p>
+          <p><strong>Gamificação da Fé (Metas & Missões):</strong> Em vez de rotular os jogos como vilões, o comunicador usa a lógica de missões coletivas, superação de desafios e cooperação para ensinar a vida cristã prática.</p>
+          <p><strong>A Regra dos Blocos Narrativos de 3 a 5 Minutos:</strong> Estruturar o ensino em pequenos blocos dinâmicos intercalados com perguntas abertas renova o ciclo de atenção e fixa o aprendizado no cérebro infantil.</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação no Púlpito infantil & Células</h3>
+          <h3>💡 Aplicação no Púlpito Infantil & Células</h3>
           <ul>
-            <li><strong>Parábolas Modernas:</strong> Compare a armadura de Deus (Efésios 6) a equipamentos de proteção de heróis virtuais.</li>
-            <li><strong>Desafios em Equipe:</strong> Crie 'missões semanais' onde as crianças praticam gentileza ou leitura bíblica em família.</li>
+            <li><strong>Parábolas do Universo Digital:</strong> Compare a Armadura de Deus (Efésios 6) a equipamentos de proteção e itens lendários de avatares.</li>
+            <li><strong>Missões Semanais do Guardião:</strong> Crie desafios práticos onde as crianças praticam atitudes de generosidade, gentileza e leitura bíblica em família.</li>
+            <li><strong>Discernimento sem Demonização:</strong> Orientar sobre segurança online e limites com tecnologia, ensinando o uso de mídias para edificar e abençoar.</li>
           </ul>
         `,
         quiz: [
@@ -273,19 +276,21 @@ export const ACADEMY_TRAILS = [
       },
       {
         id: 'ga-mod-3',
-        title: 'Módulo 3: Liderando a Gen Alpha',
-        subtitle: 'Discipulado infantil e mentoria na era hiperdigital',
+        title: 'Módulo 3: Liderando e Discipulando a Gen Alpha',
+        subtitle: 'Parceria com pais Millennials, Apologética Amigável e refúgio de saúde emocional',
         xp: 50,
         contextoPratico: `
-          <h3>🛡️ Formação de Caráter & Raízes Espirituais</h3>
-          <p>Discipular a Gen Alpha é fundamentá-los em verdades inabaláveis sobre sua identidade em Deus antes que o algoritmo das redes tente definir quem eles são. Na era da inteligência artificial, a inteligência espiritual e emocional torna-se o maior diferencial.</p>
-          <p><strong>Parceria com as Famílias:</strong> A igreja local atua como catalisadora, mas o discipulado mais poderoso acontece no lar através do altar familiar renovado.</p>
+          <h3>🛡️ Discipulado Familiar & Altar Renovado no Lar</h3>
+          <p>Discipular a Gen Alpha é fundamentá-los em verdades inabaláveis sobre sua identidade em Deus antes que o algoritmo das redes tente definir quem eles são. O ministério infantil não substitui o lar; ele fortalece e capacita a família (Deuteronômio 6:6-7).</p>
+          <p><strong>Apologética Amigável & Refúgio Emocional:</strong> Na era da inteligência artificial e da ansiedade precoce, a igreja é o espaço acolhedor onde a criança descobre que a dúvida não é punida e que seu valor está salvo na graça de Deus, imune a "dislikes".</p>
+          <p><strong>Parceria com Pais Millennials:</strong> Criar pontes de comunicação direta e ferramentas simples para capacitar os pais como os principais mentores espirituais de seus filhos.</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação Prática no Ministério</h3>
+          <h3>💡 Aplicação Prática na Liderança & Família</h3>
           <ul>
-            <li><strong>Ferramentas de Apoio aos Pais:</strong> Crie guias rápidos no WhatsApp com perguntas para os pais conversarem com os filhos no carro ou no jantar.</li>
-            <li><strong>Rituais de Passagem:</strong> Celebre marcos espirituais (batismo, primeira Bíblia, transição para o grupo de adolescentes).</li>
+            <li><strong>Roteiros Rápidos para Pais (WhatsApp):</strong> Enviar guias de 3 minutos com perguntas provocadoras para os pais conversarem no jantar ou no caminho da escola.</li>
+            <li><strong>Rituais de Passagem Espiritual:</strong> Celebrar marcos marcantes (entrega da 1ª Bíblia, dedicação, batismo e transição para os adolescentes).</li>
+            <li><strong>Ambiente de Saúde Emocional:</strong> Oferecer suporte pastoral para famílias lidando com ansiedade infantil e limites de tempo de tela.</li>
           </ul>
         `,
         quiz: [

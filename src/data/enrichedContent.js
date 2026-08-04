@@ -2,55 +2,85 @@
 // Provides rich practical examples, sermon outlines, Gen Z/Alpha metaphors, opening hooks, and communication guides.
 
 export const ENRICHED_MODULE_EXAMPLES = {
-  // Gen Alpha
+  // Gen Alpha - Trilha 1
   'ga-mod-1': {
     sermonIllustration: {
-      title: "O Experimento da Lanterna e da Bateria",
-      story: "Certo dia, um menino ganhou um brinquedo incrível, mas ao tentar ligar no escuro, nada aconteceu. O pai abriu o compartimento e mostrou: 'Ele precisa estar conectado à fonte certa de energia'. Assim como a bateria alimenta o brinquedo, o Espírito Santo alimenta o nosso coração.",
+      title: "O Experimento da Lanterna e da Bateria Sem Sinal",
+      story: "Certo dia, um menino ganhou um dispositivo incrível de presente, mas ao tentar ligá-lo no escuro, nada aconteceu. Ele tentou apertar os botões mais rápido, mas o brinquedo continuava travado. O pai abriu a tampa e mostrou: 'Não adianta clicar mais rápido; ele precisa estar conectado à fonte certa de energia'. Na vida espiritual, tentar viver na nossa própria força nos deixa lentos e no escuro. Somente quando nos conectamos ao Espírito Santo pela oração e pela Palavra nossa luz brilha de verdade.",
       outline: [
-        "1. Sem bateria (sem Deus), ficamos no escuro e travados.",
-        "2. Conectados à Fonte (oração e Bíblia), nossa luz brilha.",
-        "3. Missão: Iluminar o caminho dos amigos na escola."
+        "1. Sem bateria (sem Deus), ficamos no escuro, ansiosos e travados.",
+        "2. Conectados à Fonte Original (oração e Bíblia), nossa vida transmite luz.",
+        "3. Missão Prática: Iluminar e abençoar a escola, a família e os amigos."
       ]
     },
     openingHooks: [
-      "⚡ 'Você sabia que seu cérebro toma decisões mais rápido que um clique no Roblox? Mas existe algo que decide antes de tudo...'",
-      "🎨 'Imagine se o mundo ficasse sem cor de repente. É exatamente isso que acontece quando a gente esquece de ser grato.'",
-      "🚀 'Se você pudesse escolher um superpoder real hoje, qual seria? A Bíblia mostra que nós já temos um ativado!'"
+      "⚡ 'Você sabia que seu cérebro toma decisões em menos tempo que um clique no Roblox? Mas existe algo que decide o seu destino antes de tudo...'",
+      "🎨 'Imagine se o mundo ficasse sem cor e sem som de repente. É exatamente isso que acontece quando a gente esquece quem é em Deus.'",
+      "🚀 'Se você pudesse destravar um superpoder real hoje no mundo físico, qual seria? A Bíblia mostra que nós já temos um ativado!'"
     ],
     genZMetaphors: [
-      "🎮 'Servidor Privado': A oração é como um canal exclusivo de comunicação direta com Deus, sem lag e sem cair a conexão.",
-      "🔋 'Modo Economia de Bateria': Quando vivemos no automático sem buscar a Deus, ficamos fracos e lentos.",
-      "🛡️ 'Shield de Proteção': A Verdade de Deus age como um firewall que bloqueia pensamentos ruins e mentiras."
+      "🎮 'Servidor Privado': A oração é como um canal exclusivo de comunicação direta com Deus, sem lag, sem queda de sinal e sem fila de espera.",
+      "🔋 'Modo Economia de Bateria': Quando vivemos no automático sem buscar a Deus, ficamos fracos, irritados e lentos.",
+      "🛡️ 'Firewall da Fé': A Verdade de Deus age como um filtro de segurança que bloqueia vírus mentais, mentiras e sentimentos de rejeição."
     ],
     communicationGuide: {
-      tone: "Entusiasta, dinâmico e expressivo. Use variações de ritmo.",
-      bodyLanguage: "Gestos amplos, nível dos olhos das crianças (agachar-se quando necessário).",
-      callToAction: "Desafio da semana: 'Missão do Guardião da Luz' — fazer uma ação de bondade em casa."
+      tone: "Entusiasta, dinâmico e expressivo. Use variações de ritmo e entonação.",
+      bodyLanguage: "Gestos amplos, abaixar-se ao nível dos olhos das crianças, contato visual direto.",
+      callToAction: "Desafio da semana: 'Missão do Guardião da Luz' — realizar um ato secreto de gentileza em casa."
     }
   },
+
   'ga-mod-2': {
     sermonIllustration: {
-      title: "O Escudo do Cavaleiro Gamer",
-      story: "Um jogador montou uma armadura lendária no jogo, mas esqueceu o capacete. No primeiro ataque, perdeu o jogo. Na vida real, a Armadura de Deus (Efésios 6) nos protege inteiros contra as mentiras do inimigo.",
+      title: "O Cavaleiro sem Capacete (Efésios 6 e os Jogos)",
+      story: "Um jogador montou uma armadura lendária em seu avatar no jogo: comprou o escudo mais caro e a espada mais brilhante, mas esqueceu de vestir o capacete. No primeiro ataque inimigo, perdeu a partida inteira. Na vida real, a Armadura de Deus nos protege inteiros. Não adianta ter atitudes boas se a nossa mente (o Capacete da Salvação) estiver aberta para mentiras e duvidas.",
       outline: [
-        "1. Capacete da Salvação: Protege nossos pensamentos.",
-        "2. Escudo da Fé: Bloqueia as flechas de dúvida.",
-        "3. Espada do Espírito: A Palavra de Deus para vencer o mal."
+        "1. Capacete da Salvação: Protege nossos pensamentos contra o medo e mentiras.",
+        "2. Escudo da Fé: Bloqueia as flechas de dúvida e desânimo.",
+        "3. Espada do Espírito: A Palavra de Deus declarada para vencer o mal."
       ]
     },
     openingHooks: [
-      "👾 'Qual é o item mais poderoso que você já conquistou em um jogo? Hoje vou te mostrar um item que funciona no mundo real!'",
-      "🛡️ 'Você já tentou jogar sem proteção no chefe final? É impossível. E por que tentamos viver sem a Armadura de Deus?'"
+      "👾 'Qual foi o item mais poderoso que você já conquistou em um jogo? Hoje vou te mostrar um item que funciona no mundo real!'",
+      "🛡️ 'Você já tentou enfrentar o chefão final de um jogo completamente sem proteção? É impossível. E por que tentamos viver a semana sem a Armadura de Deus?'",
+      "📱 'Se a sua vida virasse uma história em quadrinhos ou um jogo hoje, qual seria a sua missão principal?'"
     ],
     genZMetaphors: [
-      "⚔️ 'Loot Lendário': A sabedoria bíblica é o melhor equipamento de vida.",
-      "📶 'Pings & Alertas': O Espírito Santo nos dá alertas no coração quando algo é perigoso."
+      "⚔️ 'Loot Lendário': A sabedoria bíblica dos Provérbios é o equipamento mais valioso que você pode coletar na infância.",
+      "📶 'Ping do Espírito Santo': O Espírito Santo dá alertas imediatos no coração quando um caminho é perigoso.",
+      "🏆 'XP de Caráter': Cada escolha de amor e generosidade aumenta seu nível de maturidade espiritual."
     ],
     communicationGuide: {
-      tone: "Aventureiro e cativante.",
-      bodyLanguage: "Demonstrar movimentos de defesa e conquista de forma lúdica.",
-      callToAction: "Oração em dupla para vestir a armadura da fé."
+      tone: "Aventureiro, motivador e focado em superação.",
+      bodyLanguage: "Demonstrar movimentos lúdicos de defesa, conquista e firmeza.",
+      callToAction: "Oração em duplas: 'Vestindo a Armadura da Fé' antes de sair para a escola."
+    }
+  },
+
+  'ga-mod-3': {
+    sermonIllustration: {
+      title: "O Espelho sem Filtros da Cruz",
+      story: "Uma menina passava 3 horas por dia testando filtros em um aplicativo para ver qual foto recebia mais curtidas dos amigos. Mas quanto mais edições fazia, mais insegura ficava ao olhar no espelho real. Em um acampamento da igreja, ela ouviu sobre o amor incondicional de Jesus e compreendeu: 'O Criador do universo já me amou e aprovou na cruz sem nenhum filtro'. Ela descobriu que sua paz vem do amor de Deus, não das métricas de aprovação alheia.",
+      outline: [
+        "1. A armadilha da aprovação alheia: Buscar curtidas exaure o coração.",
+        "2. O olhar do Pai na Cruz: Você é amado e aceito antes de produzir qualquer conteúdo.",
+        "3. Liberdade em Cristo: Viver com a identidade firmada na graça de Deus."
+      ]
+    },
+    openingHooks: [
+      "💔 'Você já sentiu que está cercado de seguidores ou amigos online, mas às vezes deita no quarto e se sente sozinho?'",
+      "🔍 'O que acontece quando você faz uma pergunta difícil para o Google ou pro ChatGPT? Hoje vamos ver onde encontrar respostas que não mudam.'",
+      "🏠 'Quem aqui já teve uma conversa incrível em família no jantar? Vamos aprender como transformar nossa casa num refúgio de paz.'"
+    ],
+    genZMetaphors: [
+      "☁️ 'Cloud Sync Familiar': O lar cristão precisa estar em constante sincronia de oração e amor com Deus.",
+      "🔄 'Recalculando Rota (Arrependimento)': Pedir perdão a Deus e aos pais é como um GPS recalculando o caminho certo sem acusação.",
+      "💎 'Identidade Salva na Nuvem': Seu valor está gravado no coração de Deus, imune a 'dislikes' ou críticas externas."
+    ],
+    communicationGuide: {
+      tone: "Acolhedor, profundo, empático e inspirador.",
+      bodyLanguage: "Postura aberta, sem pedestal, olhando nos olhos e demonstrando calor humano.",
+      callToAction: "Rito de oração familiar ou momento de consagração de identidade no altar."
     }
   },
 
