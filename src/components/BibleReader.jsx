@@ -503,13 +503,13 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       {/* 100% Fullscreen Refinement Chat Panel (Borda Infinita #0B0E14) */}
       <AnimatePresence>
         {isPanelOpen && (
-          <div className="fixed inset-0 z-[100] bg-[#0b0d17] text-slate-100 flex flex-col h-screen w-screen overflow-hidden font-sans selection:bg-cyan-500 selection:text-slate-950">
+          <div className="fixed inset-0 z-[100] bg-[#0b0d17] text-slate-100 overflow-y-auto w-full h-full min-h-screen font-sans selection:bg-cyan-500 selection:text-slate-950 scroll-smooth">
             
             {/* 1. HEADER FIXO COM NAVEGAÇÃO E BADGE */}
-            <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-950/80 border-b border-slate-800/80 px-4 py-3 flex items-center justify-between shrink-0">
+            <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-slate-950/90 border-b border-slate-800/80 px-4 py-3 flex items-center justify-between shrink-0 shadow-lg">
               <button
                 onClick={() => setIsPanelOpen(false)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 text-xs font-medium transition-all min-h-[44px] cursor-pointer"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 text-xs sm:text-sm font-extrabold transition-all min-h-[44px] cursor-pointer shadow-md"
                 aria-label="Voltar para a Bíblia"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -518,22 +518,23 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               
               <div className="flex items-center gap-2 bg-purple-950/40 border border-purple-500/30 px-3 py-1.5 rounded-full">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-xs font-semibold text-purple-300">Tradução Gen Z / Alpha</span>
+                <span className="text-xs font-bold text-purple-300">Tradução Gen Z / Alpha</span>
               </div>
             </header>
 
-            {/* 2. CONTEÚDO PRINCIPAL (FOCO DE LEITURA RESPONSIVO) */}
-            <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-6 flex flex-col gap-6 overflow-y-auto pb-36">
+            {/* 2. CONTEÚDO PRINCIPAL (FOCO DE LEITURA RESPONSIVO - pb-48 GARANTE SCROLL ATÉ O FIM) */}
+            <main className="max-w-3xl w-full mx-auto px-4 py-6 flex flex-col gap-6 pb-48">
               
-              {/* CARD DO VERSÍCULO BÍBLICO */}
-              <section className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-slate-900 to-slate-900/60 border border-slate-800 p-5 sm:p-6 shadow-xl">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-semibold">
+              {/* CARD DO VERSÍCULO BÍBLICO (H-AUTO COMPLETO SEM TRUNCAMENTO DE TEXTO) */}
+              <section className="w-full h-auto rounded-2xl bg-gradient-to-b from-slate-900 to-slate-900/80 border border-slate-800 p-5 sm:p-6 shadow-xl flex flex-col gap-3">
+                <div className="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                  <span className="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-300 border border-purple-500/20 text-xs font-black">
                     {selectedVerseRef}
                   </span>
-                  <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">NVI</span>
+                  <span className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold">NVI</span>
                 </div>
-                <blockquote className="font-serif text-base md:text-lg text-slate-200 leading-relaxed italic border-l-2 border-purple-500 pl-4 my-2">
+                
+                <blockquote className="font-serif text-slate-100 text-sm sm:text-base md:text-lg leading-relaxed italic border-l-4 border-purple-500 pl-4 py-1 break-words whitespace-normal font-medium">
                   "{selectedVerseText}"
                 </blockquote>
               </section>
@@ -542,15 +543,15 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               {chatMessages.map((msg, index) => {
                 if (index === 0 && msg.role === 'user') return null;
                 return (
-                  <article key={index} className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 md:p-6 shadow-2xl flex flex-col gap-4 relative overflow-hidden">
+                  <article key={index} className="w-full h-auto rounded-2xl bg-slate-900/90 border border-slate-800 p-5 md:p-6 shadow-2xl flex flex-col gap-4 relative">
                     {/* Glowing Accent Top Line */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 via-cyan-400 to-amber-400" />
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 via-cyan-400 to-amber-400 rounded-t-2xl" />
 
                     {/* HEADER DO CARD IA */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-4 mt-1">
                       <div className="flex items-center gap-2">
                         <span className="text-cyan-400 text-lg">✨</span>
-                        <h1 className="text-sm font-bold tracking-wide text-slate-100 uppercase">
+                        <h1 className="text-xs sm:text-sm font-bold tracking-wide text-slate-100 uppercase">
                           {msg.role === 'user' ? 'Sua Dúvida' : 'Estudo & Tradução Teológica IA'}
                         </h1>
                       </div>
@@ -572,7 +573,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                                 setIsPlayingAudio(true);
                               }
                             }}
-                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border min-h-[36px] cursor-pointer ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border min-h-[36px] cursor-pointer ${
                               isPlayingAudio
                                 ? 'bg-amber-500/20 border-amber-400 text-amber-400 animate-pulse'
                                 : 'bg-slate-950 border-cyan-500/40 text-cyan-300 hover:text-white hover:bg-slate-800'
@@ -593,7 +594,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
 
                     {/* MARKDOWN PROSE CONTENT */}
                     <div
-                      className="prose prose-invert max-w-none text-slate-200 text-sm md:text-base leading-relaxed space-y-4 prose-h1:text-xl sm:prose-h1:text-2xl prose-h1:font-black prose-h1:text-purple-300 prose-h2:text-base sm:prose-h2:text-lg prose-h2:font-extrabold prose-h2:text-cyan-300 prose-h3:text-amber-400 prose-strong:text-amber-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-400 prose-blockquote:bg-purple-950/20 prose-blockquote:p-4 prose-blockquote:rounded-r-xl prose-li:marker:text-purple-400"
+                      className="prose prose-invert max-w-none text-slate-100 text-sm md:text-base leading-relaxed space-y-4 prose-h1:text-xl sm:prose-h1:text-2xl prose-h1:font-black prose-h1:text-purple-300 prose-h2:text-base sm:prose-h2:text-lg prose-h2:font-extrabold prose-h2:text-cyan-300 prose-h3:text-amber-400 prose-strong:text-amber-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-400 prose-blockquote:bg-purple-950/20 prose-blockquote:p-4 prose-blockquote:rounded-r-xl prose-li:marker:text-purple-400 break-words"
                       dangerouslySetInnerHTML={{ __html: marked.parse(msg.content || '') }}
                     />
                   </article>
@@ -610,29 +611,29 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               )}
             </main>
 
-            {/* 3. FLOATING STICKY INPUT BAR (COM SUGESTÕES DE PROMPT E ACESSIBILIDADE) */}
-            <div className="fixed bottom-0 left-0 right-0 z-30 px-4 py-3 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/80">
+            {/* 3. FLOATING STICKY INPUT BAR AT BOTTOM */}
+            <div className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/80 shadow-2xl">
               <div className="max-w-3xl mx-auto space-y-2">
                 {/* Prompt Suggestion Chips */}
                 <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none no-scrollbar pb-1 text-[11px]">
                   <button
                     type="button"
                     onClick={() => setChatInput("Me dê mais 3 metáforas digitais para jovens...")}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-cyan-300 whitespace-nowrap transition-all"
+                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-cyan-300 whitespace-nowrap transition-all cursor-pointer"
                   >
                     ✨ Mais metáforas digitais
                   </button>
                   <button
                     type="button"
                     onClick={() => setChatInput("Como posso aplicar esse versículo na célula ou grupo de jovens?")}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-purple-300 whitespace-nowrap transition-all"
+                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-purple-300 whitespace-nowrap transition-all cursor-pointer"
                   >
                     💡 Aplicação para a Célula
                   </button>
                   <button
                     type="button"
                     onClick={() => setChatInput("Quais referências cruzadas adicionais explicam este tema?")}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300 whitespace-nowrap transition-all"
+                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300 whitespace-nowrap transition-all cursor-pointer"
                   >
                     📜 Mais referências bíblicas
                   </button>
