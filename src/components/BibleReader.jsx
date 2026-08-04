@@ -309,32 +309,34 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
         <div className="flex items-center justify-between gap-1.5 sm:gap-2 min-w-max w-full">
           {/* Left Group: Book & Chapter Selectors + Audio Button + NVI */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-            {/* Book Dropdown Pill (Compact Size) */}
+            {/* Book Dropdown Pill (Auto-adjusted snug width & larger font size) */}
             <div className="relative">
               <select
                 value={selectedBook}
                 onChange={(e) => setSelectedBook(e.target.value)}
-                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full px-2.5 py-1 text-[11px] sm:text-xs font-extrabold text-white appearance-none pr-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                style={{ width: `${Math.min(145, Math.max(74, selectedBook.length * 9.5 + 26))}px` }}
+                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full pl-3 pr-5 py-1 text-xs sm:text-sm font-black text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all truncate"
               >
                 {bibleDatabase?.map((b) => (
-                  <option key={b.name} value={b.name}>{b.name}</option>
+                  <option key={b.name} value={b.name} className="bg-slate-900 text-white font-bold text-xs py-1">{b.name}</option>
                 ))}
               </select>
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[8px] pointer-events-none">▼</span>
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-400 text-[8px] pointer-events-none">▼</span>
             </div>
 
-            {/* Chapter Selector Pill (Numbers only, no "Cap." word) */}
+            {/* Chapter Selector Pill (Numbers only, larger font size & compact snug width) */}
             <div className="relative">
               <select
                 value={selectedChapter}
                 onChange={(e) => setSelectedChapter(e.target.value)}
-                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full px-2.5 py-1 text-[11px] sm:text-xs font-extrabold text-white appearance-none pr-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                style={{ width: `${Math.max(46, selectedChapter.length * 10 + 24)}px` }}
+                className="bg-slate-950/90 border border-white/15 hover:border-purple-500 rounded-full pl-2.5 pr-4 py-1 text-xs sm:text-sm font-black text-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all text-center"
               >
                 {Array.from({ length: chapterOptionsCount }, (_, i) => i + 1).map((ch) => (
-                  <option key={ch} value={ch.toString()}>{ch}</option>
+                  <option key={ch} value={ch.toString()} className="bg-slate-900 text-white font-bold text-xs py-1">{ch}</option>
                 ))}
               </select>
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[8px] pointer-events-none">▼</span>
+              <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-purple-400 text-[8px] pointer-events-none">▼</span>
             </div>
 
             {/* Audio TTS Button Right After Chapter */}
