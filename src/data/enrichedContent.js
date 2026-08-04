@@ -164,6 +164,88 @@ export const ENRICHED_MODULE_EXAMPLES = {
       bodyLanguage: "Firmeza, braços abertos para convocar a equipe, expressão inspiradora.",
       callToAction: "Convocação para engajamento em células e equipes de projetos sociais."
     }
+  },
+
+  // Jesus Life & Principles - Trilha 3
+  'jl-mod-1': {
+    sermonIllustration: {
+      title: "O Pão da Vida na Poeira da Galileia",
+      story: "Certo rei poderoso desejava conhecer as reais aflições do seu povo. Ele não mandou emissários ou decretos reais; despiu-se dos mantos de seda, vestiu trajes de camponês e foi morar entre os pobres. Ele sentiu a mesma fome, o mesmo frio e a mesma dor. Foi exatamente isso que Deus fez em Jesus Cristo: João 1:14 nos diz que o Verbo se fez carne e armou Sua tenda entre nós. Ele não apenas nos olhou lá do alto; Ele veio pisar na nossa poeira para nos salvar.",
+      outline: [
+        "1. A Encarnação: Deus se tornando próximo e humano em Jesus.",
+        "2. A Cruz Vicária: O amor gracioso que tomou o nosso lugar no Julgamento.",
+        "3. A Ressurreição: O fato histórico que garantiu a vitória sobre a morte."
+      ]
+    },
+    openingHooks: [
+      "🌟 'E se eu te dissesse que a história do universo não é sobre o homem tentando subir até Deus, mas sobre Deus descendo até o homem?'",
+      "⏳ 'Por que a vida de um jovem marceneiro da Galileia que viveu há 2000 anos continua sendo o centro de todas as transformações humanas?'",
+      "✝️ 'Qual é a diferença entre um líder que dá ordens e o Rei que morre pelos seus súditos?'"
+    ],
+    genZMetaphors: [
+      "👑 'Download de Deus na Terra': A Encarnação de Jesus foi o download da presença divina na nossa realidade humana.",
+      "🗝️ 'Master Key de Acesso': A Cruz de Cristo destravou o acesso direto ao Pai, rasgando o véu de separação.",
+      "⚡ 'Power-Up da Ressurreição': A vitória sobre a sepultura é o poder que nos concede vida nova inabalável."
+    ],
+    communicationGuide: {
+      tone: "Inspirador, solene, profundo e reverente.",
+      bodyLanguage: "Expressão aquecida, braços abertos indicando acolhimento, ritmo cadenciado.",
+      callToAction: "Oração de entrega e alinhamento do coração à liderança de Jesus."
+    }
+  },
+
+  'jl-mod-2': {
+    sermonIllustration: {
+      title: "A Bacia, a Toalha e a Verdade sem Acusação",
+      story: "Na noite em que foi traído, Jesus não exigiu que os discípulos prostrassem seus pés para veneração. Ele pegou uma bacia, amarrou a toalha na cintura e ajoelhou-se para lavar os pés poeirentos daqueles homens, inclusive os de Judas. Horas depois, diante de uma mulher condenada à morte por julgadores hipócritas, Ele disse: 'Nem eu te condeno; vai e não peques mais'. Jesus revolucionou a liderança mostrando que o topo do Reino é o serviço, e que a verdade só cura quando acompanhada da graça.",
+      outline: [
+        "1. A liderança de toalha: Servir com humildade antes de exercer autoridade.",
+        "2. Graça superior ao legalismo: Relacionamento de coração antes de regras vazias.",
+        "3. Verdade com Amor: A Graça acolhe o pecador; a Verdade transforma a vida."
+      ]
+    },
+    openingHooks: [
+      "❤️ 'O que acontece quando o homem mais poderoso do mundo se ajoelha com uma bacia para lavar os seus pés?'",
+      "🕊️ 'Você já conheceu alguém que te conhecia por inteiro no seu pior dia e mesmo assim te amou sem reservas?'",
+      "👑 'Por que no Reino de Jesus o maior não é o que fica no topo da pirâmide, mas aquele que serve a todos na base?'"
+    ],
+    genZMetaphors: [
+      "🔄 'Reset de Dívida (Graça)': O perdão de Jesus é como zerar uma dívida bilionária que você jamais conseguiria pagar.",
+      "🧼 'Toalha na Bacia': O selo da verdadeira liderança cristã não é um título pomposo, é a disposição em servir.",
+      "🛡️ 'Shield do Perdão (70x7)': Perdoar sempre é manter o coração livre de amarguras e vírus de ódio."
+    ],
+    communicationGuide: {
+      tone: "Profundo, gracioso, desafiador e acolhedor.",
+      bodyLanguage: "Gesticulação serena, contato visual amoroso e sem acusação moralista.",
+      callToAction: "Momento de reconciliação, perdão ao próximo e renovo de compromisso servidor."
+    }
+  },
+
+  'jl-mod-3': {
+    sermonIllustration: {
+      title: "O Ramo Conectado à Videira Verdadeira (João 15)",
+      story: "Um jardineiro cortou um galho de uma macieira e o colocou em um vaso bonito dentro de casa. Nos primeiros dias, as flores continuavam bonitas, parecendo vivas. Mas sem estar ligado à raiz e ao tronco, o galho não podia produzir maçãs reais e logo secou. Muitas vezes tentamos viver uma vida cristã baseada apenas na nossa força ou na aparência externa. Mas Jesus disse: 'Sem mim nada podeis fazer'. A verdadeira vida nasce quando permanecemos conectados a Ele no secreto.",
+      outline: [
+        "1. O erro da desconexão: Ativismo sem oração gera esgotamento e frutos secos.",
+        "2. A oração no quarto secreto: Conversa sincera longe das exibições humanas.",
+        "3. Fé em ação: Transbordar a presença de Cristo servindo à família e à comunidade."
+      ]
+    },
+    openingHooks: [
+      "🔌 'O que acontece com o seu celular mais moderno se você passar 3 dias sem conectar na tomada? E com a sua alma sem orar?'",
+      "🌱 'Você quer uma religião cansativa de aparências ou um relacionamento diário com um Amigo Vivo?'",
+      "🚪 'Sabe o que Jesus quer encontrar quando você fecha a porta do seu quarto e desliga o celular?'"
+    ],
+    genZMetaphors: [
+      "📶 'Conexão Wi-Fi Direta no Secreto': A oração diária é a conexão contínua com a seiva da Videira (João 15).",
+      "📖 'Leitura sem Filtro (Evangelhos)': Ler os Evangelhos é olhar no espelho da verdade para ser transformado à imagem de Cristo.",
+      "👣 'Hands-On (Fé Prática)': Conectar-se com Jesus é ver Jesus nos olhos do necessitado e servir com amor real."
+    ],
+    communicationGuide: {
+      tone: "Íntimo, prático, encorajador e convocatório.",
+      bodyLanguage: "Postura acolhedora, voz calorosa e pausada para reflexão interior.",
+      callToAction: "Desafio prático de 15 minutos diários no Quarto Secreto a partir de hoje."
+    }
   }
 };
 

@@ -932,7 +932,7 @@ export const ACADEMY_TRAILS = [
   {
     id: 'jesus-life',
     title: 'Trilha 3: Conhecendo Jesus',
-    subtitle: 'O Homem, a Mensagem, os Princípios e o Modelo Perfeito de Comunicação',
+    subtitle: 'A Vida, os Princípios Revolucionários e Como Construir Conexão Diária com Cristo',
     category: 'Fundamentos Bíblicos',
     badge: '👑 Insígnia Kingdom Disciple',
     icon: 'Crown',
@@ -940,19 +940,21 @@ export const ACADEMY_TRAILS = [
     modules: [
       {
         id: 'jl-mod-1',
-        title: 'Módulo 1: A Vida de Jesus',
-        subtitle: 'O contexto histórico, social e a revolução cultural de Cristo',
+        title: 'Módulo 1: A Vida de Jesus Cristo',
+        subtitle: 'A história que dividiu o tempo, encarnação, mistério da cruz e a vitória da ressurreição',
         xp: 50,
         contextoPratico: `
-          <h3>📜 O Maior Revolucionário da História</h3>
-          <p>Jesus Cristo nasceu em uma província oprimida do Império Romano, em uma sociedade dividida por rituais religiosamente elitistas e opressão política. Sua mensagem não foi um tratado teórico distante, mas uma imersão direta na dor humana.</p>
-          <p><strong>A Comunicação Encarnacional:</strong> "E o Verbo se fez carne e habitou entre nós..." (João 1:14). Jesus não pregou do alto de uma torre de marfim; Ele pisou na poeira das estradas, comeu com pecadores e valorizou os marginalizados.</p>
+          <h3>📜 O Deus que Se Fez Próximo</h3>
+          <p>Jesus Cristo não é apenas o centro da fé cristã, mas o homem que dividiu a história em <em>antes</em> e <em>depois</em>. Ele habitou entre nós não em palácios, mas em uma manjedoura humilde em Belém (Lucas 2). Em João 1:14 (<em>"O Verbo se fez carne..."</em>), vemos o Deus Todo-Poderoso vestindo a nossa humanidade para nos resgatar.</p>
+          <p><strong>O Ministério Terreno de Compaixão:</strong> Jesus pisou na poeira das estradas, curou leprosos, devolveu a visão aos cegos, acolheu publicanos e valorizou os marginalizados. Seu ministério uniu poder milagroso com profunda sensibilidade humana.</p>
+          <p><strong>A Cruz Vicária e a Ressurreição Gloriosa:</strong> Na cruz (Isaías 53 / 2 Coríntios 5:19), Jesus tomou sobre Si nossas culpas e venceu a dívida do pecado. Ao terceiro dia, ressuscitou vitorioso sobre a morte, garantindo esperança eterna a todo aquele que nEle crê.</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação para o Preletor</h3>
+          <h3>💡 Aplicação para o Comunicador & Discípulo</h3>
           <ul>
-            <li><strong>Presença e Proximidade:</strong> O bom comunicador se conecta com a realidade concreta das pessoas antes de tentar ensinar princípios altos.</li>
-            <li><strong>Romper com o Elitismo:</strong> Use linguagem simples que o homem simples e o doutor consigam compreender com igual impacto.</li>
+            <li><strong>Presença Encarnacional:</strong> O comunicador do Reino deve pisar na realidade do ouvinte com empatia e escuta ativa antes de ensinar.</li>
+            <li><strong>Foco na Mensagem Central:</strong> Pregar a pessoa de Jesus — Sua vida, morte substitutiva e ressurreição — como a única esperança inabalável.</li>
+            <li><strong>Linguagem Acessível:</strong> Seguir o modelo de Jesus que comunicava verdades eternas com simplicidade e profundidade sem elitismos.</li>
           </ul>
         `,
         quiz: [
@@ -1070,19 +1072,22 @@ export const ACADEMY_TRAILS = [
       },
       {
         id: 'jl-mod-2',
-        title: 'Módulo 2: Princípios de Jesus',
-        subtitle: 'Graça, serviço, autoridade, compaixão e amor ao próximo',
+        title: 'Módulo 2: Os Princípios Revolucionários de Jesus',
+        subtitle: 'Amor ágape, graça sobre religiosidade estéril, liderança de toalha na bacia e verdade com amor',
         xp: 50,
         contextoPratico: `
-          <h3>❤️ A Liderança de Toalha na Bacia</h3>
-          <p>Na última ceia, Jesus surpreendeu os discípulos ao realizar a tarefa do menor dos servos: lavar os pés dos apóstolos (João 13). Ele redefiniu a grandeza. No Reino de Deus, o topo da pirâmide é a base, e o maior é aquele que serve.</p>
-          <p><strong>A Lógica da Graça:</strong> O Evangelho contrapõe a justiça do merecimento humano com o favor imerecido de Deus que alcança o pecador arrependido.</p>
+          <h3>❤️ Os Pilares do Estilo de Vida de Cristo</h3>
+          <p>Os princípios de Jesus transformaram radicalmente a história. Ele estabeleceu o <strong>Amor Ágape</strong> como o mandamento supremo (Mateus 22:37-39), ensinando a amar até mesmo os inimigos (Mateus 5:44).</p>
+          <p><strong>A Liderança Servidora (Toalha na Bacia):</strong> Ao lavar os pés dos discípulos (João 13), Jesus redefiniu a grandeza. No Reino de Deus, o maior é aquele que serve a todos.</p>
+          <p><strong>Verdade com Graça (João 1:14 / 8:11):</strong> Para a mulher pego em falha, Jesus disse: <em>"Nem eu te condeno [Graça]; vai e não peques mais [Verdade]"</em>. A Graça acolhe o pecador; a Verdade o transforma sem acusação moralista.</p>
+          <p><strong>Prioridade do Reino (Mateus 6:33):</strong> Ele nos ensina a trocar a ansiedade desordenada por coisas materiais pelo descanso na providência perfeita do Pai.</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação na Vida do Líder</h3>
+          <h3>💡 Aplicação na Vida e no Ministério</h3>
           <ul>
-            <li><strong>Liderança Servidora:</strong> Sirva sua equipe antes de fazer exigências; a liderança de Jesus é pelo exemplo.</li>
-            <li><strong>Cultura da Graça:</strong> Crie um ambiente onde pessoas quebradas encontrem restauração em vez de julgamento frio.</li>
+            <li><strong>Cultura da Graça:</strong> Construir ambientes ministeriais onde pessoas quebradas encontram cura em vez de condenação religiosa.</li>
+            <li><strong>Liderança pelo Exemplo:</strong> Demonstrar humildade, serviço e transparência antes de fazer cobranças.</li>
+            <li><strong>Perdão Ilimitado:</strong> Praticar o perdão "setenta vezes sete" (Mateus 18:22), sabendo que fomos perdoados de uma dívida impagável.</li>
           </ul>
         `,
         quiz: [
@@ -1200,19 +1205,22 @@ export const ACADEMY_TRAILS = [
       },
       {
         id: 'jl-mod-3',
-        title: 'Módulo 3: Conectados com Jesus',
-        subtitle: 'Construindo intimidade diária, devocional e identidade inabalável em Cristo',
+        title: 'Módulo 3: Como se Conectar com Jesus na Prática',
+        subtitle: 'Oração no secreto, imersão nos Evangelhos, permanência na Videira e fé em ação',
         xp: 50,
         contextoPratico: `
-          <h3>🌿 A Videira e os Ramos (João 15)</h3>
-          <p>"Permanecei em mim, e eu permanecerei em vós; como o ramo de si mesmo não pode dar fruto... assim também vós não podeis dar fruto se não permanecerdes em mim" (João 15:4). Todo o ativismo na igreja sem intimidade no secreto resulta em esgotamento (Burnout) e frutos artificiais.</p>
-          <p><strong>A Vida no Secreto:</strong> O ministério público é apenas o transbordar da vida secreta de oração e meditação na Palavra.</p>
+          <h3>🌿 A Videira Verdadeira & O Caminho da Intimidade</h3>
+          <p>Conectar-se com Jesus é cultivar um relacionamento pessoal diário com um Amigo Vivo. Em João 15:4 (<em>"Permanecei em mim, e eu permanecerei em vós..."</em>), Ele ensina que todo o fruto espiritual nasce da permanência e intimidade com Ele.</p>
+          <p><strong>A Porta do Arrependimento e Entrega:</strong> Conectar-se começa abrindo o coração sincero ao convite de Jesus (Apocalipse 3:20) e confessando-O como Senhor (Romanos 10:9).</p>
+          <p><strong>A Oração no Quarto Secreto (Mateus 6:6):</strong> Não com rezas mecânicas, mas em um diálogo transparente no secreto, desligando o ruído do mundo para ouvir a voz d'Ele.</p>
+          <p><strong>Imersão nos Evangelhos & Vida Comunitária:</strong> Conhecer a pessoa de Cristo lendo Mateus, Marcos, Lucas e João, e vivenciando essa fé no serviço ao próximo e na comunhão dos santos (Mateus 25:40 / Tiago 2:18).</p>
         `,
         insightAplicacao: `
-          <h3>💡 Aplicação na Rotina Espiritual</h3>
+          <h3>💡 Passo a Passo Diário de Conexão</h3>
           <ul>
-            <li><strong>Habito do Secreto:</strong> Reserve um horário inegociável todos os dias para desligar o celular e buscar a face de Deus.</li>
-            <li><strong>Frutos de Permanência:</strong> Avalie seu ministério não por aplausos digitais, mas pelo Fruto do Espírito na sua vida cotidiana.</li>
+            <li><strong>Momento Inegociável no Secreto:</strong> Reserve 15 minutos diários sem celular para orar e meditar em um capítulo do Evangelho.</li>
+            <li><strong>Sensibilidade ao Espírito Santo:</strong> Aprenda a desacelerar a mente para perceber a orientação amorosa do Consolador.</li>
+            <li><strong>Fé Tangível:</strong> Pratique o que lê servindo à sua família, igreja e pessoas necessitadas na sua comunidade.</li>
           </ul>
         `,
         quiz: [
