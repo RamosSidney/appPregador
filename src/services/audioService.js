@@ -31,6 +31,33 @@ class AudioService {
     this.isListening = false;
     this.isStopping = false; // Flag to prevent cancel() from firing utterance.onend auto-advance
     this.currentRate = 1.0;
+    this.voicesList = [];
+
+    if (this.synth) {
+      this.loadVoices();
+      if (typeof window !== 'undefined' && window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = () => this.loadVoices();
+      }
+    }
+  }
+
+  loadVoices() {
+    if (!this.synth) return [];
+    try {
+      const rawVoices = this.synth.getVoices() || [];
+      const ptVoices = rawVoices.filter(v => v.lang && v.lang.toLowerCase().includes('pt'));
+      this.voicesList = ptVoices.length > 0 ? ptVoices : rawVoices;
+      return this.voicesList;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  getAvailableVoices() {
+    if (!this.voicesList || this.voicesList.length === 0) {
+      return this.loadVoices();
+    }
+    return this.voicesList;
   }
 
   stop() {
