@@ -108,14 +108,6 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     loadNvi();
   }, []);
 
-  // Stop audio on unmount or chapter change
-  useEffect(() => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      setIsPlayingAudio(false);
-    }
-  }, [selectedBook, selectedChapter]);
-
   // 2. Update Verses when Book or Chapter changes
   useEffect(() => {
     if (!bibleDatabase) return;
@@ -132,9 +124,13 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     } else {
       setVersesList([]);
     }
+    // Clear verse selection and context menu position on chapter change
     setSelectedVerseRef(null);
     setSelectedVerseText('');
     setMenuPosition(null);
+    if (!isAutoPlayingNextRef.current) {
+      setAudioProgress(0);
+    }
   }, [selectedBook, selectedChapter, bibleDatabase]);
 
   // 3. Keep Floating Menu aligned with verse during page scroll

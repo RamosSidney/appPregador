@@ -1,23 +1,23 @@
-// Background Music Service for Bible Reading (Continuous Worship Ambient Piano & Cinematic)
+// Background Music Service for Bible Reading (Continuous Piano Worship & Ambient Pad - Crystal Clear MP3)
 
 export const MUSIC_TRACKS = [
   {
     id: 'piano_worship',
     name: '🎹 Continuous Worship Ambient Piano',
-    desc: 'Piano Devocional Suave & Fundo Orquestral (Youtube Cs6LqMckWkg Edition)',
-    url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=inspiring-cinematic-ambient-116199.mp3'
+    desc: 'Piano Devocional Suave (Youtube Cs6LqMckWkg Edition)',
+    url: 'https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3'
   },
   {
     id: 'moments_of_impact',
     name: '🎻 Moments of Impact (Cinematic)',
     desc: 'Pixabay Orchestral Series 541168',
-    url: 'https://cdn.pixabay.com/download/audio/2024/02/08/audio_55b3769c0d.mp3?filename=moments-of-impact-541168.mp3'
+    url: 'https://cdn.pixabay.com/audio/2024/02/08/audio_55b3769c0d.mp3'
   },
   {
-    id: 'synth_pad',
-    name: '🌌 Ambient Worship Pad (Offline)',
-    desc: 'Atmosférico & Imersivo',
-    isSynth: true
+    id: 'ambient_strings',
+    name: '🌌 Ambient Worship Pad & Strings',
+    desc: 'Atmosférico & Profundo',
+    url: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3'
   }
 ];
 
@@ -26,58 +26,7 @@ class BackgroundMusicService {
     this.audio = null;
     this.isPlaying = false;
     this.currentTrackId = 'piano_worship';
-    this.volume = 0.25; // 25% volume for soft background feel
-    this.audioCtx = null;
-    this.synthOscillators = [];
-    this.synthGain = null;
-  }
-
-  playSynthPad() {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!this.audioCtx) {
-        this.audioCtx = new AudioCtx();
-      }
-
-      if (this.audioCtx.state === 'suspended') {
-        this.audioCtx.resume();
-      }
-
-      this.stopSynthPad();
-
-      this.synthGain = this.audioCtx.createGain();
-      this.synthGain.gain.setValueAtTime(this.volume * 0.4, this.audioCtx.currentTime);
-      this.synthGain.connect(this.audioCtx.destination);
-
-      // Warm C Major 9th chord frequencies (C3, G3, B3, D4, E4)
-      const freqs = [130.81, 196.00, 246.94, 293.66, 329.63];
-      this.synthOscillators = freqs.map(freq => {
-        const osc = this.audioCtx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
-
-        const oscGain = this.audioCtx.createGain();
-        oscGain.gain.setValueAtTime(0.15, this.audioCtx.currentTime);
-
-        osc.connect(oscGain);
-        oscGain.connect(this.synthGain);
-        osc.start();
-        return osc;
-      });
-
-      this.isPlaying = true;
-    } catch (err) {
-      console.warn("Erro ao iniciar synth pad:", err);
-    }
-  }
-
-  stopSynthPad() {
-    if (this.synthOscillators.length > 0) {
-      this.synthOscillators.forEach(osc => {
-        try { osc.stop(); osc.disconnect(); } catch (e) {}
-      });
-      this.synthOscillators = [];
-    }
+    this.volume = 0.25; // Fixed 25% volume for soft background sound
   }
 
   play(trackId = null) {
@@ -87,37 +36,32 @@ class BackgroundMusicService {
 
     const track = MUSIC_TRACKS.find(t => t.id === this.currentTrackId) || MUSIC_TRACKS[0];
 
-    if (track.isSynth) {
-      if (this.audio) {
-        this.audio.pause();
-      }
-      this.playSynthPad();
-      return;
-    }
-
-    this.stopSynthPad();
-
     if (!this.audio || this.audio.src !== track.url) {
+      if (this.audio) {
+        try { this.audio.pause(); } catch (e) {}
+      }
       this.audio = new Audio(track.url);
       this.audio.loop = true;
+      this.audio.crossOrigin = 'anonymous';
     }
 
-    this.audio.volume = 0.25; // Fixed 25% volume so it never overpowers speech
+    this.audio.volume = 0.25; // 25% volume
     this.audio.play()
       .then(() => {
         this.isPlaying = true;
       })
       .catch((err) => {
-        console.warn("Autoplay bloqueado pelo navegador. Usando synth pad fallback:", err);
-        this.playSynthPad();
+        console.warn("Autoplay de fundo musical bloqueado ou aguardando interação:", err);
+        this.isPlaying = false;
       });
   }
 
   pause() {
     if (this.audio) {
-      this.audio.pause();
+      try {
+        this.audio.pause();
+      } catch (e) {}
     }
-    this.stopSynthPad();
     this.isPlaying = false;
   }
 
@@ -135,9 +79,6 @@ class BackgroundMusicService {
     this.volume = 0.25;
     if (this.audio) {
       this.audio.volume = 0.25;
-    }
-    if (this.synthGain && this.audioCtx) {
-      this.synthGain.gain.setValueAtTime(0.25 * 0.4, this.audioCtx.currentTime);
     }
   }
 }
