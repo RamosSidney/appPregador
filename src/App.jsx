@@ -13,6 +13,7 @@ import PulpitMode from './components/PulpitMode.jsx';
 import SettingsModal from './components/SettingsModal.jsx';
 import AudioPlayerBar from './components/audio/AudioPlayerBar.jsx';
 import VoiceInteractionModal from './components/audio/VoiceInteractionModal.jsx';
+import PWAInstallBanner from './components/PWAInstallBanner.jsx';
 import { generateSermonAI } from './services/aiService.js';
 import { audioService } from './services/audioService.js';
 
@@ -408,6 +409,9 @@ export default function App() {
         config={config}
         onDeductCredit={handleDeductCredit}
       />
+
+      {/* PWA Installation Prompt Banner */}
+      <PWAInstallBanner />
 
       {/* Floating Bottom Nav Dock (Hidden when full-screen lesson overlay is open) */}
       {!isLessonOpen && (
