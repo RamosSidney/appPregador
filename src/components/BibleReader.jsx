@@ -8,6 +8,7 @@ import { marked } from 'marked';
 import { generateBibleLensAI, refineBibleChatAI } from '../services/aiService.js';
 import { audioService } from '../services/audioService.js';
 import { backgroundMusicService, MUSIC_TRACKS } from '../services/backgroundMusicService.js';
+import { mediaSessionService } from '../services/mediaSessionService.js';
 
 export default function BibleReader({ userCredits, onDeductCredit, config, onOpenSettings }) {
   const [bibleDatabase, setBibleDatabase] = useState(null);
@@ -67,6 +68,40 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       }
     }
   }, [activeSpokenVerseNum, isPlayingAudio]);
+
+  // Update Lock Screen Media Session Widget & Handlers for iOS/Android
+  useEffect(() => {
+    mediaSessionService.updateMetadata({
+      title: `${selectedBook} ${selectedChapter}`,
+      artist: 'Nova Versão Internacional, Edição Gen Z',
+      album: 'appPregador 2.0 — Bíblia Sagrada'
+    });
+
+    mediaSessionService.setupActionHandlers({
+      onPlay: () => {
+        if (!audioService.isPlaying) {
+          startChapterNarration(selectedBook, selectedChapter, versesList);
+        }
+      },
+      onPause: () => {
+        audioService.stop();
+        setIsPlayingAudio(false);
+        setAudioProgress(0);
+      },
+      onPrevious: () => {
+        handlePrevChapter();
+      },
+      onNext: () => {
+        handleNextChapter();
+      }
+    });
+  }, [selectedBook, selectedChapter, versesList]);
+
+  // Sync Lock Screen Media Session Playback State & Progress
+  useEffect(() => {
+    mediaSessionService.setPlaybackState(isPlayingAudio ? 'playing' : 'paused');
+    mediaSessionService.setPositionState({ duration: 100, position: audioProgress });
+  }, [isPlayingAudio, audioProgress]);
 
   // Fullscreen Refinement Chat State
   const [isPanelOpen, setIsPanelOpen] = useState(false);
