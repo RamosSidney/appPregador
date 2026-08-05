@@ -148,28 +148,21 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     }
   };
 
-  // Audio Player Narration (Reads text cleanly WITHOUT reciting verse numbers)
+  // Audio Player Narration (Full Android Chrome Compatibility & Clean TTS)
   const toggleAudioNarration = () => {
-    if (!window.speechSynthesis) {
-      alert("Navegador não suporta reprodução de áudio TTS.");
-      return;
-    }
-
     if (isPlayingAudio) {
-      window.speechSynthesis.cancel();
+      audioService.stop();
       setIsPlayingAudio(false);
     } else {
-      window.speechSynthesis.cancel();
-      // Join verse texts without verse numbers as requested
       const chapterText = versesList.map(v => v.text).join(' ');
-      const utterance = new SpeechSynthesisUtterance(`${selectedBook}, capítulo ${selectedChapter}. ${chapterText}`);
-      utterance.lang = 'pt-BR';
-      utterance.rate = 0.95;
+      const rawText = `${selectedBook}, capítulo ${selectedChapter}. ${chapterText}`;
 
-      utterance.onend = () => setIsPlayingAudio(false);
-      utterance.onerror = () => setIsPlayingAudio(false);
-
-      window.speechSynthesis.speak(utterance);
+      audioService.speak(rawText, {
+        rate: 0.95,
+        style: 'devocional',
+        onEnd: () => setIsPlayingAudio(false),
+        onError: () => setIsPlayingAudio(false)
+      });
       setIsPlayingAudio(true);
     }
   };

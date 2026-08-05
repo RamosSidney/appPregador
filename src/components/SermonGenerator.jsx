@@ -206,7 +206,7 @@ export default function SermonGenerator({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[120] bg-slate-950/95 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center"
+            className="fixed inset-0 z-[300] bg-[#0B0E14] w-screen h-screen min-h-screen flex flex-col items-center justify-center p-6 text-center m-0 border-none overflow-hidden"
           >
             <div className="relative w-28 h-28 flex items-center justify-center mb-6">
               {/* Outer Pulse Ring */}

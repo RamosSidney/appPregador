@@ -1,14 +1,21 @@
-// Audio Service: Web Speech Synthesis (TTS) & Web Speech Recognition (STT) for pt-BR
+// Audio Service: Web Speech Synthesis (TTS) & Web Speech Recognition (STT) for pt-BR (Full Android Chrome Compatibility)
 
 export const cleanTextForSpeech = (text) => {
   if (!text) return '';
   return text
     // Remove Emojis e Símbolos Unicode
     .replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '')
-    // Remove marcadores de Markdown (*, #, _, ~, `, >, -, etc.)
+    // Remove textos de animação/status
+    .replace(/\b\d+\s*SEG\b/gi, '')
+    .replace(/\bGerando Mensagem.*?\b/gi, '')
+    .replace(/\bAbrindo mensagem.*?\b/gi, '')
+    .replace(/\bPROCESSANDO INTELIGÊNCIA.*?\b/gi, '')
+    // Remove marcadores de Markdown (*, #, _, ~, `, >, -, +, =, |, etc.)
     .replace(/[*#_~`>-]/g, ' ')
     // Remove URLs e links Markdown
     .replace(/\[.*?\]\(.*?\)/g, '')
+    // Remove tags HTML
+    .replace(/<[^>]*>?/gm, '')
     // Remove múltiplos espaços
     .replace(/\s+/g, ' ')
     .trim();
@@ -23,6 +30,7 @@ class AudioService {
     this.isListening = false;
     this.currentRate = 1.0;
     this.voicesList = [];
+    this.androidKeepAliveTimer = null;
 
     if (this.synth) {
       this.loadVoices();
@@ -54,14 +62,31 @@ class AudioService {
       return;
     }
 
+    // Android & Mobile Cleanup: Cancel current audio and clear keepalive timer
     this.stop();
     this.currentRate = rate;
 
     // Clean Markdown tags, Emojis and Unicode symbols for natural speech
     const cleanText = cleanTextForSpeech(text);
 
+    if (!cleanText) {
+      if (onEnd) onEnd();
+      return;
+    }
+
+    // Android Chrome Fix: Ensure synth is active and resumed
+    try {
+      this.synth.cancel();
+      if (this.synth.paused) {
+        this.synth.resume();
+      }
+    } catch (e) {
+      // Safe fallback
+    }
+
     this.utterance = new SpeechSynthesisUtterance(cleanText);
     this.utterance.lang = 'pt-BR';
+    this.utterance.volume = 1.0;
 
     // Apply Voice Style Presets
     let adjustedRate = rate;
@@ -99,11 +124,16 @@ class AudioService {
     }
 
     if (!selectedVoiceObj) {
-      selectedVoiceObj = voices.find(v => v.lang.toLowerCase().includes('pt-br') || v.lang.toLowerCase().includes('pt_br')) || voices[0];
+      selectedVoiceObj = voices.find(v => v.lang.toLowerCase().includes('pt-br') || v.lang.toLowerCase().includes('pt_br'));
     }
 
+    // Android Safety Check: Only bind voice if found
     if (selectedVoiceObj) {
-      this.utterance.voice = selectedVoiceObj;
+      try {
+        this.utterance.voice = selectedVoiceObj;
+      } catch (e) {
+        // Fallback to default Google TTS / System voice
+      }
     }
 
     let charCount = 0;
@@ -116,17 +146,51 @@ class AudioService {
     };
 
     this.utterance.onend = () => {
+      this.clearAndroidKeepAlive();
       this.isPlaying = false;
       if (onEnd) onEnd();
     };
 
     this.utterance.onerror = (err) => {
+      this.clearAndroidKeepAlive();
       this.isPlaying = false;
       if (onError) onError(err);
     };
 
     this.isPlaying = true;
+
+    // Android Chrome Fix: Start keep-alive interval to prevent Chrome from stopping speech mid-sentence
+    this.startAndroidKeepAlive();
+
+    try {
+      this.synth.resume();
+    } catch (e) {}
+
     this.synth.speak(this.utterance);
+  }
+
+  // Android Chrome Keep-Alive: Call resume every 10 seconds while playing to prevent engine timeout
+  startAndroidKeepAlive() {
+    this.clearAndroidKeepAlive();
+    this.androidKeepAliveTimer = setInterval(() => {
+      if (this.synth && this.isPlaying) {
+        try {
+          if (this.synth.paused) {
+            this.synth.resume();
+          } else {
+            this.synth.pause();
+            this.synth.resume();
+          }
+        } catch (e) {}
+      }
+    }, 10000);
+  }
+
+  clearAndroidKeepAlive() {
+    if (this.androidKeepAliveTimer) {
+      clearInterval(this.androidKeepAliveTimer);
+      this.androidKeepAliveTimer = null;
+    }
   }
 
   pause() {
@@ -144,8 +208,11 @@ class AudioService {
   }
 
   stop() {
+    this.clearAndroidKeepAlive();
     if (this.synth) {
-      this.synth.cancel();
+      try {
+        this.synth.cancel();
+      } catch (e) {}
       this.isPlaying = false;
     }
   }

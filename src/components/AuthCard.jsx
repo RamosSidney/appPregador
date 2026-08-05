@@ -36,7 +36,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
       initial={{ opacity: 0, scale: 0.96, y: 15 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full max-w-md bg-[#0F172A]/85 backdrop-blur-2xl border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-purple-950/40 relative z-10 overflow-hidden"
+      className="w-full min-h-screen sm:min-h-0 max-w-none sm:max-w-md bg-[#0B0E14] sm:bg-[#0F172A]/90 backdrop-blur-2xl border-none sm:border sm:border-slate-800/80 rounded-none sm:rounded-3xl p-6 sm:p-8 shadow-2xl shadow-purple-950/40 relative z-10 overflow-hidden flex flex-col justify-center"
     >
       {/* Top Cyber Accents */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400" />
