@@ -1,4 +1,4 @@
-// Audio Service: Web Speech Synthesis (TTS) & Web Speech Recognition (STT) for pt-BR (Full Android Chrome Compatibility)
+// Audio Service: Web Speech Synthesis (TTS) & Web Speech Recognition (STT) for pt-BR (100% Android Chrome & Mobile Compatibility)
 
 export const cleanTextForSpeech = (text) => {
   if (!text) return '';
@@ -74,102 +74,125 @@ class AudioService {
       return;
     }
 
-    // Android Chrome Fix: Ensure synth is active and resumed
+    // Android Chrome Fix: Ensure synth engine is unlocked and active
     try {
-      this.synth.cancel();
       if (this.synth.paused) {
         this.synth.resume();
       }
+      this.synth.cancel();
     } catch (e) {
       // Safe fallback
     }
 
-    this.utterance = new SpeechSynthesisUtterance(cleanText);
-    this.utterance.lang = 'pt-BR';
-    this.utterance.volume = 1.0;
+    const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
 
-    // Apply Voice Style Presets
-    let adjustedRate = rate;
-    let adjustedPitch = pitch;
+    // Chunk text into sentence/phrase units for Android Google Speech Engine stability
+    const sentenceMatches = cleanText.match(/[^.!?]+[.!?]+|\S+/g);
+    const chunks = isAndroid && cleanText.length > 150 && sentenceMatches
+      ? sentenceMatches
+      : [cleanText];
 
-    if (style === 'pastor') {
-      adjustedRate = rate * 0.95;
-      adjustedPitch = 0.9;
-    } else if (style === 'mentora') {
-      adjustedRate = rate * 0.95;
-      adjustedPitch = 1.15;
-    } else if (style === 'genz') {
-      adjustedRate = rate * 1.15;
-      adjustedPitch = 1.0;
-    } else if (style === 'devocional') {
-      adjustedRate = rate * 0.85;
-      adjustedPitch = 0.85;
-    }
+    let currentChunkIdx = 0;
+    const totalLength = cleanText.length;
+    let spokenLength = 0;
 
-    this.utterance.rate = Math.max(0.5, Math.min(2.0, adjustedRate));
-    this.utterance.pitch = Math.max(0.5, Math.min(2.0, adjustedPitch));
+    const speakNextChunk = () => {
+      if (currentChunkIdx >= chunks.length || !this.isPlaying) {
+        this.clearAndroidKeepAlive();
+        this.isPlaying = false;
+        if (onEnd) onEnd();
+        return;
+      }
 
-    // Try finding specified voice by name or select natural pt-BR voice
-    const voices = this.getAvailableVoices();
-    let selectedVoiceObj = null;
+      const chunkText = chunks[currentChunkIdx].trim();
+      if (!chunkText) {
+        currentChunkIdx++;
+        speakNextChunk();
+        return;
+      }
 
-    if (voiceName) {
-      selectedVoiceObj = voices.find(v => v.name === voiceName);
-    }
+      this.utterance = new SpeechSynthesisUtterance(chunkText);
+      this.utterance.lang = 'pt-BR';
+      this.utterance.volume = 1.0;
 
-    if (!selectedVoiceObj && style === 'mentora') {
-      selectedVoiceObj = voices.find(v => /female|feminina|francisca|luciana|helena|maria|joana|zira/i.test(v.name));
-    } else if (!selectedVoiceObj && style === 'pastor') {
-      selectedVoiceObj = voices.find(v => /male|masculin|antonio|felipe|daniel|ricardo|humberto/i.test(v.name));
-    }
+      // Apply Voice Style Presets
+      let adjustedRate = rate;
+      let adjustedPitch = pitch;
 
-    if (!selectedVoiceObj) {
-      selectedVoiceObj = voices.find(v => v.lang.toLowerCase().includes('pt-br') || v.lang.toLowerCase().includes('pt_br'));
-    }
+      if (style === 'pastor') {
+        adjustedRate = rate * 0.95;
+        adjustedPitch = 0.9;
+      } else if (style === 'mentora') {
+        adjustedRate = rate * 0.95;
+        adjustedPitch = 1.15;
+      } else if (style === 'genz') {
+        adjustedRate = rate * 1.15;
+        adjustedPitch = 1.0;
+      } else if (style === 'devocional') {
+        adjustedRate = rate * 0.85;
+        adjustedPitch = 0.85;
+      }
 
-    // Android Safety Check: Only bind voice if found
-    if (selectedVoiceObj) {
+      this.utterance.rate = Math.max(0.5, Math.min(2.0, adjustedRate));
+      this.utterance.pitch = Math.max(0.5, Math.min(2.0, adjustedPitch));
+
+      // On Android, bypass custom voice object assignment to prevent Google TTS crashes
+      if (!isAndroid) {
+        const voices = this.getAvailableVoices();
+        let selectedVoiceObj = null;
+
+        if (voiceName) {
+          selectedVoiceObj = voices.find(v => v.name === voiceName);
+        }
+
+        if (!selectedVoiceObj && style === 'mentora') {
+          selectedVoiceObj = voices.find(v => /female|feminina|francisca|luciana|helena|maria|joana|zira/i.test(v.name));
+        } else if (!selectedVoiceObj && style === 'pastor') {
+          selectedVoiceObj = voices.find(v => /male|masculin|antonio|felipe|daniel|ricardo|humberto/i.test(v.name));
+        }
+
+        if (!selectedVoiceObj) {
+          selectedVoiceObj = voices.find(v => v.lang.toLowerCase().includes('pt-br') || v.lang.toLowerCase().includes('pt_br'));
+        }
+
+        if (selectedVoiceObj) {
+          try {
+            this.utterance.voice = selectedVoiceObj;
+          } catch (e) {}
+        }
+      }
+
+      this.utterance.onend = () => {
+        spokenLength += chunkText.length;
+        if (onProgress && totalLength > 0) {
+          const percent = Math.min(100, Math.round((spokenLength / totalLength) * 100));
+          onProgress(percent);
+        }
+        currentChunkIdx++;
+        speakNextChunk();
+      };
+
+      this.utterance.onerror = (err) => {
+        console.warn("[AudioService] Erro ao sintetizar trecho:", err);
+        currentChunkIdx++;
+        speakNextChunk();
+      };
+
       try {
-        this.utterance.voice = selectedVoiceObj;
-      } catch (e) {
-        // Fallback to default Google TTS / System voice
-      }
-    }
+        if (this.synth.paused) {
+          this.synth.resume();
+        }
+      } catch (e) {}
 
-    let charCount = 0;
-    this.utterance.onboundary = (e) => {
-      if (onProgress && cleanText.length > 0) {
-        charCount = e.charIndex;
-        const progressPercent = Math.min(100, Math.round((charCount / cleanText.length) * 100));
-        onProgress(progressPercent);
-      }
-    };
-
-    this.utterance.onend = () => {
-      this.clearAndroidKeepAlive();
-      this.isPlaying = false;
-      if (onEnd) onEnd();
-    };
-
-    this.utterance.onerror = (err) => {
-      this.clearAndroidKeepAlive();
-      this.isPlaying = false;
-      if (onError) onError(err);
+      this.synth.speak(this.utterance);
     };
 
     this.isPlaying = true;
-
-    // Android Chrome Fix: Start keep-alive interval to prevent Chrome from stopping speech mid-sentence
     this.startAndroidKeepAlive();
-
-    try {
-      this.synth.resume();
-    } catch (e) {}
-
-    this.synth.speak(this.utterance);
+    speakNextChunk();
   }
 
-  // Android Chrome Keep-Alive: Call resume every 10 seconds while playing to prevent engine timeout
+  // Android Chrome Keep-Alive: Call resume every 8 seconds while playing to prevent engine timeout
   startAndroidKeepAlive() {
     this.clearAndroidKeepAlive();
     this.androidKeepAliveTimer = setInterval(() => {
@@ -177,13 +200,10 @@ class AudioService {
         try {
           if (this.synth.paused) {
             this.synth.resume();
-          } else {
-            this.synth.pause();
-            this.synth.resume();
           }
         } catch (e) {}
       }
-    }, 10000);
+    }, 8000);
   }
 
   clearAndroidKeepAlive() {
@@ -195,14 +215,18 @@ class AudioService {
 
   pause() {
     if (this.synth && this.isPlaying) {
-      this.synth.pause();
+      try {
+        this.synth.pause();
+      } catch (e) {}
       this.isPlaying = false;
     }
   }
 
   resume() {
     if (this.synth && !this.isPlaying) {
-      this.synth.resume();
+      try {
+        this.synth.resume();
+      } catch (e) {}
       this.isPlaying = true;
     }
   }
