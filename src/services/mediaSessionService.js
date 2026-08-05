@@ -5,13 +5,13 @@ class MediaSessionService {
     this.currentMetadata = null;
   }
 
-  updateMetadata({ title, artist = 'Nova Versão Internacional', album = 'appPregador 2.0 — Bíblia Sagrada', artworkUrl = '/icon-512.png' }) {
+  updateMetadata({ title, artist = 'Nova Versão Internacional, Edição Gen Z', album = 'appPregador 2.0 — Bíblia Sagrada', artworkUrl = '/icon-512.png' }) {
     if (typeof window === 'undefined' || !('mediaSession' in navigator)) return;
 
     try {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: title || 'Bíblia Sagrada NVI',
-        artist: artist || 'Nova Versão Internacional',
+        artist: artist || 'Nova Versão Internacional, Edição Gen Z',
         album: album || 'appPregador 2.0',
         artwork: [
           { src: artworkUrl || '/icon-512.png', sizes: '512x512', type: 'image/png' },

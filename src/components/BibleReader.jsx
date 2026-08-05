@@ -269,12 +269,24 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     });
   };
 
+  const lastToggleTimeRef = useRef(0);
+
   const toggleAudioNarration = (e) => {
     if (e) {
-      try { e.stopPropagation(); } catch (err) {}
+      try {
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      } catch (err) {}
     }
 
-    // Android Chrome Mobile Unlock: Synchronously resume Web Speech Engine
+    // Debounce double-firing on mobile touch screens (prevent double execution within 400ms)
+    const now = Date.now();
+    if (now - lastToggleTimeRef.current < 400) {
+      return;
+    }
+    lastToggleTimeRef.current = now;
+
+    // Mobile Unlock: Synchronously resume Web Speech Engine
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       try {
         window.speechSynthesis.cancel();
@@ -286,7 +298,10 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       audioService.stop();
       setIsPlayingAudio(false);
       setAudioProgress(0);
+      mediaSessionService.setPlaybackState('paused');
     } else {
+      // Start background music as HTML5 audio anchor for screen lock & OS media session widget
+      backgroundMusicService.play();
       startChapterNarration(selectedBook, selectedChapter, versesList);
     }
   };
@@ -687,11 +702,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
           </button>
 
           <button
-            onClick={toggleAudioNarration}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              toggleAudioNarration(e);
-            }}
+            onClick={(e) => toggleAudioNarration(e)}
             className={`p-3.5 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold shadow-lg shadow-purple-950/60 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer ${
               isPlayingAudio ? 'animate-pulse' : ''
             }`}
