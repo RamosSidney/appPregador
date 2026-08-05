@@ -1,23 +1,17 @@
-// Background Music Service for Bible Reading (Pixabay Moments of Impact Cinematic & Ambient)
+// Background Music Service for Bible Reading (Continuous Worship Ambient Piano & Cinematic)
 
 export const MUSIC_TRACKS = [
   {
+    id: 'piano_worship',
+    name: '🎹 Continuous Worship Ambient Piano',
+    desc: 'Piano Devocional Suave & Fundo Orquestral (Youtube Cs6LqMckWkg Edition)',
+    url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=inspiring-cinematic-ambient-116199.mp3'
+  },
+  {
     id: 'moments_of_impact',
     name: '🎻 Moments of Impact (Cinematic)',
-    desc: 'Pixabay Orchestral Cinematic Series 541168',
+    desc: 'Pixabay Orchestral Series 541168',
     url: 'https://cdn.pixabay.com/download/audio/2024/02/08/audio_55b3769c0d.mp3?filename=moments-of-impact-541168.mp3'
-  },
-  {
-    id: 'cinematic',
-    name: '🎼 Orquestral Motivacional',
-    desc: 'Épico & Inspirador',
-    url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=cinematic-documentary-115669.mp3'
-  },
-  {
-    id: 'piano',
-    name: '🎹 Piano Devocional Suave',
-    desc: 'Calmo & Meditativo',
-    url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=inspiring-cinematic-ambient-116199.mp3'
   },
   {
     id: 'synth_pad',
@@ -31,8 +25,8 @@ class BackgroundMusicService {
   constructor() {
     this.audio = null;
     this.isPlaying = false;
-    this.currentTrackId = 'moments_of_impact';
-    this.volume = 0.25; // Fixed 25% volume so it never overpowers narration
+    this.currentTrackId = 'piano_worship';
+    this.volume = 0.25; // 25% volume for soft background feel
     this.audioCtx = null;
     this.synthOscillators = [];
     this.synthGain = null;
@@ -108,13 +102,13 @@ class BackgroundMusicService {
       this.audio.loop = true;
     }
 
-    this.audio.volume = 0.25; // Fixed 25% volume
+    this.audio.volume = 0.25; // Fixed 25% volume so it never overpowers speech
     this.audio.play()
       .then(() => {
         this.isPlaying = true;
       })
       .catch((err) => {
-        console.warn("Autoplay de áudio Pixabay bloqueado. Usando synth pad fallback:", err);
+        console.warn("Autoplay bloqueado pelo navegador. Usando synth pad fallback:", err);
         this.playSynthPad();
       });
   }
@@ -138,7 +132,7 @@ class BackgroundMusicService {
   }
 
   setVolume(vol) {
-    this.volume = 0.25; // Keep 25%
+    this.volume = 0.25;
     if (this.audio) {
       this.audio.volume = 0.25;
     }

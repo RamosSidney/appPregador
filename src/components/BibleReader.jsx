@@ -40,6 +40,28 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
   const [audioProgress, setAudioProgress] = useState(0);
   const isAutoPlayingNextRef = useRef(false);
 
+  // Calculate active spoken verse index and verse number
+  const activeVerseIdx = versesList.length > 0
+    ? Math.min(versesList.length - 1, Math.floor((audioProgress / 100) * versesList.length))
+    : -1;
+  const activeSpokenVerseNum = isPlayingAudio && activeVerseIdx >= 0 ? versesList[activeVerseIdx]?.num : null;
+
+  // Sync Audio & Music playing state on mount
+  useEffect(() => {
+    setIsPlayingAudio(audioService.isPlaying);
+    setIsPlayingMusic(backgroundMusicService.isPlaying);
+  }, []);
+
+  // Smooth Auto-Scroll page to keep spoken verse centered in viewport
+  useEffect(() => {
+    if (isPlayingAudio && activeSpokenVerseNum) {
+      const el = document.querySelector(`[data-verse-num="${activeSpokenVerseNum}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [activeSpokenVerseNum, isPlayingAudio]);
+
   // Fullscreen Refinement Chat State
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [panelTitle, setPanelTitle] = useState('');
@@ -525,6 +547,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               const ref = `${selectedBook} ${selectedChapter}:${verse.num}`;
               const highlightColor = highlights[ref];
               const isSelected = selectedVerseRef === ref;
+              const isSpokenVerse = isPlayingAudio && activeSpokenVerseNum === verse.num;
 
               let highlightBg = '';
               if (highlightColor === 'green') highlightBg = 'bg-emerald-500/25 text-white rounded px-1';
@@ -532,14 +555,20 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               else if (highlightColor === 'yellow') highlightBg = 'bg-amber-500/30 text-white rounded px-1';
               else if (highlightColor === 'pink') highlightBg = 'bg-rose-500/30 text-white rounded px-1';
 
+              let spokenClass = '';
+              if (isSpokenVerse) {
+                spokenClass = 'bg-cyan-500/30 border-b-2 border-cyan-400 text-cyan-100 font-bold ring-2 ring-cyan-400/60 shadow-[0_0_12px_rgba(6,182,212,0.5)] px-1.5 py-0.5 animate-pulse';
+              }
+
               return (
                 <span
                   key={verse.num}
                   data-verse-ref={ref}
+                  data-verse-num={verse.num}
                   onClick={(e) => handleVerseClick(e, verse)}
-                  className={`cursor-pointer transition-all duration-150 inline-block mr-1.5 py-0.5 rounded ${
+                  className={`cursor-pointer transition-all duration-200 inline-block mr-1.5 py-0.5 rounded ${
                     isSelected ? 'bg-purple-600/40 border-b-2 border-purple-400 text-white font-bold ring-2 ring-purple-500/50 px-1' : ''
-                  } ${highlightBg || 'hover:bg-slate-800/60'}`}
+                  } ${spokenClass || highlightBg || 'hover:bg-slate-800/60'}`}
                 >
                   <sup className="text-[0.65em] font-extrabold text-amber-400/90 mr-1 select-none font-sans">
                     {verse.num}
