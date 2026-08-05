@@ -1,23 +1,17 @@
-// Background Music Service for Bible Reading (Continuous Piano Worship & Ambient Pad - Crystal Clear MP3)
+// Background Music Service for Bible Reading (Local High-Fidelity MP3 Tracks - 100% Reliable & Synchronized)
 
 export const MUSIC_TRACKS = [
   {
     id: 'piano_worship',
     name: '🎹 Continuous Worship Ambient Piano',
-    desc: 'Piano Devocional Suave (Youtube Cs6LqMckWkg Edition)',
-    url: 'https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3'
+    desc: 'Piano Devocional Suave & Fundo Orquestral (Edição YouTube Cs6LqMckWkg)',
+    url: '/audio/worship-piano.mp3'
   },
   {
-    id: 'moments_of_impact',
+    id: 'cinematic_ambient',
     name: '🎻 Moments of Impact (Cinematic)',
-    desc: 'Pixabay Orchestral Series 541168',
-    url: 'https://cdn.pixabay.com/audio/2024/02/08/audio_55b3769c0d.mp3'
-  },
-  {
-    id: 'ambient_strings',
-    name: '🌌 Ambient Worship Pad & Strings',
-    desc: 'Atmosférico & Profundo',
-    url: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3'
+    desc: 'Trilha Cinemática Motivacional & Épica',
+    url: '/audio/cinematic-ambient.mp3'
   }
 ];
 
@@ -27,33 +21,71 @@ class BackgroundMusicService {
     this.isPlaying = false;
     this.currentTrackId = 'piano_worship';
     this.volume = 0.25; // Fixed 25% volume for soft background sound
+    this.listeners = new Set();
   }
 
-  play(trackId = null) {
+  subscribe(callback) {
+    this.listeners.add(callback);
+    return () => this.listeners.delete(callback);
+  }
+
+  notify() {
+    this.listeners.forEach(cb => {
+      try { cb(this.isPlaying); } catch (e) {}
+    });
+  }
+
+  initAudio(url) {
+    if (this.audio) {
+      try {
+        this.audio.pause();
+        this.audio.currentTime = 0;
+      } catch (e) {}
+    }
+
+    this.audio = new Audio(url);
+    this.audio.loop = true;
+    this.audio.volume = 0.25;
+
+    this.audio.onplay = () => {
+      this.isPlaying = true;
+      this.notify();
+    };
+
+    this.audio.onpause = () => {
+      this.isPlaying = false;
+      this.notify();
+    };
+
+    this.audio.onerror = (err) => {
+      console.warn("[BackgroundMusic] Erro no player de áudio:", err);
+      this.isPlaying = false;
+      this.notify();
+    };
+  }
+
+  async play(trackId = null) {
     if (trackId) {
       this.currentTrackId = trackId;
     }
 
     const track = MUSIC_TRACKS.find(t => t.id === this.currentTrackId) || MUSIC_TRACKS[0];
 
-    if (!this.audio || this.audio.src !== track.url) {
-      if (this.audio) {
-        try { this.audio.pause(); } catch (e) {}
-      }
-      this.audio = new Audio(track.url);
-      this.audio.loop = true;
-      this.audio.crossOrigin = 'anonymous';
+    if (!this.audio || !this.audio.src.includes(track.url)) {
+      this.initAudio(track.url);
     }
 
-    this.audio.volume = 0.25; // 25% volume
-    this.audio.play()
-      .then(() => {
+    if (this.audio) {
+      this.audio.volume = 0.25;
+      try {
+        await this.audio.play();
         this.isPlaying = true;
-      })
-      .catch((err) => {
-        console.warn("Autoplay de fundo musical bloqueado ou aguardando interação:", err);
+      } catch (err) {
+        console.warn("[BackgroundMusic] Autoplay bloqueado pelo navegador:", err);
         this.isPlaying = false;
-      });
+      }
+      this.notify();
+    }
   }
 
   pause() {
@@ -63,16 +95,16 @@ class BackgroundMusicService {
       } catch (e) {}
     }
     this.isPlaying = false;
+    this.notify();
   }
 
   toggle(trackId = null) {
     if (this.isPlaying) {
       this.pause();
-      return false;
     } else {
       this.play(trackId || this.currentTrackId);
-      return true;
     }
+    return this.isPlaying;
   }
 
   setVolume(vol) {

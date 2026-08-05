@@ -46,10 +46,16 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     : -1;
   const activeSpokenVerseNum = isPlayingAudio && activeVerseIdx >= 0 ? versesList[activeVerseIdx]?.num : null;
 
-  // Sync Audio & Music playing state on mount
+  // Sync Audio & Music playing state on mount & subscribe to backgroundMusicService updates
   useEffect(() => {
     setIsPlayingAudio(audioService.isPlaying);
     setIsPlayingMusic(backgroundMusicService.isPlaying);
+
+    const unsubscribe = backgroundMusicService.subscribe((playingState) => {
+      setIsPlayingMusic(playingState);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Smooth Auto-Scroll page to keep spoken verse centered in viewport
@@ -82,8 +88,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
   // Background Music Handlers
   const toggleBackgroundMusic = (trackId = null) => {
     const targetTrack = trackId || selectedMusicTrack;
-    const isNowPlaying = backgroundMusicService.toggle(targetTrack);
-    setIsPlayingMusic(isNowPlaying);
+    backgroundMusicService.toggle(targetTrack);
   };
 
   const handleSelectMusicTrack = (trackId) => {
