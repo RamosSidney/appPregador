@@ -1,4 +1,4 @@
-// Background Music Service: YouTube Player Audio Integration for Cs6LqMckWkg (25% Volume) + HTML5 Media Anchor for iOS/Android Lock Screen Widget
+// Background Music Service: Single Audio Engine (YouTube Cs6LqMckWkg at 25% Volume - ZERO Overlap / ZERO Track Mixing)
 
 export const MUSIC_TRACKS = [
   {
@@ -12,16 +12,13 @@ export const MUSIC_TRACKS = [
 class BackgroundMusicService {
   constructor() {
     this.player = null;
-    this.audioAnchor = null;
     this.isPlaying = false;
     this.isReady = false;
-    this.currentTrackId = 'youtube_worship';
-    this.volume = 25; // Fixed 25% volume
+    this.volume = 25; // Fixed 25% volume for background feel
     this.listeners = new Set();
 
     if (typeof window !== 'undefined') {
       this.loadYouTubeAPI();
-      this.initMediaAnchor();
     }
   }
 
@@ -34,15 +31,6 @@ class BackgroundMusicService {
     this.listeners.forEach(cb => {
       try { cb(this.isPlaying); } catch (e) {}
     });
-  }
-
-  initMediaAnchor() {
-    if (typeof window === 'undefined') return;
-    if (!this.audioAnchor) {
-      this.audioAnchor = new Audio('/audio/worship-piano.mp3');
-      this.audioAnchor.loop = true;
-      this.audioAnchor.volume = 0.25; // 25% volume
-    }
   }
 
   loadYouTubeAPI() {
@@ -121,14 +109,7 @@ class BackgroundMusicService {
     }
   }
 
-  async play(trackId = null) {
-    if (this.audioAnchor) {
-      try {
-        this.audioAnchor.volume = 0.25;
-        await this.audioAnchor.play();
-      } catch (e) {}
-    }
-
+  async play() {
     if (this.player && this.isReady && typeof this.player.playVideo === 'function') {
       try {
         this.player.setVolume(25);
@@ -150,9 +131,6 @@ class BackgroundMusicService {
   }
 
   pause() {
-    if (this.audioAnchor) {
-      try { this.audioAnchor.pause(); } catch (e) {}
-    }
     if (this.player && typeof this.player.pauseVideo === 'function') {
       try { this.player.pauseVideo(); } catch (e) {}
     }
@@ -160,11 +138,11 @@ class BackgroundMusicService {
     this.notify();
   }
 
-  toggle(trackId = null) {
+  toggle() {
     if (this.isPlaying) {
       this.pause();
     } else {
-      this.play(trackId || this.currentTrackId);
+      this.play();
     }
     return this.isPlaying;
   }
@@ -173,9 +151,6 @@ class BackgroundMusicService {
     this.volume = 25;
     if (this.player && typeof this.player.setVolume === 'function') {
       try { this.player.setVolume(25); } catch (e) {}
-    }
-    if (this.audioAnchor) {
-      this.audioAnchor.volume = 0.25;
     }
   }
 }
