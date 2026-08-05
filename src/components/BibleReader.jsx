@@ -35,8 +35,10 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     }
   });
 
-  // Audio Narration State
+  // Audio Narration State & Auto-Play Ref
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const isAutoPlayingNextRef = useRef(false);
 
   // Fullscreen Refinement Chat State
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -167,24 +169,67 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     }
   };
 
-  // Audio Player Narration (Full Android Chrome Compatibility & Clean TTS)
+  // Audio Player Narration with Realtime Progress & Auto-Next Chapter
+  const startChapterNarration = (bookName, chapterNum, verses) => {
+    if (!verses || verses.length === 0) return;
+    const chapterText = verses.map(v => v.text).join(' ');
+    const rawText = `${bookName}, capítulo ${chapterNum}. ${chapterText}`;
+
+    setAudioProgress(0);
+    setIsPlayingAudio(true);
+
+    audioService.speak(rawText, {
+      rate: 0.95,
+      style: 'devocional',
+      onProgress: (percent) => {
+        setAudioProgress(percent);
+      },
+      onEnd: () => {
+        setIsPlayingAudio(false);
+        setAudioProgress(100);
+        // Auto-advance to next chapter automatically when finished!
+        const chNum = parseInt(chapterNum, 10);
+        const bookData = bibleDatabase?.find(b => b.name === bookName);
+        if (bookData && chNum < bookData.chapters.length) {
+          isAutoPlayingNextRef.current = true;
+          setSelectedChapter((chNum + 1).toString());
+        } else {
+          const currentBookIdx = bibleDatabase?.findIndex(b => b.name === bookName);
+          if (currentBookIdx < (bibleDatabase?.length || 0) - 1) {
+            const nextBook = bibleDatabase[currentBookIdx + 1];
+            isAutoPlayingNextRef.current = true;
+            setSelectedBook(nextBook.name);
+            setSelectedChapter('1');
+          }
+        }
+      },
+      onError: () => {
+        setIsPlayingAudio(false);
+        setAudioProgress(0);
+      }
+    });
+  };
+
   const toggleAudioNarration = () => {
     if (isPlayingAudio) {
       audioService.stop();
       setIsPlayingAudio(false);
+      setAudioProgress(0);
     } else {
-      const chapterText = versesList.map(v => v.text).join(' ');
-      const rawText = `${selectedBook}, capítulo ${selectedChapter}. ${chapterText}`;
-
-      audioService.speak(rawText, {
-        rate: 0.95,
-        style: 'devocional',
-        onEnd: () => setIsPlayingAudio(false),
-        onError: () => setIsPlayingAudio(false)
-      });
-      setIsPlayingAudio(true);
+      startChapterNarration(selectedBook, selectedChapter, versesList);
     }
   };
+
+  // Auto-play next chapter when advancing automatically
+  useEffect(() => {
+    if (isAutoPlayingNextRef.current && versesList.length > 0) {
+      isAutoPlayingNextRef.current = false;
+      const timer = setTimeout(() => {
+        startChapterNarration(selectedBook, selectedChapter, versesList);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedBook, selectedChapter, versesList]);
 
   // Handle Verse Click (Toggle selection: select / unselect)
   const handleVerseClick = (e, verse) => {
@@ -457,41 +502,53 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
         </div>
       </div>
 
-      {/* Bible Reading Continuous Flow Container (Sans or Serif) */}
-      <div
-        className={`bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-3xl p-5 sm:p-10 shadow-2xl space-y-4 ${
-          fontSerif ? "font-serif" : "font-sans"
-        }`}
-        style={{ fontSize: `${fontSize}px` }}
-      >
-        <div className="leading-relaxed sm:leading-loose text-slate-200 space-y-3">
-          {versesList.map((verse) => {
-            const ref = `${selectedBook} ${selectedChapter}:${verse.num}`;
-            const highlightColor = highlights[ref];
-            const isSelected = selectedVerseRef === ref;
+      {/* Bible Reading Continuous Flow Container with Left Audio Progress Bar */}
+      <div className="relative flex items-stretch gap-2.5 sm:gap-3">
+        {/* Sleek Vertical Progress Indicator Bar tracking Audio Narration */}
+        <div className="w-1.5 sm:w-2 bg-slate-900/90 border border-slate-800 rounded-full overflow-hidden shrink-0 relative flex flex-col justify-start my-1 shadow-inner">
+          <motion.div
+            className="w-full bg-gradient-to-b from-purple-500 via-cyan-400 to-amber-400 rounded-full shadow-[0_0_12px_rgba(168,85,247,0.8)]"
+            animate={{ height: `${audioProgress}%` }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          />
+        </div>
 
-            let highlightBg = '';
-            if (highlightColor === 'green') highlightBg = 'bg-emerald-500/25 text-white rounded px-1';
-            else if (highlightColor === 'blue') highlightBg = 'bg-cyan-500/25 text-white rounded px-1';
-            else if (highlightColor === 'yellow') highlightBg = 'bg-amber-500/30 text-white rounded px-1';
-            else if (highlightColor === 'pink') highlightBg = 'bg-rose-500/30 text-white rounded px-1';
+        {/* Bible Text Container */}
+        <div
+          className={`flex-1 bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-3xl p-5 sm:p-10 shadow-2xl space-y-4 ${
+            fontSerif ? "font-serif" : "font-sans"
+          }`}
+          style={{ fontSize: `${fontSize}px` }}
+        >
+          <div className="leading-relaxed sm:leading-loose text-slate-200 space-y-3">
+            {versesList.map((verse) => {
+              const ref = `${selectedBook} ${selectedChapter}:${verse.num}`;
+              const highlightColor = highlights[ref];
+              const isSelected = selectedVerseRef === ref;
 
-            return (
-              <span
-                key={verse.num}
-                data-verse-ref={ref}
-                onClick={(e) => handleVerseClick(e, verse)}
-                className={`cursor-pointer transition-all duration-150 inline-block mr-1.5 py-0.5 rounded ${
-                  isSelected ? 'bg-purple-600/40 border-b-2 border-purple-400 text-white font-bold ring-2 ring-purple-500/50 px-1' : ''
-                } ${highlightBg || 'hover:bg-slate-800/60'}`}
-              >
-                <sup className="text-[0.65em] font-extrabold text-amber-400/90 mr-1 select-none font-sans">
-                  {verse.num}
-                </sup>
-                <span>{verse.text}</span>
-              </span>
-            );
-          })}
+              let highlightBg = '';
+              if (highlightColor === 'green') highlightBg = 'bg-emerald-500/25 text-white rounded px-1';
+              else if (highlightColor === 'blue') highlightBg = 'bg-cyan-500/25 text-white rounded px-1';
+              else if (highlightColor === 'yellow') highlightBg = 'bg-amber-500/30 text-white rounded px-1';
+              else if (highlightColor === 'pink') highlightBg = 'bg-rose-500/30 text-white rounded px-1';
+
+              return (
+                <span
+                  key={verse.num}
+                  data-verse-ref={ref}
+                  onClick={(e) => handleVerseClick(e, verse)}
+                  className={`cursor-pointer transition-all duration-150 inline-block mr-1.5 py-0.5 rounded ${
+                    isSelected ? 'bg-purple-600/40 border-b-2 border-purple-400 text-white font-bold ring-2 ring-purple-500/50 px-1' : ''
+                  } ${highlightBg || 'hover:bg-slate-800/60'}`}
+                >
+                  <sup className="text-[0.65em] font-extrabold text-amber-400/90 mr-1 select-none font-sans">
+                    {verse.num}
+                  </sup>
+                  <span>{verse.text}</span>
+                </span>
+              );
+            })}
+          </div>
         </div>
       </div>
 

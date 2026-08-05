@@ -1,10 +1,16 @@
-// Background Music Service for Bible Reading (Cinematic Motivational & Ambient Pad)
+// Background Music Service for Bible Reading (Pixabay Moments of Impact Cinematic & Ambient)
 
 export const MUSIC_TRACKS = [
   {
+    id: 'moments_of_impact',
+    name: '🎻 Moments of Impact (Cinematic)',
+    desc: 'Pixabay Orchestral Cinematic Series 541168',
+    url: 'https://cdn.pixabay.com/download/audio/2024/02/08/audio_55b3769c0d.mp3?filename=moments-of-impact-541168.mp3'
+  },
+  {
     id: 'cinematic',
-    name: '🎻 Cinemático Motivacional',
-    desc: 'Inspirador & Épico',
+    name: '🎼 Orquestral Motivacional',
+    desc: 'Épico & Inspirador',
     url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=cinematic-documentary-115669.mp3'
   },
   {
@@ -15,7 +21,7 @@ export const MUSIC_TRACKS = [
   },
   {
     id: 'synth_pad',
-    name: '🌌 Ambient Worship Pad (Offline AI)',
+    name: '🌌 Ambient Worship Pad (Offline)',
     desc: 'Atmosférico & Imersivo',
     isSynth: true
   }
@@ -25,8 +31,8 @@ class BackgroundMusicService {
   constructor() {
     this.audio = null;
     this.isPlaying = false;
-    this.currentTrackId = 'cinematic';
-    this.volume = 0.25;
+    this.currentTrackId = 'moments_of_impact';
+    this.volume = 0.25; // Fixed 25% volume so it never overpowers narration
     this.audioCtx = null;
     this.synthOscillators = [];
     this.synthGain = null;
@@ -102,13 +108,13 @@ class BackgroundMusicService {
       this.audio.loop = true;
     }
 
-    this.audio.volume = this.volume;
+    this.audio.volume = 0.25; // Fixed 25% volume
     this.audio.play()
       .then(() => {
         this.isPlaying = true;
       })
       .catch((err) => {
-        console.warn("Autoplay bloqueado. Usando synth pad fallback:", err);
+        console.warn("Autoplay de áudio Pixabay bloqueado. Usando synth pad fallback:", err);
         this.playSynthPad();
       });
   }
@@ -132,12 +138,12 @@ class BackgroundMusicService {
   }
 
   setVolume(vol) {
-    this.volume = Math.max(0, Math.min(1, vol));
+    this.volume = 0.25; // Keep 25%
     if (this.audio) {
-      this.audio.volume = this.volume;
+      this.audio.volume = 0.25;
     }
     if (this.synthGain && this.audioCtx) {
-      this.synthGain.gain.setValueAtTime(this.volume * 0.4, this.audioCtx.currentTime);
+      this.synthGain.gain.setValueAtTime(0.25 * 0.4, this.audioCtx.currentTime);
     }
   }
 }
