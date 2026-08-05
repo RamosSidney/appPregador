@@ -79,13 +79,16 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
 
     mediaSessionService.setupActionHandlers({
       onPlay: () => {
+        backgroundMusicService.play();
         if (!audioService.isPlaying) {
           startChapterNarration(selectedBook, selectedChapter, versesList);
         }
       },
       onPause: () => {
         audioService.stop();
+        backgroundMusicService.pause();
         setIsPlayingAudio(false);
+        setIsPlayingMusic(false);
         setAudioProgress(0);
       },
       onPrevious: () => {

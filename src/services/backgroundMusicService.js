@@ -1,27 +1,28 @@
-// Background Music Service: Native HTML5 Audio Engine (iOS & Android Screen Lock Media Widget Support)
+// Background Music Service: YouTube Player Audio Integration for Cs6LqMckWkg (25% Volume) + HTML5 Media Anchor for iOS/Android Lock Screen Widget
 
 export const MUSIC_TRACKS = [
   {
-    id: 'piano_worship',
+    id: 'youtube_worship',
     name: '🎹 Continuous Worship Ambient Piano',
-    desc: 'Piano Devocional Suave & Fundo Orquestral (Edição YouTube Cs6LqMckWkg)',
-    url: '/audio/worship-piano.mp3'
-  },
-  {
-    id: 'cinematic_ambient',
-    name: '🎻 Moments of Impact (Cinematic)',
-    desc: 'Trilha Cinemática Motivacional & Épica',
-    url: '/audio/cinematic-ambient.mp3'
+    desc: 'Trilha Oficial Devocional YouTube (Cs6LqMckWkg)',
+    youtubeId: 'Cs6LqMckWkg'
   }
 ];
 
 class BackgroundMusicService {
   constructor() {
-    this.audio = null;
+    this.player = null;
+    this.audioAnchor = null;
     this.isPlaying = false;
-    this.currentTrackId = 'piano_worship';
-    this.volume = 0.25; // 25% volume for background feel
+    this.isReady = false;
+    this.currentTrackId = 'youtube_worship';
+    this.volume = 25; // Fixed 25% volume
     this.listeners = new Set();
+
+    if (typeof window !== 'undefined') {
+      this.loadYouTubeAPI();
+      this.initMediaAnchor();
+    }
   }
 
   subscribe(callback) {
@@ -35,64 +36,125 @@ class BackgroundMusicService {
     });
   }
 
-  initAudio(url) {
-    if (this.audio) {
-      try {
-        this.audio.pause();
-        this.audio.currentTime = 0;
-      } catch (e) {}
+  initMediaAnchor() {
+    if (typeof window === 'undefined') return;
+    if (!this.audioAnchor) {
+      this.audioAnchor = new Audio('/audio/worship-piano.mp3');
+      this.audioAnchor.loop = true;
+      this.audioAnchor.volume = 0.25; // 25% volume
+    }
+  }
+
+  loadYouTubeAPI() {
+    if (typeof window === 'undefined') return;
+
+    let container = document.getElementById('yt-bg-music-player');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'yt-bg-music-player';
+      container.style.position = 'fixed';
+      container.style.bottom = '-9999px';
+      container.style.right = '-9999px';
+      container.style.width = '1px';
+      container.style.height = '1px';
+      container.style.opacity = '0';
+      container.style.pointerEvents = 'none';
+      document.body.appendChild(container);
     }
 
-    this.audio = new Audio(url);
-    this.audio.loop = true;
-    this.audio.volume = 0.25;
+    if (window.YT && window.YT.Player) {
+      this.initPlayer();
+      return;
+    }
 
-    this.audio.onplay = () => {
-      this.isPlaying = true;
-      this.notify();
-    };
+    if (!document.getElementById('yt-iframe-api-script')) {
+      const tag = document.createElement('script');
+      tag.id = 'yt-iframe-api-script';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
 
-    this.audio.onpause = () => {
-      this.isPlaying = false;
-      this.notify();
+    const prevReady = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      if (prevReady) try { prevReady(); } catch (e) {}
+      this.initPlayer();
     };
+  }
 
-    this.audio.onerror = (err) => {
-      console.warn("[BackgroundMusic] Erro de áudio:", err);
-      this.isPlaying = false;
-      this.notify();
-    };
+  initPlayer() {
+    if (this.player || typeof window === 'undefined' || !window.YT) return;
+
+    try {
+      this.player = new window.YT.Player('yt-bg-music-player', {
+        height: '1',
+        width: '1',
+        videoId: 'Cs6LqMckWkg',
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          loop: 1,
+          playlist: 'Cs6LqMckWkg',
+          modestbranding: 1,
+          playsinline: 1
+        },
+        events: {
+          onReady: (event) => {
+            this.isReady = true;
+            try { event.target.setVolume(25); } catch (e) {}
+          },
+          onStateChange: (event) => {
+            if (event.data === 1) {
+              this.isPlaying = true;
+              this.notify();
+            } else if (event.data === 2 || event.data === 0) {
+              this.isPlaying = false;
+              this.notify();
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("Falha ao carregar YouTube Player:", e);
+    }
   }
 
   async play(trackId = null) {
-    if (trackId) {
-      this.currentTrackId = trackId;
-    }
-
-    const track = MUSIC_TRACKS.find(t => t.id === this.currentTrackId) || MUSIC_TRACKS[0];
-
-    if (!this.audio || !this.audio.src.includes(track.url)) {
-      this.initAudio(track.url);
-    }
-
-    if (this.audio) {
-      this.audio.volume = 0.25;
+    if (this.audioAnchor) {
       try {
-        await this.audio.play();
-        this.isPlaying = true;
-      } catch (err) {
-        console.warn("[BackgroundMusic] Autoplay bloqueado:", err);
-        this.isPlaying = false;
-      }
-      this.notify();
+        this.audioAnchor.volume = 0.25;
+        await this.audioAnchor.play();
+      } catch (e) {}
     }
+
+    if (this.player && this.isReady && typeof this.player.playVideo === 'function') {
+      try {
+        this.player.setVolume(25);
+        this.player.playVideo();
+      } catch (e) {}
+    } else {
+      setTimeout(() => {
+        if (this.player && typeof this.player.playVideo === 'function') {
+          try {
+            this.player.setVolume(25);
+            this.player.playVideo();
+          } catch (e) {}
+        }
+      }, 400);
+    }
+
+    this.isPlaying = true;
+    this.notify();
   }
 
   pause() {
-    if (this.audio) {
-      try {
-        this.audio.pause();
-      } catch (e) {}
+    if (this.audioAnchor) {
+      try { this.audioAnchor.pause(); } catch (e) {}
+    }
+    if (this.player && typeof this.player.pauseVideo === 'function') {
+      try { this.player.pauseVideo(); } catch (e) {}
     }
     this.isPlaying = false;
     this.notify();
@@ -108,9 +170,12 @@ class BackgroundMusicService {
   }
 
   setVolume(vol) {
-    this.volume = 0.25;
-    if (this.audio) {
-      this.audio.volume = 0.25;
+    this.volume = 25;
+    if (this.player && typeof this.player.setVolume === 'function') {
+      try { this.player.setVolume(25); } catch (e) {}
+    }
+    if (this.audioAnchor) {
+      this.audioAnchor.volume = 0.25;
     }
   }
 }

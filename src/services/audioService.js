@@ -192,18 +192,27 @@ class AudioService {
     speakNextChunk();
   }
 
-  // Android Chrome Keep-Alive: Call resume every 8 seconds while playing to prevent engine timeout
+  // Android Chrome Keep-Alive: Call resume every 1.5 seconds while playing to prevent engine timeout on screen lock
   startAndroidKeepAlive() {
     this.clearAndroidKeepAlive();
     this.androidKeepAliveTimer = setInterval(() => {
       if (this.synth && this.isPlaying) {
         try {
-          if (this.synth.paused) {
+          if (this.synth.paused || this.synth.pending) {
             this.synth.resume();
           }
         } catch (e) {}
       }
-    }, 8000);
+    }, 1500);
+
+    if (typeof document !== 'undefined' && !this._boundVisibilityHandler) {
+      this._boundVisibilityHandler = () => {
+        if (document.visibilityState === 'hidden' && this.synth && this.isPlaying) {
+          try { this.synth.resume(); } catch (e) {}
+        }
+      };
+      document.addEventListener('visibilitychange', this._boundVisibilityHandler);
+    }
   }
 
   clearAndroidKeepAlive() {
