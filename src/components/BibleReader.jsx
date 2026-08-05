@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen, Copy, Share2, Sparkles, ArrowLeft, Send, X,
-  ChevronLeft, ChevronRight, Play, Pause, Volume2, Search, Type, Sliders
+  ChevronLeft, ChevronRight, Play, Pause, Volume2, Search, Type, Sliders, Music
 } from 'lucide-react';
 import { marked } from 'marked';
 import { generateBibleLensAI, refineBibleChatAI } from '../services/aiService.js';
 import { audioService } from '../services/audioService.js';
+import { backgroundMusicService, MUSIC_TRACKS } from '../services/backgroundMusicService.js';
 
 export default function BibleReader({ userCredits, onDeductCredit, config, onOpenSettings }) {
   const [bibleDatabase, setBibleDatabase] = useState(null);
@@ -15,6 +16,11 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
   const [versesList, setVersesList] = useState([]);
   const [fontSerif, setFontSerif] = useState(true);
   const [fontSize, setFontSize] = useState(18);
+
+  // Background Music State
+  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [selectedMusicTrack, setSelectedMusicTrack] = useState('cinematic');
+  const [showMusicMenu, setShowMusicMenu] = useState(false);
 
   // Verse Selection / Highlight State
   const [selectedVerseRef, setSelectedVerseRef] = useState(null);
@@ -47,6 +53,19 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
 
   const handleIncreaseFontSize = () => {
     setFontSize(prev => Math.min(32, prev + 2));
+  };
+
+  // Background Music Handlers
+  const toggleBackgroundMusic = (trackId = null) => {
+    const targetTrack = trackId || selectedMusicTrack;
+    const isNowPlaying = backgroundMusicService.toggle(targetTrack);
+    setIsPlayingMusic(isNowPlaying);
+  };
+
+  const handleSelectMusicTrack = (trackId) => {
+    setSelectedMusicTrack(trackId);
+    backgroundMusicService.play(trackId);
+    setIsPlayingMusic(true);
   };
 
   // 1. Fetch NVI Bible JSON on mount
@@ -388,6 +407,52 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               <Type className="w-3.5 h-3.5" />
               <span className="hidden sm:inline text-[11px]">{fontSerif ? 'Serif' : 'Sans'}</span>
             </button>
+
+            {/* Background Ambient Music Toggle & Menu */}
+            <div className="relative">
+              <button
+                onClick={() => toggleBackgroundMusic()}
+                onContextMenu={(e) => { e.preventDefault(); setShowMusicMenu(!showMusicMenu); }}
+                className={`px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-full border transition-all text-xs font-extrabold flex items-center gap-1 cursor-pointer ${
+                  isPlayingMusic
+                    ? 'bg-amber-500/20 border-amber-400 text-amber-300 animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                    : 'bg-slate-950/80 border-white/10 text-slate-400 hover:text-white'
+                }`}
+                title={isPlayingMusic ? 'Pausar Fundo Musical (Clique com botão direito para escolher estilo)' : 'Ativar Fundo Musical Motivacional/Cinemático'}
+              >
+                <Music className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-[11px]">{isPlayingMusic ? 'Fundo ON' : 'Fundo'}</span>
+              </button>
+
+              {/* Music Track Selector Popover Dropdown */}
+              {showMusicMenu && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-slate-950/95 backdrop-blur-2xl border border-purple-500/40 rounded-2xl p-3 shadow-2xl z-50 space-y-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
+                    <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">Fundo Musical Bíblico</span>
+                    <button onClick={() => setShowMusicMenu(false)} className="text-slate-400 hover:text-white text-xs font-bold">✕</button>
+                  </div>
+                  <div className="space-y-1">
+                    {MUSIC_TRACKS.map(track => (
+                      <button
+                        key={track.id}
+                        onClick={() => {
+                          handleSelectMusicTrack(track.id);
+                          setShowMusicMenu(false);
+                        }}
+                        className={`w-full text-left p-2 rounded-xl border text-xs transition-all ${
+                          selectedMusicTrack === track.id && isPlayingMusic
+                            ? 'bg-purple-600/30 border-purple-400 text-white font-bold'
+                            : 'bg-slate-900 border-white/10 text-slate-300 hover:bg-slate-800'
+                        }`}
+                      >
+                        <div className="font-bold">{track.name}</div>
+                        <div className="text-[9px] text-slate-400">{track.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -478,9 +543,22 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
             className={`p-3.5 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold shadow-lg shadow-purple-950/60 hover:scale-105 active:scale-95 transition-all flex items-center justify-center ${
               isPlayingAudio ? 'animate-pulse' : ''
             }`}
-            title={isPlayingAudio ? 'Pausar Áudio' : 'Ouvir Narração'}
+            title={isPlayingAudio ? 'Pausar Narração por Voz' : 'Ouvir Capítulo por Voz'}
           >
             {isPlayingAudio ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+          </button>
+
+          {/* Quick Toggle Background Music Button */}
+          <button
+            onClick={() => toggleBackgroundMusic()}
+            className={`p-2.5 rounded-full border transition-all cursor-pointer ${
+              isPlayingMusic
+                ? 'bg-amber-500/20 border-amber-400 text-amber-400 animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                : 'bg-slate-950/80 border-white/10 text-slate-400 hover:text-white'
+            }`}
+            title={isPlayingMusic ? 'Pausar Fundo Musical' : 'Ativar Fundo Musical Motivacional/Cinemático'}
+          >
+            <Music className="w-4 h-4 text-amber-400" />
           </button>
 
           <button
