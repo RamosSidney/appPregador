@@ -40,6 +40,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const isAutoPlayingNextRef = useRef(false);
+  const pausedVerseIndexRef = useRef(0);
 
   // Calculate active spoken verse index and verse number
   const activeVerseIdx = versesList.length > 0
@@ -81,15 +82,17 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       onPlay: () => {
         backgroundMusicService.play();
         if (!audioService.isPlaying) {
-          startChapterNarration(selectedBook, selectedChapter, versesList);
+          startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current);
         }
       },
       onPause: () => {
+        if (activeVerseIdx >= 0) {
+          pausedVerseIndexRef.current = activeVerseIdx;
+        }
         audioService.stop();
         backgroundMusicService.pause();
         setIsPlayingAudio(false);
         setIsPlayingMusic(false);
-        setAudioProgress(0);
       },
       onPrevious: () => {
         handlePrevChapter();
@@ -98,7 +101,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
         handleNextChapter();
       }
     });
-  }, [selectedBook, selectedChapter, versesList]);
+  }, [selectedBook, selectedChapter, versesList, activeVerseIdx]);
 
   // Sync Lock Screen Media Session Playback State & Progress
   useEffect(() => {
@@ -167,10 +170,11 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     } else {
       setVersesList([]);
     }
-    // Clear verse selection and context menu position on chapter change
+    // Clear verse selection, paused position, and context menu position on chapter change
     setSelectedVerseRef(null);
     setSelectedVerseText('');
     setMenuPosition(null);
+    pausedVerseIndexRef.current = 0;
     if (!isAutoPlayingNextRef.current) {
       setAudioProgress(0);
     }
@@ -230,25 +234,37 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     }
   };
 
-  // Audio Player Narration with Realtime Progress & Auto-Next Chapter
-  const startChapterNarration = (bookName, chapterNum, verses) => {
+  // Audio Player Narration with Realtime Progress, Resume from Paused Verse & Auto-Next Chapter
+  const startChapterNarration = (bookName, chapterNum, verses, startIdx = 0) => {
     if (!verses || verses.length === 0) return;
-    const chapterText = verses.map(v => v.text).join(' ');
-    const rawText = `${bookName}, capítulo ${chapterNum}. ${chapterText}`;
 
-    setAudioProgress(0);
+    const safeStartIdx = Math.max(0, Math.min(startIdx, verses.length - 1));
+    const versesToRead = verses.slice(safeStartIdx);
+    const chapterText = versesToRead.map(v => v.text).join(' ');
+
+    const introText = safeStartIdx === 0 ? `${bookName}, capítulo ${chapterNum}. ` : '';
+    const rawText = `${introText}${chapterText}`;
+
+    const baseProgress = (safeStartIdx / verses.length) * 100;
+    setAudioProgress(baseProgress);
     setIsPlayingAudio(true);
 
     audioService.speak(rawText, {
       rate: 0.95,
       style: 'devocional',
       onProgress: (percent) => {
-        setAudioProgress(percent);
+        const remainingSpan = 100 - baseProgress;
+        const currentTotalPercent = Math.min(100, Math.round(baseProgress + (percent / 100) * remainingSpan));
+        setAudioProgress(currentTotalPercent);
+
+        const currentVerseIdx = Math.min(verses.length - 1, Math.floor((currentTotalPercent / 100) * verses.length));
+        pausedVerseIndexRef.current = currentVerseIdx;
       },
       onEnd: () => {
         setIsPlayingAudio(false);
-        setAudioProgress(0); // Reset progress bar to 0% immediately on completion!
-        
+        setAudioProgress(0);
+        pausedVerseIndexRef.current = 0;
+
         // Auto-advance to next chapter automatically when finished!
         const chNum = parseInt(chapterNum, 10);
         const bookData = bibleDatabase?.find(b => b.name === bookName);
@@ -267,7 +283,6 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       },
       onError: () => {
         setIsPlayingAudio(false);
-        setAudioProgress(0);
       }
     });
   };
@@ -298,14 +313,16 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     }
 
     if (isPlayingAudio) {
+      if (activeVerseIdx >= 0) {
+        pausedVerseIndexRef.current = activeVerseIdx;
+      }
       audioService.stop();
       setIsPlayingAudio(false);
-      setAudioProgress(0);
       mediaSessionService.setPlaybackState('paused');
     } else {
       // Start background music as HTML5 audio anchor for screen lock & OS media session widget
       backgroundMusicService.play();
-      startChapterNarration(selectedBook, selectedChapter, versesList);
+      startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current);
     }
   };
 
