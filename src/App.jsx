@@ -84,22 +84,24 @@ export default function App() {
   // Auth Handlers
   const handleLogin = (credentials) => {
     setUserProfile({ nome: 'Pregador Z', username: 'lider_z' });
+    setIsAuthenticated(true);
     setIsTransitioning(true);
   };
 
   const handleRegister = (data) => {
     setUserProfile({ nome: data.name || 'Pregador Z', username: data.username || 'lider_z' });
+    setIsAuthenticated(true);
     setIsTransitioning(true);
   };
 
   const handleGuestBypass = () => {
     setUserProfile(null);
+    setIsAuthenticated(true);
     setIsTransitioning(true);
   };
 
   const handleTransitionComplete = () => {
     setIsTransitioning(false);
-    setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
@@ -276,33 +278,28 @@ export default function App() {
     alert("Configurações salvas!");
   };
 
-  // Authentication and Transition Loader Orchester
-  if (!isAuthenticated || isTransitioning) {
+  // Authentication Check
+  if (!isAuthenticated) {
     return (
-      <>
-        <AnimatePresence mode="wait">
-          {isTransitioning && (
-            <TransitionLoader
-              key="transition-loader"
-              onComplete={handleTransitionComplete}
-            />
-          )}
-        </AnimatePresence>
-
-        {!isAuthenticated && !isTransitioning && (
-          <AuthScreen
-            onLogin={handleLogin}
-            onRegister={handleRegister}
-            onGuestBypass={handleGuestBypass}
-          />
-        )}
-      </>
+      <AuthScreen
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+        onGuestBypass={handleGuestBypass}
+      />
     );
   }
 
-
   return (
     <div className="min-h-screen bg-dark-space text-slate-100 flex flex-col selection:bg-purple-500 selection:text-white">
+      {/* 3-Second Transition Loader Overlay */}
+      <AnimatePresence>
+        {isTransitioning && (
+          <TransitionLoader
+            key="transition-loader"
+            onComplete={handleTransitionComplete}
+          />
+        )}
+      </AnimatePresence>
       {/* Header */}
       <Header
         userCredits={userCredits}
