@@ -209,7 +209,8 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       },
       onEnd: () => {
         setIsPlayingAudio(false);
-        setAudioProgress(100);
+        setAudioProgress(0); // Reset progress bar to 0% immediately on completion!
+        
         // Auto-advance to next chapter automatically when finished!
         const chNum = parseInt(chapterNum, 10);
         const bookData = bibleDatabase?.find(b => b.name === bookName);
@@ -233,7 +234,19 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     });
   };
 
-  const toggleAudioNarration = () => {
+  const toggleAudioNarration = (e) => {
+    if (e) {
+      try { e.stopPropagation(); } catch (err) {}
+    }
+
+    // Android Chrome Mobile Unlock: Synchronously resume Web Speech Engine
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
+      } catch (err) {}
+    }
+
     if (isPlayingAudio) {
       audioService.stop();
       setIsPlayingAudio(false);
@@ -245,14 +258,27 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
 
   // Auto-play next chapter when advancing automatically
   useEffect(() => {
-    if (isAutoPlayingNextRef.current && versesList.length > 0) {
+    if (isAutoPlayingNextRef.current && bibleDatabase) {
       isAutoPlayingNextRef.current = false;
-      const timer = setTimeout(() => {
-        startChapterNarration(selectedBook, selectedChapter, versesList);
-      }, 600);
-      return () => clearTimeout(timer);
+      setAudioProgress(0);
+
+      const bookData = bibleDatabase.find(b => b.name === selectedBook);
+      const chapterIdx = parseInt(selectedChapter, 10) - 1;
+
+      if (bookData && bookData.chapters && bookData.chapters[chapterIdx]) {
+        const nextVerses = bookData.chapters[chapterIdx].map((text, idx) => ({
+          num: idx + 1,
+          text
+        }));
+        setVersesList(nextVerses);
+
+        const timer = setTimeout(() => {
+          startChapterNarration(selectedBook, selectedChapter, nextVerses);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [selectedBook, selectedChapter, versesList]);
+  }, [selectedBook, selectedChapter, bibleDatabase]);
 
   // Handle Verse Click (Toggle selection: select / unselect)
   const handleVerseClick = (e, verse) => {
@@ -627,7 +653,11 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
 
           <button
             onClick={toggleAudioNarration}
-            className={`p-3.5 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold shadow-lg shadow-purple-950/60 hover:scale-105 active:scale-95 transition-all flex items-center justify-center ${
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              toggleAudioNarration(e);
+            }}
+            className={`p-3.5 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold shadow-lg shadow-purple-950/60 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer ${
               isPlayingAudio ? 'animate-pulse' : ''
             }`}
             title={isPlayingAudio ? 'Pausar Narração por Voz' : 'Ouvir Capítulo por Voz'}
