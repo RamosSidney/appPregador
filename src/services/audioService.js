@@ -1,5 +1,4 @@
-// Audio Service: Universal HTML5 Audio Stream Engine (Option A) with Web Speech Fallback
-// Guaranteed 100% Identical Execution across Windows, iOS, and Android!
+// Audio Service: High-Performance Web Speech Synthesis Engine for pt-BR (Zero Looping / Zero High-Speed Skipping)
 
 export const cleanTextForSpeech = (text) => {
   if (!text) return '';
@@ -24,14 +23,14 @@ export const cleanTextForSpeech = (text) => {
 
 class AudioService {
   constructor() {
-    this.audioElement = null;
     this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
     this.utterance = null;
     this.isPlaying = false;
     this.isListening = false;
-    this.isStopping = false; // Flag to prevent cancel() from firing utterance.onend auto-advance
+    this.isStopping = false; // Prevents cancel() from firing utterance.onend auto-advance
     this.currentRate = 1.0;
     this.voicesList = [];
+    this.androidKeepAliveTimer = null;
 
     if (this.synth) {
       this.loadVoices();
@@ -63,18 +62,8 @@ class AudioService {
   stop() {
     this.isStopping = true;
     this.isPlaying = false;
+    this.clearAndroidKeepAlive();
 
-    // Stop HTML5 Audio Element
-    if (this.audioElement) {
-      try {
-        this.audioElement.pause();
-        this.audioElement.currentTime = 0;
-        this.audioElement.src = '';
-      } catch (e) {}
-      this.audioElement = null;
-    }
-
-    // Stop Web Speech Synthesis Fallback
     if (this.synth) {
       try {
         this.synth.cancel();
@@ -83,8 +72,15 @@ class AudioService {
   }
 
   speak(text, { rate = 0.95, style = 'devocional', onProgress, onEnd, onError } = {}) {
+    if (!this.synth) {
+      console.warn("Web SpeechSynthesis não suportado neste navegador.");
+      if (onError) onError(new Error("Navegador não suporta áudio de voz."));
+      return;
+    }
+
     this.stop();
     this.isStopping = false;
+    this.currentRate = rate;
 
     const cleanText = cleanTextForSpeech(text);
     if (!cleanText) {
@@ -92,7 +88,15 @@ class AudioService {
       return;
     }
 
-    // Chunk text into sentence/verse units (~120 chars each for optimal MP3 streaming)
+    // Android/iOS Resume unlock
+    try {
+      if (this.synth.paused) {
+        this.synth.resume();
+      }
+      this.synth.cancel();
+    } catch (e) {}
+
+    // Chunk text into sentence/phrase units for natural speech flow
     const sentenceMatches = cleanText.match(/[^.!?]+[.!?]+|\S+/g);
     const chunks = sentenceMatches && sentenceMatches.length > 0 ? sentenceMatches : [cleanText];
 
@@ -100,13 +104,15 @@ class AudioService {
     const totalLength = cleanText.length;
     let spokenLength = 0;
 
-    const playNextChunkHTML5 = () => {
-      if (this.isStopping) {
+    const speakNextChunk = () => {
+      if (this.isStopping || !this.isPlaying) {
+        this.clearAndroidKeepAlive();
         this.isPlaying = false;
         return;
       }
 
-      if (currentChunkIdx >= chunks.length || !this.isPlaying) {
+      if (currentChunkIdx >= chunks.length) {
+        this.clearAndroidKeepAlive();
         this.isPlaying = false;
         if (onEnd && !this.isStopping) onEnd();
         return;
@@ -115,21 +121,44 @@ class AudioService {
       const chunkText = chunks[currentChunkIdx].trim();
       if (!chunkText) {
         currentChunkIdx++;
-        playNextChunkHTML5();
+        speakNextChunk();
         return;
       }
 
-      // Stream native MP3 audio via HTML5 Audio element
-      const streamUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunkText)}&tl=pt&client=tw-ob`;
+      this.utterance = new SpeechSynthesisUtterance(chunkText);
+      this.utterance.lang = 'pt-BR';
+      this.utterance.volume = 1.0;
 
-      if (this.audioElement) {
-        try { this.audioElement.pause(); } catch (e) {}
+      let adjustedRate = rate;
+      let adjustedPitch = 1.0;
+
+      if (style === 'pastor') {
+        adjustedRate = rate * 0.95;
+        adjustedPitch = 0.9;
+      } else if (style === 'mentora') {
+        adjustedRate = rate * 0.95;
+        adjustedPitch = 1.15;
+      } else if (style === 'genz') {
+        adjustedRate = rate * 1.15;
+        adjustedPitch = 1.0;
+      } else if (style === 'devocional') {
+        adjustedRate = rate * 0.85;
+        adjustedPitch = 0.85;
       }
 
-      this.audioElement = new Audio(streamUrl);
-      this.audioElement.playbackRate = rate || 0.95;
+      this.utterance.rate = Math.max(0.5, Math.min(2.0, adjustedRate));
+      this.utterance.pitch = Math.max(0.5, Math.min(2.0, adjustedPitch));
 
-      this.audioElement.onended = () => {
+      const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
+      if (!isAndroid) {
+        const voices = this.getAvailableVoices();
+        let selectedVoiceObj = voices.find(v => v.lang && v.lang.toLowerCase().includes('pt-br'));
+        if (selectedVoiceObj) {
+          try { this.utterance.voice = selectedVoiceObj; } catch (e) {}
+        }
+      }
+
+      this.utterance.onend = () => {
         if (this.isStopping) return;
         spokenLength += chunkText.length;
         if (onProgress && totalLength > 0) {
@@ -137,91 +166,89 @@ class AudioService {
           onProgress(percent);
         }
         currentChunkIdx++;
-        playNextChunkHTML5();
+        speakNextChunk();
       };
 
-      this.audioElement.onerror = () => {
-        // Fallback to Web Speech Synthesis if stream fails
-        console.warn("[AudioService] HTML5 Stream offline, usando Web Speech Fallback.");
-        this.playChunkWebSpeech(chunkText, () => {
-          spokenLength += chunkText.length;
-          if (onProgress && totalLength > 0) {
-            onProgress(Math.min(100, Math.round((spokenLength / totalLength) * 100)));
+      this.utterance.onerror = (err) => {
+        if (this.isStopping) return;
+        console.warn("[AudioService] Erro ao sintetizar trecho:", err);
+        // Delay before next chunk to prevent rapid skipping loops
+        setTimeout(() => {
+          if (!this.isStopping && this.isPlaying) {
+            currentChunkIdx++;
+            speakNextChunk();
           }
-          currentChunkIdx++;
-          playNextChunkHTML5();
-        });
+        }, 500);
       };
+
+      try {
+        if (this.synth.paused) {
+          this.synth.resume();
+        }
+      } catch (e) {}
 
       this.isPlaying = true;
-      this.audioElement.play().catch(err => {
-        console.warn("[AudioService] Autoplay HTML5 prevenido, fallback para WebSpeech:", err);
-        this.playChunkWebSpeech(chunkText, () => {
-          spokenLength += chunkText.length;
-          if (onProgress && totalLength > 0) {
-            onProgress(Math.min(100, Math.round((spokenLength / totalLength) * 100)));
-          }
-          currentChunkIdx++;
-          playNextChunkHTML5();
-        });
-      });
+      this.synth.speak(this.utterance);
     };
 
     this.isPlaying = true;
-    playNextChunkHTML5();
+    this.startAndroidKeepAlive();
+    speakNextChunk();
   }
 
-  playChunkWebSpeech(chunkText, onChunkEnd) {
-    if (!this.synth || this.isStopping) {
-      if (onChunkEnd) onChunkEnd();
-      return;
+  startAndroidKeepAlive() {
+    this.clearAndroidKeepAlive();
+    this.androidKeepAliveTimer = setInterval(() => {
+      if (this.synth && this.isPlaying && !this.isStopping) {
+        try {
+          if (this.synth.paused || this.synth.pending) {
+            this.synth.resume();
+          }
+        } catch (e) {}
+      }
+    }, 1500);
+
+    if (typeof document !== 'undefined' && !this._boundVisibilityHandler) {
+      this._boundVisibilityHandler = () => {
+        if (document.visibilityState === 'hidden' && this.synth && this.isPlaying && !this.isStopping) {
+          try { this.synth.resume(); } catch (e) {}
+        }
+      };
+      document.addEventListener('visibilitychange', this._boundVisibilityHandler);
     }
+  }
 
-    try {
-      if (this.synth.paused) this.synth.resume();
-      this.synth.cancel();
-    } catch (e) {}
-
-    this.utterance = new SpeechSynthesisUtterance(chunkText);
-    this.utterance.lang = 'pt-BR';
-    this.utterance.rate = 0.95;
-
-    this.utterance.onend = () => {
-      if (!this.isStopping && onChunkEnd) onChunkEnd();
-    };
-    this.utterance.onerror = () => {
-      if (!this.isStopping && onChunkEnd) onChunkEnd();
-    };
-
-    this.synth.speak(this.utterance);
+  clearAndroidKeepAlive() {
+    if (this.androidKeepAliveTimer) {
+      clearInterval(this.androidKeepAliveTimer);
+      this.androidKeepAliveTimer = null;
+    }
   }
 
   pause() {
     this.isStopping = true;
     this.isPlaying = false;
-    if (this.audioElement) {
-      try { this.audioElement.pause(); } catch (e) {}
-    }
     if (this.synth) {
-      try { this.synth.pause(); } catch (e) {}
+      try {
+        this.synth.pause();
+      } catch (e) {}
     }
   }
 
   resume() {
     this.isStopping = false;
     this.isPlaying = true;
-    if (this.audioElement) {
-      try { this.audioElement.play(); } catch (e) {}
-    }
     if (this.synth) {
-      try { this.synth.resume(); } catch (e) {}
+      try {
+        this.synth.resume();
+      } catch (e) {}
     }
   }
 
   setRate(rate) {
     this.currentRate = rate;
-    if (this.audioElement) {
-      this.audioElement.playbackRate = rate;
+    if (this.utterance) {
+      this.utterance.rate = rate;
     }
   }
 
