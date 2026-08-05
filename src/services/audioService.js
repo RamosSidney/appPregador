@@ -28,6 +28,7 @@ class AudioService {
     this.utterance = null;
     this.isPlaying = false;
     this.isListening = false;
+    this.isStopping = false; // Flag to prevent synth.cancel() from triggering utterance.onend auto-advance
     this.currentRate = 1.0;
     this.voicesList = [];
     this.androidKeepAliveTimer = null;
@@ -62,11 +63,10 @@ class AudioService {
       return;
     }
 
-    // Android & Mobile Cleanup: Cancel current audio and clear keepalive timer
     this.stop();
+    this.isStopping = false;
     this.currentRate = rate;
 
-    // Clean Markdown tags, Emojis and Unicode symbols for natural speech
     const cleanText = cleanTextForSpeech(text);
 
     if (!cleanText) {
@@ -74,19 +74,15 @@ class AudioService {
       return;
     }
 
-    // Android Chrome Fix: Ensure synth engine is unlocked and active
     try {
       if (this.synth.paused) {
         this.synth.resume();
       }
       this.synth.cancel();
-    } catch (e) {
-      // Safe fallback
-    }
+    } catch (e) {}
 
     const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
 
-    // Chunk text into sentence/phrase units for Android Google Speech Engine stability
     const sentenceMatches = cleanText.match(/[^.!?]+[.!?]+|\S+/g);
     const chunks = isAndroid && cleanText.length > 150 && sentenceMatches
       ? sentenceMatches
@@ -97,10 +93,16 @@ class AudioService {
     let spokenLength = 0;
 
     const speakNextChunk = () => {
+      if (this.isStopping) {
+        this.clearAndroidKeepAlive();
+        this.isPlaying = false;
+        return;
+      }
+
       if (currentChunkIdx >= chunks.length || !this.isPlaying) {
         this.clearAndroidKeepAlive();
         this.isPlaying = false;
-        if (onEnd) onEnd();
+        if (onEnd && !this.isStopping) onEnd();
         return;
       }
 
@@ -115,7 +117,6 @@ class AudioService {
       this.utterance.lang = 'pt-BR';
       this.utterance.volume = 1.0;
 
-      // Apply Voice Style Presets
       let adjustedRate = rate;
       let adjustedPitch = pitch;
 
@@ -136,7 +137,6 @@ class AudioService {
       this.utterance.rate = Math.max(0.5, Math.min(2.0, adjustedRate));
       this.utterance.pitch = Math.max(0.5, Math.min(2.0, adjustedPitch));
 
-      // On Android, bypass custom voice object assignment to prevent Google TTS crashes
       if (!isAndroid) {
         const voices = this.getAvailableVoices();
         let selectedVoiceObj = null;
@@ -144,13 +144,11 @@ class AudioService {
         if (voiceName) {
           selectedVoiceObj = voices.find(v => v.name === voiceName);
         }
-
         if (!selectedVoiceObj && style === 'mentora') {
           selectedVoiceObj = voices.find(v => /female|feminina|francisca|luciana|helena|maria|joana|zira/i.test(v.name));
         } else if (!selectedVoiceObj && style === 'pastor') {
           selectedVoiceObj = voices.find(v => /male|masculin|antonio|felipe|daniel|ricardo|humberto/i.test(v.name));
         }
-
         if (!selectedVoiceObj) {
           selectedVoiceObj = voices.find(v => v.lang.toLowerCase().includes('pt-br') || v.lang.toLowerCase().includes('pt_br'));
         }
@@ -163,6 +161,7 @@ class AudioService {
       }
 
       this.utterance.onend = () => {
+        if (this.isStopping) return;
         spokenLength += chunkText.length;
         if (onProgress && totalLength > 0) {
           const percent = Math.min(100, Math.round((spokenLength / totalLength) * 100));
@@ -173,6 +172,7 @@ class AudioService {
       };
 
       this.utterance.onerror = (err) => {
+        if (this.isStopping) return;
         console.warn("[AudioService] Erro ao sintetizar trecho:", err);
         currentChunkIdx++;
         speakNextChunk();
@@ -192,11 +192,10 @@ class AudioService {
     speakNextChunk();
   }
 
-  // Android Chrome Keep-Alive: Call resume every 1.5 seconds while playing to prevent engine timeout on screen lock
   startAndroidKeepAlive() {
     this.clearAndroidKeepAlive();
     this.androidKeepAliveTimer = setInterval(() => {
-      if (this.synth && this.isPlaying) {
+      if (this.synth && this.isPlaying && !this.isStopping) {
         try {
           if (this.synth.paused || this.synth.pending) {
             this.synth.resume();
@@ -207,7 +206,7 @@ class AudioService {
 
     if (typeof document !== 'undefined' && !this._boundVisibilityHandler) {
       this._boundVisibilityHandler = () => {
-        if (document.visibilityState === 'hidden' && this.synth && this.isPlaying) {
+        if (document.visibilityState === 'hidden' && this.synth && this.isPlaying && !this.isStopping) {
           try { this.synth.resume(); } catch (e) {}
         }
       };
@@ -223,6 +222,7 @@ class AudioService {
   }
 
   pause() {
+    this.isStopping = true;
     if (this.synth && this.isPlaying) {
       try {
         this.synth.pause();
@@ -232,6 +232,7 @@ class AudioService {
   }
 
   resume() {
+    this.isStopping = false;
     if (this.synth && !this.isPlaying) {
       try {
         this.synth.resume();
@@ -241,6 +242,7 @@ class AudioService {
   }
 
   stop() {
+    this.isStopping = true;
     this.clearAndroidKeepAlive();
     if (this.synth) {
       try {
