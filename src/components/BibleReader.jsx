@@ -758,13 +758,14 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                       onClick={() => {
                         const newStyle = vs.id;
                         setSelectedVoiceStyle(newStyle);
+                        setSelectedVoiceName(null);
                         audioService.stop();
                         setIsPlayingAudio(true);
-                        startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, newStyle, selectedVoiceName);
+                        startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, newStyle, null);
                       }}
                       className={`p-2 rounded-xl text-left border transition-all ${
-                        selectedVoiceStyle === vs.id
-                          ? 'bg-purple-600/30 border-purple-400 text-white shadow-md'
+                        selectedVoiceStyle === vs.id && !selectedVoiceName
+                          ? 'bg-purple-600/30 border-purple-400 text-white shadow-md font-extrabold'
                           : 'bg-slate-900/60 border-white/10 text-slate-300 hover:bg-slate-800'
                       }`}
                     >
@@ -805,7 +806,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               {availableSystemVoices.length > 0 && (
                 <div>
                   <label className="text-[10px] font-black uppercase text-cyan-400 tracking-wider block mb-1">
-                    🔊 Vozes do Sistema
+                    🔊 Vozes do Sistema (Web Speech)
                   </label>
                   <select
                     value={selectedVoiceName || ''}

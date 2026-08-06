@@ -103,7 +103,7 @@ class AudioService {
     }
   }
 
-  speak(text, { rate = 0.95, style = 'devocional', voiceName = null, openaiKey = null, onProgress, onEnd, onError } = {}) {
+  speak(text, { rate = 0.95, style = 'devocional', voiceName = null, openaiKey = null, engine = null, onProgress, onEnd, onError } = {}) {
     this.stop();
     this.isStopping = false;
     this.currentRate = rate;
@@ -119,28 +119,36 @@ class AudioService {
 
     const keyToUse = openaiKey || this.getOpenAIKey();
 
-    // Se tivermos uma chave da OpenAI, tentamos gerar via áudio neural emocional
+    // Se o usuário escolheu uma voz do sistema (ex: Microsoft Maria, Google) ou engine 'native', usa o motor nativo do navegador
+    const isExplicitSystemVoice = voiceName && voiceName !== 'system_default' && !voiceName.startsWith('openai_') && !['onyx', 'nova', 'fable', 'alloy', 'echo', 'shimmer'].includes(voiceName);
+
+    if (engine === 'native' || isExplicitSystemVoice) {
+      this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, token);
+      return;
+    }
+
+    // Se tivermos uma chave da OpenAI e for voz OpenAI ou estilo temático, usa OpenAI Neural Audio
     if (keyToUse && keyToUse.trim() !== '') {
       this.speakOpenAI(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, keyToUse.trim(), token);
       return;
     }
 
-    // Fallback nativo do navegador
+    // Fallback nativo do navegador se não houver chave OpenAI
     this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, token);
   }
 
   async speakOpenAI(cleanText, { rate = 1.0, style = 'pastor', voiceName = null, onProgress, onEnd, onError }, apiKey, token) {
-    // Mapeamento de estilos ou voz selecionada para vozes da OpenAI
-    let openAiVoice = 'onyx'; // Padrão pastor solene
+    // Mapeamento estrito: se voiceName for informado e for voz OpenAI, usa voiceName. Caso contrário, usa o estilo!
+    let openAiVoice = 'onyx';
 
     if (voiceName && voiceName.startsWith('openai_')) {
       openAiVoice = voiceName.replace('openai_', '');
     } else if (['onyx', 'nova', 'fable', 'alloy', 'echo', 'shimmer'].includes(voiceName)) {
       openAiVoice = voiceName;
-    } else if (style === 'pastor') {
-      openAiVoice = 'onyx'; // Tom firme, grave, estilo pregador
     } else if (style === 'mentora') {
-      openAiVoice = 'nova'; // Tom feminino acolhedor e expressivo
+      openAiVoice = 'nova'; // Tom feminino acolhedor
+    } else if (style === 'pastor') {
+      openAiVoice = 'onyx'; // Tom masculino solene
     } else if (style === 'devocional') {
       openAiVoice = 'fable'; // Tom calmo, narrativa reflexiva
     } else if (style === 'genz') {

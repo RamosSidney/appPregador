@@ -166,11 +166,14 @@ export default function App() {
 
   const handleChangeVoiceStyle = (newStyle) => {
     setVoiceStyle(newStyle);
+    setVoiceName(null);
     if (currentTrack) {
+      audioService.stop();
       audioService.speak(currentTrack.content, {
         rate: playbackRate,
         style: newStyle,
-        voiceName: voiceName,
+        voiceName: null,
+        openaiKey: config?.openaiKey,
         onProgress: (p) => setAudioProgress(p),
         onEnd: () => setIsPlayingAudio(false),
         onError: () => setIsPlayingAudio(false)
