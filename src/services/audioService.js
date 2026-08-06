@@ -85,6 +85,14 @@ class AudioService {
     this.clearAndroidKeepAlive();
     this.currentSpeechToken = null;
 
+    if (this.utterance) {
+      try {
+        this.utterance.onend = null;
+        this.utterance.onerror = null;
+        this.utterance = null;
+      } catch (e) {}
+    }
+
     // Parar áudio HTML5 da OpenAI se estiver tocando
     if (this.audioElement) {
       try {
@@ -266,7 +274,7 @@ class AudioService {
     let spokenLength = 0;
 
     const speakNextChunk = () => {
-      if (this.isStopping || !this.isPlaying) {
+      if (this.isStopping || !this.isPlaying || this.currentSpeechToken !== token) {
         this.clearAndroidKeepAlive();
         this.isPlaying = false;
         return;
@@ -327,7 +335,7 @@ class AudioService {
       }
 
       this.utterance.onend = () => {
-        if (this.isStopping) return;
+        if (this.isStopping || this.currentSpeechToken !== token) return;
         spokenLength += chunkText.length;
         if (onProgress && totalLength > 0) {
           const percent = Math.min(100, Math.round((spokenLength / totalLength) * 100));
@@ -338,14 +346,9 @@ class AudioService {
       };
 
       this.utterance.onerror = (err) => {
-        if (this.isStopping) return;
-        console.warn("[AudioService] Erro ao sintetizar trecho:", err);
-        setTimeout(() => {
-          if (!this.isStopping && this.isPlaying) {
-            currentChunkIdx++;
-            speakNextChunk();
-          }
-        }, 500);
+        if (this.isStopping || this.currentSpeechToken !== token) return;
+        if (err.error === 'interrupted' || err.error === 'canceled') return;
+        console.warn("[AudioService] Erro no trecho nativo:", err.error || err);
       };
 
       try {
