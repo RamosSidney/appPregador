@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen, Copy, Share2, Sparkles, ArrowLeft, Send, X,
-  ChevronLeft, ChevronRight, Play, Pause, Volume2, Search, Type, Sliders, Music
+  ChevronLeft, ChevronRight, Play, Pause, Volume2, Search, Type, Sliders, Music, Mic
 } from 'lucide-react';
 import { marked } from 'marked';
 import { generateBibleLensAI, refineBibleChatAI } from '../services/aiService.js';
@@ -10,13 +10,19 @@ import { audioService } from '../services/audioService.js';
 import { backgroundMusicService, MUSIC_TRACKS } from '../services/backgroundMusicService.js';
 import { mediaSessionService } from '../services/mediaSessionService.js';
 
-export default function BibleReader({ userCredits, onDeductCredit, config, onOpenSettings }) {
+export default function BibleReader({ userCredits, onDeductCredit, config, onOpenSettings, onPlayAudio }) {
   const [bibleDatabase, setBibleDatabase] = useState(null);
   const [selectedBook, setSelectedBook] = useState('João');
   const [selectedChapter, setSelectedChapter] = useState('1');
   const [versesList, setVersesList] = useState([]);
   const [fontSerif, setFontSerif] = useState(true);
   const [fontSize, setFontSize] = useState(18);
+
+  // Voice Selection State for Bible Reader
+  const [selectedVoiceStyle, setSelectedVoiceStyle] = useState('devocional');
+  const [selectedVoiceName, setSelectedVoiceName] = useState(null);
+  const [showReaderVoiceMenu, setShowReaderVoiceMenu] = useState(false);
+  const [availableSystemVoices, setAvailableSystemVoices] = useState([]);
 
   // Background Music State
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
@@ -235,7 +241,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
   };
 
   // Audio Player Narration with Realtime Progress, Resume from Paused Verse & Auto-Next Chapter
-  const startChapterNarration = (bookName, chapterNum, verses, startIdx = 0) => {
+  const startChapterNarration = (bookName, chapterNum, verses, startIdx = 0, styleToUse = selectedVoiceStyle, voiceToUse = selectedVoiceName) => {
     if (!verses || verses.length === 0) return;
 
     const safeStartIdx = Math.max(0, Math.min(startIdx, verses.length - 1));
@@ -251,7 +257,9 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
 
     audioService.speak(rawText, {
       rate: 0.95,
-      style: 'devocional',
+      style: styleToUse,
+      voiceName: voiceToUse,
+      openaiKey: config?.openaiKey,
       onProgress: (percent) => {
         const remainingSpan = 100 - baseProgress;
         const currentTotalPercent = Math.min(100, Math.round(baseProgress + (percent / 100) * remainingSpan));
@@ -711,7 +719,115 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
       )}
 
       {/* Floating Bottom Quick Controls Bar */}
-      <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none flex justify-center">
+      <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none flex flex-col items-center">
+        {/* Voice Selection Popover Dropdown for Reader */}
+        <AnimatePresence>
+          {showReaderVoiceMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="pointer-events-auto mb-3 w-80 max-w-[92vw] bg-slate-950/95 backdrop-blur-2xl border border-purple-500/40 rounded-2xl p-4 shadow-2xl space-y-3 z-50 text-left"
+            >
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <span className="text-xs font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                  <Mic className="w-4 h-4 text-amber-400" /> Seleção de Vozes & Estilos
+                </span>
+                <button
+                  onClick={() => setShowReaderVoiceMenu(false)}
+                  className="text-slate-400 hover:text-white text-xs font-bold p-1 rounded bg-slate-900"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Estilos Temáticos */}
+              <div>
+                <label className="text-[10px] font-black uppercase text-purple-400 tracking-wider block mb-1">
+                  Estilos de Narração
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { id: 'devocional', label: '📖 Devocional', desc: 'Calmo & Reflexivo' },
+                    { id: 'pastor', label: '🎙️ Pastor', desc: 'Solene & Marcante' },
+                    { id: 'mentora', label: '✨ Mentora', desc: 'Feminino Acolhedor' },
+                    { id: 'genz', label: '⚡ Gen Z', desc: 'Dinâmico & Ágil' }
+                  ].map(vs => (
+                    <button
+                      key={vs.id}
+                      onClick={() => {
+                        setSelectedVoiceStyle(vs.id);
+                        if (isPlayingAudio) {
+                          startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, vs.id, selectedVoiceName);
+                        }
+                      }}
+                      className={`p-2 rounded-xl text-left border transition-all ${
+                        selectedVoiceStyle === vs.id
+                          ? 'bg-purple-600/30 border-purple-400 text-white shadow-md'
+                          : 'bg-slate-900/60 border-white/10 text-slate-300 hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="text-xs font-bold">{vs.label}</div>
+                      <div className="text-[9px] text-slate-400">{vs.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Vozes OpenAI */}
+              <div>
+                <label className="text-[10px] font-black uppercase text-amber-400 tracking-wider block mb-1">
+                  🤖 Vozes Neurais (OpenAI)
+                </label>
+                <select
+                  value={selectedVoiceName || ''}
+                  onChange={(e) => {
+                    const newV = e.target.value || null;
+                    setSelectedVoiceName(newV);
+                    if (isPlayingAudio) {
+                      startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, selectedVoiceStyle, newV);
+                    }
+                  }}
+                  className="w-full bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-white appearance-none cursor-pointer focus:outline-none focus:border-amber-400"
+                >
+                  <option value="">✨ Automático pelo Estilo Selecionado</option>
+                  <option value="openai_onyx">🎙️ Onyx - Pastor Solene (Masculino)</option>
+                  <option value="openai_nova">✨ Nova - Mentora Acolhedora (Feminino)</option>
+                  <option value="openai_fable">📖 Fable - Devocional / Storyteller</option>
+                  <option value="openai_alloy">⚡ Alloy - Gen Z Equilibrado</option>
+                  <option value="openai_echo">🔊 Echo - Reflexivo & Solene</option>
+                  <option value="openai_shimmer">🕊️ Shimmer - Suave & Inspirador</option>
+                </select>
+              </div>
+
+              {/* Vozes Sistema */}
+              {availableSystemVoices.length > 0 && (
+                <div>
+                  <label className="text-[10px] font-black uppercase text-cyan-400 tracking-wider block mb-1">
+                    🔊 Vozes do Sistema
+                  </label>
+                  <select
+                    value={selectedVoiceName || ''}
+                    onChange={(e) => {
+                      const newV = e.target.value || null;
+                      setSelectedVoiceName(newV);
+                      if (isPlayingAudio) {
+                        startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, selectedVoiceStyle, newV);
+                      }
+                    }}
+                    className="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-xs text-white appearance-none cursor-pointer focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="">Voz Padrão do Dispositivo</option>
+                    {availableSystemVoices.map((v, i) => (
+                      <option key={i} value={v.name}>{v.name} ({v.lang})</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-full bg-slate-900/90 backdrop-blur-2xl border border-white/15 shadow-2xl shadow-purple-950/60">
           <button
             onClick={handlePrevChapter}
@@ -729,6 +845,20 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
             title={isPlayingAudio ? 'Pausar Narração por Voz' : 'Ouvir Capítulo por Voz'}
           >
             {isPlayingAudio ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+          </button>
+
+          {/* Quick Voice Selector Toggle Button */}
+          <button
+            onClick={() => setShowReaderVoiceMenu(!showReaderVoiceMenu)}
+            className={`px-3 py-1.5 rounded-full border text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
+              showReaderVoiceMenu
+                ? 'bg-purple-600 text-white border-purple-400'
+                : 'bg-slate-950/80 border-white/15 text-amber-400 hover:text-white'
+            }`}
+            title="Selecionar Vozes e Estilos (OpenAI & Sistema)"
+          >
+            <Mic className="w-4 h-4 text-amber-400" />
+            <span>Vozes</span>
           </button>
 
           {/* Quick Toggle Background Music Button */}
