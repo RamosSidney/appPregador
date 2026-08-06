@@ -756,10 +756,11 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                     <button
                       key={vs.id}
                       onClick={() => {
-                        setSelectedVoiceStyle(vs.id);
-                        if (isPlayingAudio) {
-                          startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, vs.id, selectedVoiceName);
-                        }
+                        const newStyle = vs.id;
+                        setSelectedVoiceStyle(newStyle);
+                        audioService.stop();
+                        setIsPlayingAudio(true);
+                        startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, newStyle, selectedVoiceName);
                       }}
                       className={`p-2 rounded-xl text-left border transition-all ${
                         selectedVoiceStyle === vs.id
@@ -784,9 +785,9 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                   onChange={(e) => {
                     const newV = e.target.value || null;
                     setSelectedVoiceName(newV);
-                    if (isPlayingAudio) {
-                      startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, selectedVoiceStyle, newV);
-                    }
+                    audioService.stop();
+                    setIsPlayingAudio(true);
+                    startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, selectedVoiceStyle, newV);
                   }}
                   className="w-full bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-white appearance-none cursor-pointer focus:outline-none focus:border-amber-400"
                 >
@@ -811,9 +812,9 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                     onChange={(e) => {
                       const newV = e.target.value || null;
                       setSelectedVoiceName(newV);
-                      if (isPlayingAudio) {
-                        startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, selectedVoiceStyle, newV);
-                      }
+                      audioService.stop();
+                      setIsPlayingAudio(true);
+                      startChapterNarration(selectedBook, selectedChapter, versesList, pausedVerseIndexRef.current, selectedVoiceStyle, newV);
                     }}
                     className="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-xs text-white appearance-none cursor-pointer focus:outline-none focus:border-purple-500"
                   >

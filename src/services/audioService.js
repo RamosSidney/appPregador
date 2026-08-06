@@ -83,12 +83,14 @@ class AudioService {
     this.isStopping = true;
     this.isPlaying = false;
     this.clearAndroidKeepAlive();
+    this.currentSpeechToken = null;
 
     // Parar áudio HTML5 da OpenAI se estiver tocando
     if (this.audioElement) {
       try {
         this.audioElement.pause();
         this.audioElement.currentTime = 0;
+        this.audioElement.src = '';
         this.audioElement = null;
       } catch (e) {}
     }
@@ -106,6 +108,9 @@ class AudioService {
     this.isStopping = false;
     this.currentRate = rate;
 
+    const token = Symbol('speechToken');
+    this.currentSpeechToken = token;
+
     const cleanText = cleanTextForSpeech(text);
     if (!cleanText) {
       if (onEnd) onEnd();
@@ -116,15 +121,15 @@ class AudioService {
 
     // Se tivermos uma chave da OpenAI, tentamos gerar via áudio neural emocional
     if (keyToUse && keyToUse.trim() !== '') {
-      this.speakOpenAI(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, keyToUse.trim());
+      this.speakOpenAI(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, keyToUse.trim(), token);
       return;
     }
 
     // Fallback nativo do navegador
-    this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError });
+    this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, token);
   }
 
-  async speakOpenAI(cleanText, { rate = 1.0, style = 'pastor', voiceName = null, onProgress, onEnd, onError }, apiKey) {
+  async speakOpenAI(cleanText, { rate = 1.0, style = 'pastor', voiceName = null, onProgress, onEnd, onError }, apiKey, token) {
     // Mapeamento de estilos ou voz selecionada para vozes da OpenAI
     let openAiVoice = 'onyx'; // Padrão pastor solene
 
@@ -162,50 +167,71 @@ class AudioService {
         })
       });
 
+      if (this.currentSpeechToken !== token || this.isStopping) return;
+
       if (!response.ok) {
         const errJson = await response.json().catch(() => ({}));
         throw new Error(errJson.error?.message || `Status HTTP ${response.status} na API da OpenAI Audio`);
       }
 
       const blob = await response.blob();
-      if (this.isStopping) return;
+      if (this.currentSpeechToken !== token || this.isStopping) return;
+
+      if (this.audioElement) {
+        try {
+          this.audioElement.pause();
+          this.audioElement.currentTime = 0;
+          this.audioElement.src = '';
+          this.audioElement = null;
+        } catch (e) {}
+      }
 
       const audioUrl = URL.createObjectURL(blob);
-      this.audioElement = new Audio(audioUrl);
-      this.audioElement.playbackRate = rate;
+      const audio = new Audio(audioUrl);
+      this.audioElement = audio;
+      audio.playbackRate = rate;
 
-      this.audioElement.ontimeupdate = () => {
+      audio.ontimeupdate = () => {
+        if (this.currentSpeechToken !== token) {
+          try { audio.pause(); audio.src = ''; } catch (e) {}
+          return;
+        }
         if (this.audioElement && this.audioElement.duration && onProgress) {
           const pct = Math.min(100, Math.round((this.audioElement.currentTime / this.audioElement.duration) * 100));
           onProgress(pct);
         }
       };
 
-      this.audioElement.onended = () => {
+      audio.onended = () => {
+        if (this.currentSpeechToken !== token) return;
         this.isPlaying = false;
         this.audioElement = null;
         if (onEnd && !this.isStopping) onEnd();
       };
 
-      this.audioElement.onerror = (e) => {
+      audio.onerror = (e) => {
+        if (this.currentSpeechToken !== token) return;
         console.warn("[AudioService] Erro ao tocar stream da OpenAI:", e);
         this.audioElement = null;
         // Fallback automático para nativo
-        this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError });
+        this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, token);
       };
 
       await this.audioElement.play();
 
     } catch (err) {
+      if (this.currentSpeechToken !== token) return;
       console.warn("[AudioService] Falha na API OpenAI TTS. Recorrendo ao motor nativo:", err.message);
       this.isPlaying = false;
       this.audioElement = null;
       // Fallback gracioso para a voz nativa do sistema em caso de erro na API
-      this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError });
+      this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, token);
     }
   }
 
-  speakNative(cleanText, { rate = 0.95, style = 'devocional', voiceName = null, onProgress, onEnd, onError }) {
+  speakNative(cleanText, { rate = 0.95, style = 'devocional', voiceName = null, onProgress, onEnd, onError }, token) {
+    if (this.currentSpeechToken !== token || this.isStopping) return;
+
     if (!this.synth) {
       console.warn("Web SpeechSynthesis não suportado neste navegador.");
       if (onError) onError(new Error("Navegador não suporta áudio de voz."));
