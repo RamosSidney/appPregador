@@ -156,11 +156,33 @@ export default function AudioPlayerBar({
               </div>
             </div>
 
+            {/* OpenAI Neural Voices */}
+            <div>
+              <label className="text-[10px] font-black uppercase text-amber-400 tracking-wider block mb-1">
+                🤖 Vozes neurais com emoção (OpenAI)
+              </label>
+              <select
+                value={currentVoiceName || ''}
+                onChange={(e) => {
+                  if (onChangeVoiceName) onChangeVoiceName(e.target.value || null);
+                }}
+                className="w-full bg-slate-950 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-white appearance-none cursor-pointer focus:outline-none focus:border-amber-400"
+              >
+                <option value="">✨ Automático pelo Estilo Selecionado</option>
+                <option value="openai_onyx">🎙️ Onyx - Pastor Solene & Gravitas (Masculino)</option>
+                <option value="openai_nova">✨ Nova - Mentora Empática & Calorosa (Feminino)</option>
+                <option value="openai_fable">📖 Fable - Devocional & Storyteller (Reflexivo)</option>
+                <option value="openai_alloy">⚡ Alloy - Gen Z Equilibrado (Jovem)</option>
+                <option value="openai_echo">🔊 Echo - Reflexivo & Marcante</option>
+                <option value="openai_shimmer">🕊️ Shimmer - Suave & Inspirador</option>
+              </select>
+            </div>
+
             {/* System TTS Voices Selection */}
             {availableVoices.length > 0 && (
               <div>
                 <label className="text-[10px] font-black uppercase text-cyan-400 tracking-wider block mb-1">
-                  Vozes do Sistema (TTS)
+                  🔊 Vozes Nativas do Navegador (Sistema)
                 </label>
                 <select
                   value={currentVoiceName || ''}
@@ -169,7 +191,7 @@ export default function AudioPlayerBar({
                   }}
                   className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white appearance-none cursor-pointer focus:outline-none focus:border-purple-500"
                 >
-                  <option value="">Voz Automática Recomendada</option>
+                  <option value="">Voz Padrão do Dispositivo</option>
                   {availableVoices.map((v, i) => (
                     <option key={i} value={v.name}>
                       {v.name} ({v.lang})

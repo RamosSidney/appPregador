@@ -11,13 +11,14 @@ export default function SettingsModal({
 }) {
   const [activeTab, setActiveTab] = useState('api');
   const [groqKey, setGroqKey] = useState(config.groqKey || '');
+  const [openaiKey, setOpenaiKey] = useState(config.openaiKey || '');
   const [supabaseUrl, setSupabaseUrl] = useState(config.supabaseUrl || '');
   const [supabaseKey, setSupabaseKey] = useState(config.supabaseKey || '');
 
   if (!isOpen) return null;
 
   const handleSave = () => {
-    onSaveConfig({ groqKey, supabaseUrl, supabaseKey });
+    onSaveConfig({ groqKey, openaiKey, supabaseUrl, supabaseKey });
     onClose();
   };
 
@@ -42,7 +43,7 @@ export default function SettingsModal({
               activeTab === 'api' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Chaves de API (Groq & Supabase)
+            Chaves de API (Groq, OpenAI & Supabase)
           </button>
           <button
             onClick={() => setActiveTab('account')}
@@ -56,10 +57,10 @@ export default function SettingsModal({
 
         {/* Tab 1: API Settings */}
         {activeTab === 'api' ? (
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                <Key className="w-4 h-4 text-purple-400" /> Groq API Key (Llama 3.1 Gratuito)
+                <Key className="w-4 h-4 text-purple-400" /> Groq API Key (Llama 3.3 70B - Texto)
               </label>
               <input
                 type="password"
@@ -68,6 +69,20 @@ export default function SettingsModal({
                 placeholder="gsk_..."
                 className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <Key className="w-4 h-4 text-amber-400" /> OpenAI API Key (Vozes Emocionais IA)
+              </label>
+              <input
+                type="password"
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
+                placeholder="sk-proj-..."
+                className="w-full bg-slate-950 border border-amber-500/30 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
+              />
+              <p className="text-[10px] text-slate-400">Ativa vozes neurais humanizadas com emoções reais (Onyx, Nova, Fable, Alloy).</p>
             </div>
 
             <div className="space-y-1.5">

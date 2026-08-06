@@ -1,4 +1,4 @@
-// Audio Service: High-Performance Web Speech Synthesis Engine for pt-BR (Zero Looping / Zero High-Speed Skipping)
+// Audio Service: High-Performance Speech Synthesis Engine (OpenAI Neural TTS + Web Speech API Fallback)
 
 export const cleanTextForSpeech = (text) => {
   if (!text) return '';
@@ -25,18 +25,38 @@ class AudioService {
   constructor() {
     this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
     this.utterance = null;
+    this.audioElement = null; // Elemento HTML5 Audio para OpenAI TTS stream
     this.isPlaying = false;
     this.isListening = false;
     this.isStopping = false; // Prevents cancel() from firing utterance.onend auto-advance
     this.currentRate = 1.0;
     this.voicesList = [];
     this.androidKeepAliveTimer = null;
+    this.openaiKey = null;
 
     if (this.synth) {
       this.loadVoices();
       if (typeof window !== 'undefined' && window.speechSynthesis.onvoiceschanged !== undefined) {
         window.speechSynthesis.onvoiceschanged = () => this.loadVoices();
       }
+    }
+  }
+
+  setOpenAIKey(key) {
+    if (key && typeof key === 'string') {
+      this.openaiKey = key.trim();
+      try {
+        localStorage.setItem('app_pregador_openai_key', this.openaiKey);
+      } catch (e) {}
+    }
+  }
+
+  getOpenAIKey() {
+    if (this.openaiKey) return this.openaiKey;
+    try {
+      return localStorage.getItem('app_pregador_openai_key') || null;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -64,6 +84,16 @@ class AudioService {
     this.isPlaying = false;
     this.clearAndroidKeepAlive();
 
+    // Parar áudio HTML5 da OpenAI se estiver tocando
+    if (this.audioElement) {
+      try {
+        this.audioElement.pause();
+        this.audioElement.currentTime = 0;
+        this.audioElement = null;
+      } catch (e) {}
+    }
+
+    // Parar síntese nativa
     if (this.synth) {
       try {
         this.synth.cancel();
@@ -71,13 +101,7 @@ class AudioService {
     }
   }
 
-  speak(text, { rate = 0.95, style = 'devocional', onProgress, onEnd, onError } = {}) {
-    if (!this.synth) {
-      console.warn("Web SpeechSynthesis não suportado neste navegador.");
-      if (onError) onError(new Error("Navegador não suporta áudio de voz."));
-      return;
-    }
-
+  speak(text, { rate = 0.95, style = 'devocional', voiceName = null, openaiKey = null, onProgress, onEnd, onError } = {}) {
     this.stop();
     this.isStopping = false;
     this.currentRate = rate;
@@ -87,6 +111,109 @@ class AudioService {
       if (onEnd) onEnd();
       return;
     }
+
+    const keyToUse = openaiKey || this.getOpenAIKey();
+
+    // Se tivermos uma chave da OpenAI, tentamos gerar via áudio neural emocional
+    if (keyToUse && keyToUse.trim() !== '') {
+      this.speakOpenAI(cleanText, { rate, style, voiceName, onProgress, onEnd, onError }, keyToUse.trim());
+      return;
+    }
+
+    // Fallback nativo do navegador
+    this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError });
+  }
+
+  async speakOpenAI(cleanText, { rate = 1.0, style = 'pastor', voiceName = null, onProgress, onEnd, onError }, apiKey) {
+    // Mapeamento de estilos ou voz selecionada para vozes da OpenAI
+    let openAiVoice = 'onyx'; // Padrão pastor solene
+
+    if (voiceName && voiceName.startsWith('openai_')) {
+      openAiVoice = voiceName.replace('openai_', '');
+    } else if (['onyx', 'nova', 'fable', 'alloy', 'echo', 'shimmer'].includes(voiceName)) {
+      openAiVoice = voiceName;
+    } else if (style === 'pastor') {
+      openAiVoice = 'onyx'; // Tom firme, grave, estilo pregador
+    } else if (style === 'mentora') {
+      openAiVoice = 'nova'; // Tom feminino acolhedor e expressivo
+    } else if (style === 'devocional') {
+      openAiVoice = 'fable'; // Tom calmo, narrativa reflexiva
+    } else if (style === 'genz') {
+      openAiVoice = 'alloy'; // Tom jovem e equilibrado
+    }
+
+    // Truncar textos excessivamente longos para evitar estourar limites em requisições únicas se necessário
+    const safeText = cleanText.length > 4000 ? cleanText.substring(0, 4000) + '...' : cleanText;
+
+    try {
+      this.isPlaying = true;
+
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'tts-1',
+          input: safeText,
+          voice: openAiVoice,
+          speed: Math.max(0.5, Math.min(2.0, rate))
+        })
+      });
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error?.message || `Status HTTP ${response.status} na API da OpenAI Audio`);
+      }
+
+      const blob = await response.blob();
+      if (this.isStopping) return;
+
+      const audioUrl = URL.createObjectURL(blob);
+      this.audioElement = new Audio(audioUrl);
+      this.audioElement.playbackRate = rate;
+
+      this.audioElement.ontimeupdate = () => {
+        if (this.audioElement && this.audioElement.duration && onProgress) {
+          const pct = Math.min(100, Math.round((this.audioElement.currentTime / this.audioElement.duration) * 100));
+          onProgress(pct);
+        }
+      };
+
+      this.audioElement.onended = () => {
+        this.isPlaying = false;
+        this.audioElement = null;
+        if (onEnd && !this.isStopping) onEnd();
+      };
+
+      this.audioElement.onerror = (e) => {
+        console.warn("[AudioService] Erro ao tocar stream da OpenAI:", e);
+        this.audioElement = null;
+        // Fallback automático para nativo
+        this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError });
+      };
+
+      await this.audioElement.play();
+
+    } catch (err) {
+      console.warn("[AudioService] Falha na API OpenAI TTS. Recorrendo ao motor nativo:", err.message);
+      this.isPlaying = false;
+      this.audioElement = null;
+      // Fallback gracioso para a voz nativa do sistema em caso de erro na API
+      this.speakNative(cleanText, { rate, style, voiceName, onProgress, onEnd, onError });
+    }
+  }
+
+  speakNative(cleanText, { rate = 0.95, style = 'devocional', voiceName = null, onProgress, onEnd, onError }) {
+    if (!this.synth) {
+      console.warn("Web SpeechSynthesis não suportado neste navegador.");
+      if (onError) onError(new Error("Navegador não suporta áudio de voz."));
+      return;
+    }
+
+    this.isStopping = false;
+    this.currentRate = rate;
 
     // Android/iOS Resume unlock
     try {
@@ -149,12 +276,19 @@ class AudioService {
       this.utterance.rate = Math.max(0.5, Math.min(2.0, adjustedRate));
       this.utterance.pitch = Math.max(0.5, Math.min(2.0, adjustedPitch));
 
-      const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
-      if (!isAndroid) {
-        const voices = this.getAvailableVoices();
-        let selectedVoiceObj = voices.find(v => v.lang && v.lang.toLowerCase().includes('pt-br'));
-        if (selectedVoiceObj) {
-          try { this.utterance.voice = selectedVoiceObj; } catch (e) {}
+      const voices = this.getAvailableVoices();
+      if (voiceName) {
+        const customV = voices.find(v => v.name === voiceName);
+        if (customV) {
+          try { this.utterance.voice = customV; } catch (e) {}
+        }
+      } else {
+        const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
+        if (!isAndroid) {
+          let selectedVoiceObj = voices.find(v => v.lang && v.lang.toLowerCase().includes('pt-br'));
+          if (selectedVoiceObj) {
+            try { this.utterance.voice = selectedVoiceObj; } catch (e) {}
+          }
         }
       }
 
@@ -172,7 +306,6 @@ class AudioService {
       this.utterance.onerror = (err) => {
         if (this.isStopping) return;
         console.warn("[AudioService] Erro ao sintetizar trecho:", err);
-        // Delay before next chunk to prevent rapid skipping loops
         setTimeout(() => {
           if (!this.isStopping && this.isPlaying) {
             currentChunkIdx++;
@@ -199,7 +332,7 @@ class AudioService {
   startAndroidKeepAlive() {
     this.clearAndroidKeepAlive();
     this.androidKeepAliveTimer = setInterval(() => {
-      if (this.synth && this.isPlaying && !this.isStopping) {
+      if (this.synth && this.isPlaying && !this.isStopping && !this.audioElement) {
         try {
           if (this.synth.paused || this.synth.pending) {
             this.synth.resume();
@@ -210,7 +343,7 @@ class AudioService {
 
     if (typeof document !== 'undefined' && !this._boundVisibilityHandler) {
       this._boundVisibilityHandler = () => {
-        if (document.visibilityState === 'hidden' && this.synth && this.isPlaying && !this.isStopping) {
+        if (document.visibilityState === 'hidden' && this.synth && this.isPlaying && !this.isStopping && !this.audioElement) {
           try { this.synth.resume(); } catch (e) {}
         }
       };
@@ -228,7 +361,9 @@ class AudioService {
   pause() {
     this.isStopping = true;
     this.isPlaying = false;
-    if (this.synth) {
+    if (this.audioElement) {
+      try { this.audioElement.pause(); } catch (e) {}
+    } else if (this.synth) {
       try {
         this.synth.pause();
       } catch (e) {}
@@ -238,7 +373,9 @@ class AudioService {
   resume() {
     this.isStopping = false;
     this.isPlaying = true;
-    if (this.synth) {
+    if (this.audioElement) {
+      try { this.audioElement.play(); } catch (e) {}
+    } else if (this.synth) {
       try {
         this.synth.resume();
       } catch (e) {}
@@ -247,6 +384,9 @@ class AudioService {
 
   setRate(rate) {
     this.currentRate = rate;
+    if (this.audioElement) {
+      try { this.audioElement.playbackRate = rate; } catch (e) {}
+    }
     if (this.utterance) {
       this.utterance.rate = rate;
     }
@@ -313,3 +453,4 @@ class AudioService {
 }
 
 export const audioService = new AudioService();
+
