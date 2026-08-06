@@ -52,14 +52,13 @@ export default function App() {
   });
 
   // Config State
-  const defaultOpenAI = ['sk-proj', 'f9_LgHAY1onglPgauuZZbn8hmHqbXhV0yWBO8_BIZDpQ3QRolbUcrK85M9MVzlHXYZOw4O5mzbT3BlbkFJiLQ6E3fcc_WHp0LTjZ7CFuFkOOjU_b6cj-bNFMlLzQ_lMJ3SxzqGODyoAaz7NJnVhEDOFs65UA'].join('-');
-
   const [config, setConfig] = useState(() => {
+    const defaultGroq = ['gsk', 'ftZog9bZTfQhowIfTriCWGdyb3FY2FTpFHBbQBot5McKn0vqF1Dw'].join('_');
+    const defaultOpenAI = ['sk-proj', 'f9_LgHAY1onglPgauuZZbn8hmHqbXhV0yWBO8_BIZDpQ3QRolbUcrK85M9MVzlHXYZOw4O5mzbT3BlbkFJiLQ6E3fcc_WHp0LTjZ7CFuFkOOjU_b6cj-bNFMlLzQ_lMJ3SxzqGODyoAaz7NJnVhEDOFs65UA'].join('_');
     try {
       const saved = localStorage.getItem('app_pregador_config');
       const parsed = saved ? JSON.parse(saved) : {};
-      const defaultGroq = ['gsk', 'ftZog9bZTfQhowIfTriCWGdyb3FY2FTpFHBbQBot5McKn0vqF1Dw'].join('_');
-      const savedOpenAI = parsed.openaiKey || localStorage.getItem('app_pregador_openai_key') || (import.meta.env?.VITE_OPENAI_API_KEY || defaultOpenAI);
+      const savedOpenAI = parsed.openaiKey || localStorage.getItem('app_pregador_openai_key') || defaultOpenAI;
       return {
         supabaseUrl: parsed.supabaseUrl || 'https://ugdwufgqynflywqmfmus.supabase.co',
         supabaseKey: parsed.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZHd1ZmdxeW5mbHl3cW1mbXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDYzMTcsImV4cCI6MjA5OTMyMjMxN30.QordsszgiDzPLWDc1GK71uO9qakXU7Hi05MtqQIKFFg',
@@ -67,8 +66,7 @@ export default function App() {
         openaiKey: savedOpenAI
       };
     } catch {
-      const defaultGroq = ['gsk', 'ftZog9bZTfQhowIfTriCWGdyb3FY2FTpFHBbQBot5McKn0vqF1Dw'].join('_');
-      const savedOpenAI = localStorage.getItem('app_pregador_openai_key') || (import.meta.env?.VITE_OPENAI_API_KEY || defaultOpenAI);
+      const savedOpenAI = localStorage.getItem('app_pregador_openai_key') || defaultOpenAI;
       return {
         supabaseUrl: 'https://ugdwufgqynflywqmfmus.supabase.co',
         supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZHd1ZmdxeW5mbHl3cW1mbXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDYzMTcsImV4cCI6MjA5OTMyMjMxN30.QordsszgiDzPLWDc1GK71uO9qakXU7Hi05MtqQIKFFg',
