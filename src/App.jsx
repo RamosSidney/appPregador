@@ -365,6 +365,8 @@ export default function App() {
             config={config}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onPlayAudio={handlePlayTrack}
+            onAddXp={handleAddXp}
+            onAddCredits={handleAddCredits}
           />
         )}
 
