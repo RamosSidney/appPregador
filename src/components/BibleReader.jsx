@@ -431,7 +431,12 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     if (!selectedVerseRef) return;
     setMenuPosition(null);
 
-    const title = type === 'quebra-gelo' ? '🎲 Quebra-Gelo Célula' : '💡 Tradução Gen Z / Alpha';
+    const title =
+      type === 'originais'
+        ? '🔍 Lupa dos Originais (Hebraico & Grego)'
+        : type === 'quebra-gelo'
+        ? '🎲 Quebra-Gelo de Célula'
+        : '💡 Exegese & Estudo Contextualizado';
     setPanelTitle(title);
     setActionType(type);
     setIsPanelOpen(true);
@@ -474,9 +479,12 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
     setIsLoading(true);
 
     try {
-      let sysPrompt = actionType === 'quebra-gelo'
-        ? `Você é um líder de jovens e teólogo especialista em dinâmicas de grupo para Gen Z e Alpha.`
-        : `Você é um tradutor cultural teológico especializado na Geração Z e Alpha.`;
+      let sysPrompt =
+        actionType === 'originais'
+          ? 'Você é um erudito bíblico e professor de Hebraico Bíblico e Grego Koiné explicando os termos originais de forma acessível.'
+          : actionType === 'quebra-gelo'
+          ? 'Você é um líder e teólogo especialista em dinâmicas de grupo e estudos para células.'
+          : 'Você é um exegeta e professor bíblico explicando o contexto histórico e aplicação prática das Escrituras.';
 
       const aiReply = await refineBibleChatAI({
         systemPrompt: sysPrompt,
@@ -776,8 +784,28 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               </div>
             </div>
 
-            {/* Row 2 (Mobile Grid) / Right Group (Desktop): AI & RPG Tools */}
-            <div className="grid grid-cols-3 sm:flex items-center gap-1.5 w-full sm:w-auto">
+            {/* Row 2 (Mobile Grid) / Right Group (Desktop): AI Exegesis & Study Tools */}
+            <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto">
+              <button
+                onClick={() => handleTriggerAction('originais')}
+                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-emerald-500/30 shrink-0 cursor-pointer"
+                title="Estudo das Palavras no Hebraico / Grego Original"
+              >
+                <span>🔍 Originais</span>
+              </button>
+              <button
+                onClick={() => handleTriggerAction('traducao')}
+                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-purple-600/30 text-purple-200 hover:bg-purple-500 hover:text-white text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-purple-400/40 shrink-0 cursor-pointer"
+              >
+                <span>💡 Exegese</span>
+              </button>
+              <button
+                onClick={() => handleTriggerAction('quebra-gelo')}
+                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500 hover:text-slate-950 text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-cyan-500/30 shrink-0 cursor-pointer"
+              >
+                <Sparkles className="w-3 h-3 shrink-0" />
+                <span>Quebra-Gelo</span>
+              </button>
               <button
                 onClick={() => {
                   setMemorizeTarget({ ref: selectedVerseRef, text: selectedVerseText });
@@ -788,19 +816,6 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                 title="Jogo de Memorização do Versículo Selecionado"
               >
                 <span>🎮 Memorizar</span>
-              </button>
-              <button
-                onClick={() => handleTriggerAction('quebra-gelo')}
-                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500 hover:text-slate-950 text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-cyan-500/30 shrink-0 cursor-pointer"
-              >
-                <Sparkles className="w-3 h-3 shrink-0" />
-                <span>Quebra-Gelo</span>
-              </button>
-              <button
-                onClick={() => handleTriggerAction('traducao')}
-                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-purple-600/30 text-purple-200 hover:bg-purple-500 hover:text-white text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-purple-400/40 shrink-0 cursor-pointer"
-              >
-                <span>💡 Gen Z</span>
               </button>
             </div>
           </motion.div>

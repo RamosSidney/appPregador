@@ -173,25 +173,65 @@ ${SECURITY_GUARDRAIL_RULES}`;
 
   const payload = {
     tema: safeTheme || safePains.join(', '),
-    publicoAlvo: 'Gen Z / Alpha',
-    tagVibe: safePops.join(', ')
+    publicoAlvo: 'Estudo & Ensino',
+    tagVibe: safeFormat
   };
 
   return await callAI(messages, config, 'GERAR_SERMAO', payload);
 }
 
 /**
- * Gerador de Quebra-Gelo Célula ou Tradução Gen Z com IA Real
+ * Gerador de Quebra-Gelo Célula, Tradução Cultural ou Lupa dos Originais (Hebraico/Grego) com IA Real
  */
 export async function generateBibleLensAI({ verseRef, verseText, actionType, config }) {
   const safeRef = sanitizePromptInput(verseRef, 60);
   const safeText = sanitizePromptInput(verseText, 600);
 
   let systemPrompt = '';
-  if (actionType === 'quebra-gelo') {
-    systemPrompt = `Você é um teólogo e líder de jovens especialista em dinâmicas de grupo (células) para a Geração Z e Alpha. Sua missão é criar um estudo com dinâmica prática e profunda baseada no versículo fornecido.
+  if (actionType === 'originais') {
+    systemPrompt = `Você é um erudito bíblico e professor de Hebraico Bíblico e Grego Koiné, especialista em explicar os termos originais das Escrituras de forma clara, acessível e fascinante para pregadores, líderes e estudantes da Bíblia.
 
-IMPORTANTE: Formate a resposta obrigatoriamente em Markdown impecável, LIMPO e ultra-escaneável para leitura em telas mobile. NUNCA gere blocos contínuos e gigantes de texto. Deixe linhas em branco entre títulos e parágrafos. Use listas com marcadores (-) e negritos para destacar conceitos.
+IMPORTANTE: Formate a resposta em Markdown impecável, bem espaçado e escaneável.
+
+Estrutura obrigatória:
+
+# 🔍 Lupa dos Originais (Hebraico & Grego): ${safeRef}
+
+## 📜 Idioma Original & Pano de Fundo
+- **Idioma & Gênero Literário:** [Informe se é Hebraico/Aramaico no AT ou Grego Koiné no NT e o estilo do livro]
+- **Nuance que as Traduções Não Mostram:** [1 parágrafo explicando a riqueza da construção original deste versículo]
+
+---
+
+## 🔑 As 3 Palavras-Chave no Original
+1. **[Palavra em Português] — *[Transliteração Fácil]* ([Grafia em Hebraico ou Grego])**
+   - **Significado Literal na Época:** [Explicação rica e descomplicada]
+   - **Impacto Teológico:** [Como essa palavra aprofunda o entendimento do versículo]
+
+2. **[Palavra 2 em Português] — *[Transliteração Fácil]* ([Grafia Original])**
+   - **Significado Literal na Época:** [Explicação clara]
+   - **Impacto Teológico:** [Aplicação no estudo]
+
+3. **[Palavra 3 em Português] — *[Transliteração Fácil]* ([Grafia Original])**
+   - **Significado Literal na Época:** [Explicação clara]
+   - **Impacto Teológico:** [Aplicação no estudo]
+
+---
+
+## 🎓 Como Ensinar Isso na Aula ou Púlpito
+> 💡 **Frase Pronta para o Ensino:**
+> "[Escreva um parágrafo pronto e inspirador que o professor/pregador pode falar na aula explicando o termo original sem parecer acadêmico demais.]"
+
+---
+
+## 🔗 Onde Mais Essa Palavra Aparece na Bíblia
+- **Conexão 1:** [Versículo e explicação]
+- **Conexão 2:** [Versículo e explicação]
+${SECURITY_GUARDRAIL_RULES}`;
+  } else if (actionType === 'quebra-gelo') {
+    systemPrompt = `Você é um teólogo e líder especialista em dinâmicas de grupo (células e classes bíblicas). Sua missão é criar um estudo com dinâmica prática e profunda baseada no versículo fornecido.
+
+IMPORTANTE: Formate a resposta obrigatoriamente em Markdown impecável, LIMPO e ultra-escaneável para leitura em telas mobile.
 
 Estrutura obrigatória:
 
@@ -226,13 +266,13 @@ Estrutura obrigatória:
 3. [Pergunta 3]
 ${SECURITY_GUARDRAIL_RULES}`;
   } else {
-    systemPrompt = `Você é um exegeta, teólogo e tradutor cultural especializado na Geração Z e Alpha. Sua missão é realizar um estudo bíblico completo, profundo e altamente atraente a partir do versículo fornecido.
+    systemPrompt = `Você é um exegeta, teólogo e professor bíblico. Sua missão é realizar um estudo bíblico completo, profundo e contextualizado para os dias atuais a partir do versículo fornecido.
 
-IMPORTANTE: Formate a resposta obrigatoriamente em Markdown impecável, LIMPO e ultra-escaneável para leitura em telas mobile (Gen Z & Alpha). NUNCA gere blocos contínuos e gigantes de texto. Deixe linhas em branco entre títulos e parágrafos. Use listas com marcadores (-), negritos para destacar palavras-chave e citações destacadas (>).
+IMPORTANTE: Formate a resposta obrigatoriamente em Markdown impecável, LIMPO e ultra-escaneável.
 
 Estrutura obrigatória em Markdown:
 
-# 💡 Tradução & Estudo Profundo (Gen Z / Alpha)
+# 💡 Exegese & Estudo Contextualizado: ${safeRef}
 
 ## 🏛️ Contexto Histórico & Teológico
 - **Autor & Destinatários:** [Quem escreveu e para quem]
@@ -241,11 +281,11 @@ Estrutura obrigatória em Markdown:
 
 ---
 
-## ⚡ Tradução Livre & Metáforas Digitais
-> ⚡ **Tradução na Linguagem Gen Z / Alpha:**
-> "[Traduza o versículo utilizando metáforas culturais modernas e autênticas (algoritmos, lag, firmware, skins, modo foco, feed de notícias, servidores), mantendo 100% de fidelidade ao sentido teológico original.]"
+## ⚡ Paráfrase Contemporânea & Ilustração Didática
+> 💡 **Como Comunicar Hoje:**
+> "[Traduza o princípio do versículo em linguagem clara e atual, mantendo 100% de fidelidade ao sentido teológico original.]"
 
-- **Explicação das Metáforas:** [Como cada termo digital ilustra o princípio espiritual]
+- **Ilustração para a Aula:** [Exemplo prático que ajuda os alunos a visualizarem a verdade bíblica]
 
 ---
 
@@ -257,9 +297,9 @@ Estrutura obrigatória em Markdown:
 ---
 
 ## 🎯 Aplicação Prática no Dia a Dia
-- **No Cotidiano:** [Como viver essa verdade hoje]
-- **Nas Redes Sociais:** [Como testemunhar no feed e Stories]
-- **Nos Relacionamentos:** [Como aplicar com amigos e família]
+- **Na Vida Pessoal:** [Como viver essa verdade hoje]
+- **Na Comunidade / Igreja:** [Como praticar o ensino em comunhão]
+- **Na Família & Vocação:** [Como aplicar nos relacionamentos]
 ${SECURITY_GUARDRAIL_RULES}`;
   }
 
@@ -306,7 +346,7 @@ export async function mentorChatAI({ mentor, history = [], config }) {
     'bonhoeffer': `Você é o avatar teológico de Dietrich Bonhoeffer. Seu pensamento é moldado por 'Discipulado' e 'Vida em Comunidade'. Responda focando na ética cristã radical e coragem moral.`
   };
 
-  const systemPrompt = `${personas[mentor.id] || personas['lewis']}\n${SECURITY_GUARDRAIL_RULES}`;
+  const systemPrompt = `${mentor?.promptPersona || personas[mentor?.id] || personas['lewis']}\n${SECURITY_GUARDRAIL_RULES}`;
 
   const safeHistory = history.slice(-10).map(msg => ({
     role: msg.role === 'assistant' ? 'assistant' : 'user',
@@ -321,7 +361,159 @@ export async function mentorChatAI({ mentor, history = [], config }) {
   const lastUserMsg = safeHistory[safeHistory.length - 1]?.content || '';
 
   return await callAI(messages, config, 'MENTORIA_HISTORICA', {
-    mentor: mentor.name,
+    mentor: mentor?.name || 'C.S. Lewis',
     pergunta: lastUserMsg
   });
+}
+
+/**
+ * Proposta 2A: Gerador de Kit Devocional da Semana (Segunda a Sexta) para Alunos / Igreja
+ */
+export async function generateWeeklyDevotionalAI({ studyTitle, studyContent, config }) {
+  const safeTitle = sanitizePromptInput(studyTitle, 120);
+  const safeExcerpt = sanitizePromptInput(studyContent, 900);
+
+  const systemPrompt = `Você é um pastor e educador cristão especialista em discipulado contínuo. Sua missão é transformar o estudo ou sermão fornecido em um **Kit Devocional de 5 Dias (Segunda a Sexta-feira)** pronto para o líder enviar no grupo de WhatsApp da igreja, célula ou turma de alunos.
+
+Formate em Markdown limpo contendo:
+# 📲 Kit Devocional da Semana: ${safeTitle}
+*Texto pronto para compartilhar com seus alunos ou igreja de Segunda a Sexta!*
+
+---
+## 📅 Segunda-Feira: O Ponto de Partida
+- **📖 Leitura do Dia:** [Versículo chave]
+- **💡 Meditação Rápida:** [Parágrafo curto e inspirador]
+- **❓ Pergunta Prática:** [Pergunta para reflexão]
+- **🙏 Oração:** [1 frase de oração]
+
+---
+## 📅 Terça-Feira: Aprofundando a Raiz
+- **📖 Leitura do Dia:** [Versículo complementar]
+- **💡 Meditação Rápida:** [Parágrafo curto]
+- **❓ Pergunta Prática:** [Pergunta para reflexão]
+- **🙏 Oração:** [1 frase de oração]
+
+---
+## 📅 Quarta-Feira: Virada de Chave no Cotidiano
+- **📖 Leitura do Dia:** [Versículo complementar]
+- **💡 Meditação Rápida:** [Parágrafo curto]
+- **❓ Pergunta Prática:** [Pergunta para reflexão]
+- **🙏 Oração:** [1 frase de oração]
+
+---
+## 📅 Quinta-Feira: Vivendo em Comunidade
+- **📖 Leitura do Dia:** [Versículo complementar]
+- **💡 Meditação Rápida:** [Parágrafo curto]
+- **❓ Pergunta Prática:** [Pergunta para reflexão]
+- **🙏 Oração:** [1 frase de oração]
+
+---
+## 📅 Sexta-Feira: Consolidação & Prática
+- **📖 Leitura do Dia:** [Versículo de encerramento]
+- **💡 Meditação Rápida:** [Parágrafo curto]
+- **🏆 Desafio do Fim de Semana:** [Ação prática concreta]
+${SECURITY_GUARDRAIL_RULES}`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Transforme este estudo em um Kit Devocional de 5 dias:\n<user_input>TÍTULO: ${safeTitle}\nCONTEÚDO BASE: ${safeExcerpt}</user_input>` }
+  ];
+
+  return await callAI(messages, config);
+}
+
+/**
+ * Proposta 2B: Planejador de Série de Ensino de 4 Semanas (Currículo Ministerial)
+ */
+export async function generateSeriesCurriculumAI({ studyTitle, studyContent, config }) {
+  const safeTitle = sanitizePromptInput(studyTitle, 120);
+  const safeExcerpt = sanitizePromptInput(studyContent, 800);
+
+  const systemPrompt = `Você é um diretor de educação cristã e especialista em currículo bíblico e séries expositivas. Sua missão é expandir o tema fornecido em um **Planejamento Completo de Série de 4 Semanas (1 Mês de Ensino)** para igreja, escola bíblica ou pequenos grupos.
+
+Formate em Markdown limpo contendo:
+# 📅 Planejamento de Série (4 Semanas): ${safeTitle}
+
+## 🎯 Visão Geral & Objetivo Pedagógico da Série
+[Resumo claro da jornada de transformação ao longo das 4 semanas.]
+
+---
+## 📘 Semana 1: Fundamentos & Despertar
+- **Título da Aula:** [Título impactante]
+- **📖 Texto Bíblico Base:** [Referência]
+- **🎓 3 Tópicos de Ensino:** [Lista objetiva]
+- **💬 Dinâmica / Pergunta de Grupo:** [Aplicação]
+
+---
+## 📗 Semana 2: Confronto Amoroso & Exegese
+- **Título da Aula:** [Título impactante]
+- **📖 Texto Bíblico Base:** [Referência]
+- **🎓 3 Tópicos de Ensino:** [Lista objetiva]
+- **💬 Dinâmica / Pergunta de Grupo:** [Aplicação]
+
+---
+## 📙 Semana 3: Prática Cristã & Comunidade
+- **Título da Aula:** [Título impactante]
+- **📖 Texto Bíblico Base:** [Referência]
+- **🎓 3 Tópicos de Ensino:** [Lista objetiva]
+- **💬 Dinâmica / Pergunta de Grupo:** [Aplicação]
+
+---
+## 🏆 Semana 4: Maturidade, Envio & Multiplicação
+- **Título da Aula:** [Título impactante]
+- **📖 Texto Bíblico Base:** [Referência]
+- **🎓 3 Tópicos de Ensino:** [Lista objetiva]
+- **💬 Desafio Final da Série:** [Aplicação prática]
+${SECURITY_GUARDRAIL_RULES}`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Crie o Planejamento de Série de 4 Semanas a partir deste estudo:\n<user_input>TEMA: ${safeTitle}\nBASE: ${safeExcerpt}</user_input>` }
+  ];
+
+  return await callAI(messages, config);
+}
+
+/**
+ * Proposta 3: Coach de Oratória & Didática com IA para o Modo Púlpito
+ */
+export async function analyzeOratoryCoachAI({ sermonTitle, sermonOutline, spokenTranscript, durationSeconds = 60, config }) {
+  const safeTitle = sanitizePromptInput(sermonTitle, 120);
+  const safeOutline = sanitizePromptInput(sermonOutline, 600);
+  const safeTranscript = sanitizePromptInput(spokenTranscript, 1200);
+
+  const wordCount = safeTranscript ? safeTranscript.split(/\s+/).filter(Boolean).length : 0;
+  const wpm = durationSeconds > 0 ? Math.round((wordCount / durationSeconds) * 60) : 130;
+
+  const systemPrompt = `Você é um Coach de Homilética, Oratória Sacra e Didática de Ensino Bíblico. Avalie o treino de pregação/aula do usuário comparando com o esboço proposto. Seja encorajador, pastoral e altamente construtivo.
+
+Formate em Markdown limpo contendo:
+# 🎙️ Avaliação do Coach de Oratória & Didática
+
+## 📊 Métricas de Entrega
+- **Ritmo Estimado:** ~${wpm} palavras por minuto (${wpm > 160 ? 'Rápido — lembre-se de fazer pausas reflexivas' : wpm < 100 ? 'Pausado e contemplativo' : 'Cadência ideal para ensino (110–150 ppm)'})
+- **Clareza Teológica & Didática:** [Nota de 0 a 10 e comentário positivo]
+
+---
+## ✅ Pontos Fortes da Sua Ministração
+- [Ponto forte 1]
+- [Ponto forte 2]
+
+---
+## 🎯 3 Ajustes Práticos para o Altar / Sala de Aula
+1. **Dicção, Pausas & Ênfase:** [Dica prática]
+2. **Conexão com os Ouvintes:** [Dica prática]
+3. **Transição Bíblica:** [Sugestão de frase de impacto para reforçar o ponto central]
+${SECURITY_GUARDRAIL_RULES}`;
+
+  const userPrompt = safeTranscript
+    ? `Avalie minha fala treinada no púlpito:\n<user_input>\nTEMA DO ESBOÇO: ${safeTitle}\nTRECHO FALADO PELO PREGADOR (${durationSeconds}s): "${safeTranscript}"\n</user_input>`
+    : `Gere um Guia de Preparo de Oratória, Entonação e Pausas para ministrar este esboço no púlpito:\n<user_input>\nTEMA: ${safeTitle}\nESBOÇO: ${safeOutline}\n</user_input>`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
+  ];
+
+  return await callAI(messages, config);
 }

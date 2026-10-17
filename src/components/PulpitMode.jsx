@@ -1,14 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Play, Pause, RotateCcw, Type, Plus, Minus, Clock } from 'lucide-react';
+import {
+  X,
+  Play,
+  Pause,
+  RotateCcw,
+  Type,
+  Plus,
+  Minus,
+  Clock,
+  Mic,
+  MicOff,
+  Sparkles,
+  RefreshCw,
+  Award
+} from 'lucide-react';
 import { marked } from 'marked';
 import { sanitizeHtml } from '../services/securityService.js';
+import { analyzeOratoryCoachAI } from '../services/aiService.js';
 
-export default function PulpitMode({ sermon, onClose }) {
+export default function PulpitMode({ sermon, config, userCredits = 100, onDeductCredit, onClose }) {
   const [fontSize, setFontSize] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 640 ? 22 : 30));
   const [speed, setSpeed] = useState(0); // 0 = Off, 1 = Slow, 2 = Normal, 3 = Fast
   const [timerSeconds, setTimerSeconds] = useState(900); // 15 mins default
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const scrollRef = useRef(null);
+
+  // Proposta 3: Coach de Oratória & Didática com IA
+  const [isCoachOpen, setIsCoachOpen] = useState(false);
+  const [isRecordingCoach, setIsRecordingCoach] = useState(false);
+  const [spokenTranscript, setSpokenTranscript] = useState('');
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [coachFeedback, setCoachFeedback] = useState('');
+  const [isAnalyzingCoach, setIsAnalyzingCoach] = useState(false);
+  const recognitionRef = useRef(null);
 
   // Auto-scroll loop
   useEffect(() => {
@@ -41,6 +65,26 @@ export default function PulpitMode({ sermon, onClose }) {
     return () => clearInterval(timer);
   }, [isTimerRunning]);
 
+  // Recording duration counter for Oratory Coach
+  useEffect(() => {
+    if (!isRecordingCoach) return;
+    const recTimer = setInterval(() => {
+      setRecordingSeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(recTimer);
+  }, [isRecordingCoach]);
+
+  // Cleanup speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+    };
+  }, []);
+
   const formatTimer = (totalSecs) => {
     const mins = Math.floor(totalSecs / 60);
     const secs = totalSecs % 60;
@@ -61,13 +105,90 @@ export default function PulpitMode({ sermon, onClose }) {
     }
   };
 
+  // Start / Stop Live Speech Practice for Oratory Coach
+  const handleToggleCoachRecording = () => {
+    if (isRecordingCoach) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+      setIsRecordingCoach(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Seu navegador não suporta captura de voz direta. Você pode digitar seu trecho abaixo ou clicar em "Gerar Guia de Oratória do Esboço"!');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let fullText = '';
+      for (let i = 0; i < event.results.length; i++) {
+        fullText += event.results[i][0].transcript + ' ';
+      }
+      setSpokenTranscript(fullText.trim());
+    };
+
+    recognition.onerror = () => {
+      setIsRecordingCoach(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecordingCoach(false);
+    };
+
+    setSpokenTranscript('');
+    setRecordingSeconds(0);
+    setIsRecordingCoach(true);
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+  const handleRunCoachEvaluation = async (useTranscript = true) => {
+    if (userCredits <= 0) {
+      alert('Créditos de Raios insuficientes!');
+      return;
+    }
+
+    if (isRecordingCoach && recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      setIsRecordingCoach(false);
+    }
+
+    setIsAnalyzingCoach(true);
+    try {
+      const result = await analyzeOratoryCoachAI({
+        sermonTitle: sermon?.title || 'Estudo Bíblico',
+        sermonOutline: sermon?.content || '',
+        spokenTranscript: useTranscript ? spokenTranscript : '',
+        durationSeconds: recordingSeconds || 60,
+        config
+      });
+      if (onDeductCredit) await onDeductCredit();
+      setCoachFeedback(result);
+    } catch (err) {
+      alert(err.message || 'Erro ao consultar o Coach de Oratória.');
+    } finally {
+      setIsAnalyzingCoach(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[150] bg-black text-white flex flex-col overflow-hidden h-dvh pt-safe pb-safe">
-      {/* Top Floating Control Bar (Mobile-First 2-Row -> Desktop 1-Row) */}
+      {/* Top Floating Control Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 sm:p-4 bg-slate-950/95 border-b border-white/10 backdrop-blur-xl shrink-0">
-        {/* Row 1: Close + Title + Timer */}
+        {/* Row 1: Close + Title + Coach Button + Mobile Timer */}
         <div className="flex items-center justify-between gap-2 w-full sm:w-auto">
-          <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={onClose}
               aria-label="Sair do Modo Púlpito"
@@ -75,37 +196,42 @@ export default function PulpitMode({ sermon, onClose }) {
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-xs sm:text-sm font-black text-amber-400 truncate">
+            <h3 className="text-xs sm:text-sm font-black text-amber-400 truncate max-w-[140px] sm:max-w-xs">
               {sermon?.title || 'Modo Púlpito'}
             </h3>
           </div>
 
-          {/* Configurable Timer (Visible in Row 1 on Mobile) */}
-          <div className="flex sm:hidden items-center gap-1.5 bg-slate-900 border border-white/10 rounded-xl px-2.5 py-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Proposta 3: Coach de Oratória Button */}
             <button
-              onClick={() => setIsTimerRunning(!isTimerRunning)}
-              className="p-1 text-amber-400 hover:text-white cursor-pointer"
-              aria-label="Iniciar ou pausar cronômetro"
+              type="button"
+              onClick={() => setIsCoachOpen(!isCoachOpen)}
+              className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                isCoachOpen
+                  ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
+                  : 'bg-purple-600/25 border border-purple-400/40 text-purple-200 hover:bg-purple-600 hover:text-white'
+              }`}
             >
-              {isTimerRunning ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
+              <Award className="w-3.5 h-3.5 text-amber-300" />
+              <span>Coach Oratória IA</span>
             </button>
-            <span
-              onClick={handleConfigureTimer}
-              className="text-xs font-black text-amber-400 cursor-pointer flex items-center gap-1 font-mono"
-            >
-              <Clock className="w-3.5 h-3.5" />
-              {formatTimer(timerSeconds)}
-            </span>
-            <button
-              onClick={() => {
-                setIsTimerRunning(false);
-                setTimerSeconds(900);
-              }}
-              className="p-1 text-slate-400 hover:text-white cursor-pointer"
-              aria-label="Reiniciar cronômetro"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
+
+            {/* Mobile Timer */}
+            <div className="flex sm:hidden items-center gap-1 bg-slate-900 border border-white/10 rounded-xl px-2 py-1.5">
+              <button
+                onClick={() => setIsTimerRunning(!isTimerRunning)}
+                className="p-0.5 text-amber-400 hover:text-white cursor-pointer"
+                aria-label="Iniciar ou pausar cronômetro"
+              >
+                {isTimerRunning ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              </button>
+              <span
+                onClick={handleConfigureTimer}
+                className="text-xs font-black text-amber-400 cursor-pointer font-mono"
+              >
+                {formatTimer(timerSeconds)}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -184,6 +310,105 @@ export default function PulpitMode({ sermon, onClose }) {
         </div>
       </div>
 
+      {/* Proposta 3: Collapsible Coach de Oratória & Didática Drawer */}
+      {isCoachOpen && (
+        <div className="bg-slate-900/95 border-b border-purple-500/40 px-4 py-4 sm:px-8 max-h-[65dvh] overflow-y-auto space-y-4 shrink-0">
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <h4 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                  <Award className="w-4 h-4 text-amber-400" />
+                  <span>Laboratório Coach de Oratória & Didática</span>
+                </h4>
+                <p className="text-xs text-slate-300">
+                  Treine sua introdução por voz para medir ritmo (PPM) e clareza, ou gere dicas imediatas de entonação e pausas para este estudo.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsCoachOpen(false)}
+                className="text-xs font-bold text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-950 border border-white/10 cursor-pointer"
+              >
+                Fechar Coach
+              </button>
+            </div>
+
+            {/* Action Buttons Row */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={handleToggleCoachRecording}
+                className={`min-h-[42px] px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
+                  isRecordingCoach
+                    ? 'bg-rose-600 text-white animate-pulse shadow-lg'
+                    : 'bg-slate-950 hover:bg-slate-800 border border-white/15 text-cyan-300'
+                }`}
+              >
+                {isRecordingCoach ? (
+                  <>
+                    <MicOff className="w-4 h-4" />
+                    <span>Parar Gravação ({recordingSeconds}s)</span>
+                  </>
+                ) : (
+                  <>
+                    <Mic className="w-4 h-4 text-cyan-400" />
+                    <span>1. Treinar Minha Voz no Microfone</span>
+                  </>
+                )}
+              </button>
+
+              {spokenTranscript && (
+                <button
+                  type="button"
+                  disabled={isAnalyzingCoach}
+                  onClick={() => handleRunCoachEvaluation(true)}
+                  className="min-h-[42px] px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black flex items-center gap-2 shadow-lg cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Avaliar Minha Fala Gravada</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                disabled={isAnalyzingCoach}
+                onClick={() => handleRunCoachEvaluation(false)}
+                className="min-h-[42px] px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white text-xs font-black flex items-center gap-2 shadow-lg cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Gerar Guia de Entonação & Pausas Deste Esboço</span>
+              </button>
+            </div>
+
+            {/* Live Transcript Box */}
+            {(isRecordingCoach || spokenTranscript) && (
+              <div className="rounded-xl bg-slate-950/90 border border-white/10 p-3 space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">
+                  Transcrição do Seu Treino ({recordingSeconds}s):
+                </span>
+                <p className="text-xs text-slate-200 italic">
+                  {spokenTranscript || 'Ouvindo sua voz... fale o início da sua mensagem ou explicação bíblica...'}
+                </p>
+              </div>
+            )}
+
+            {/* Loading or AI Coach Feedback */}
+            {isAnalyzingCoach && (
+              <div className="p-4 rounded-xl bg-slate-950/80 border border-purple-500/30 flex items-center gap-3 text-xs text-purple-200">
+                <RefreshCw className="w-4 h-4 animate-spin text-purple-400 shrink-0" />
+                <span>O Coach de Homilética está analisando ritmo, clareza e estrutura didática...</span>
+              </div>
+            )}
+
+            {coachFeedback && !isAnalyzingCoach && (
+              <div
+                className="prose prose-invert max-w-none text-xs sm:text-sm bg-slate-950/90 border border-purple-500/30 rounded-2xl p-4 sm:p-5 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(coachFeedback)) }}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Teleprompter Scroll Container */}
       <div
         ref={scrollRef}
@@ -194,7 +419,6 @@ export default function PulpitMode({ sermon, onClose }) {
           className="prose prose-invert max-w-none text-slate-100 font-serif leading-relaxed break-words"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(sermon?.content || '')) }}
         />
-        {/* Extra spacing at bottom for teleprompter scroll finish */}
         <div className="h-[55dvh]" />
       </div>
     </div>

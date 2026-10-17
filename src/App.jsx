@@ -381,6 +381,8 @@ export default function App() {
             onOpenPulpit={(s) => setPulpitSermon(s)}
             onPlayAudio={handlePlayTrack}
             userCredits={userCredits}
+            onDeductCredit={handleDeductCredit}
+            config={config}
             isGenerating={isGenerating}
             generatedSermon={generatedSermon}
             onResultStateChange={setIsLessonOpen}
@@ -435,6 +437,9 @@ export default function App() {
       {pulpitSermon && (
         <PulpitMode
           sermon={pulpitSermon}
+          config={config}
+          userCredits={userCredits}
+          onDeductCredit={handleDeductCredit}
           onClose={() => setPulpitSermon(null)}
         />
       )}

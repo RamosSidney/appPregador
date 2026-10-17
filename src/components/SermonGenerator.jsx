@@ -7,15 +7,17 @@ import {
   Copy,
   Bookmark,
   Mic,
-  Flame,
   ArrowLeft,
   BookOpen,
   GraduationCap,
   Users,
-  Compass
+  Calendar,
+  Share2,
+  RefreshCw
 } from 'lucide-react';
 import { marked } from 'marked';
 import { sanitizeHtml } from '../services/securityService.js';
+import { generateWeeklyDevotionalAI, generateSeriesCurriculumAI } from '../services/aiService.js';
 
 export default function SermonGenerator({
   onGenerate,
@@ -23,6 +25,8 @@ export default function SermonGenerator({
   onOpenPulpit,
   onPlayAudio,
   userCredits,
+  onDeductCredit,
+  config,
   isGenerating,
   generatedSermon,
   onResultStateChange
@@ -36,11 +40,24 @@ export default function SermonGenerator({
   const [countdown, setCountdown] = useState(3);
   const [showFullResultPage, setShowFullResultPage] = useState(false);
 
+  // Proposta 2: Active Tab inside Result ('estudo' | 'devocional' | 'serie')
+  const [resultTab, setResultTab] = useState('estudo');
+  const [weeklyDevotionalContent, setWeeklyDevotionalContent] = useState('');
+  const [seriesCurriculumContent, setSeriesCurriculumContent] = useState('');
+  const [isExpandingAI, setIsExpandingAI] = useState(false);
+
+  // Reset expansion tabs whenever a new sermon is generated
+  useEffect(() => {
+    setResultTab('estudo');
+    setWeeklyDevotionalContent('');
+    setSeriesCurriculumContent('');
+  }, [generatedSermon?.id]);
+
   const studyFormats = [
     { id: 'Pregação Expositiva', label: 'Pregação Expositiva', icon: BookOpen },
     { id: 'Estudo & Ensino Bíblico', label: 'Aula / Estudo Bíblico', icon: GraduationCap },
-    { id: 'Pequeno Grupo / Célula', label: 'Estudo para Célula', icon: Users },
-    { id: 'Mentoria & Discipulado', label: 'Mentoria & Discipulado', icon: Compass }
+    { id: 'Série de 4 Semanas (Currículo)', label: 'Série de 4 Semanas', icon: Calendar },
+    { id: 'Pequeno Grupo / Célula', label: 'Estudo para Célula', icon: Users }
   ];
 
   const painOptions = [
@@ -143,10 +160,61 @@ export default function SermonGenerator({
     }
   };
 
+  // Proposta 2A: Generate 5-Day Devotional Kit (Mon-Fri)
+  const handleSelectDevotionalTab = async () => {
+    setResultTab('devocional');
+    if (weeklyDevotionalContent || isExpandingAI || !generatedSermon) return;
+
+    setIsExpandingAI(true);
+    try {
+      const content = await generateWeeklyDevotionalAI({
+        studyTitle: generatedSermon.title,
+        studyContent: generatedSermon.content,
+        config
+      });
+      if (onDeductCredit) await onDeductCredit();
+      setWeeklyDevotionalContent(content);
+    } catch (err) {
+      alert(err.message || 'Erro ao gerar Kit Devocional da Semana.');
+      setResultTab('estudo');
+    } finally {
+      setIsExpandingAI(false);
+    }
+  };
+
+  // Proposta 2B: Generate 4-Week Teaching Series Plan
+  const handleSelectSeriesTab = async () => {
+    setResultTab('serie');
+    if (seriesCurriculumContent || isExpandingAI || !generatedSermon) return;
+
+    setIsExpandingAI(true);
+    try {
+      const content = await generateSeriesCurriculumAI({
+        studyTitle: generatedSermon.title,
+        studyContent: generatedSermon.content,
+        config
+      });
+      if (onDeductCredit) await onDeductCredit();
+      setSeriesCurriculumContent(content);
+    } catch (err) {
+      alert(err.message || 'Erro ao gerar Planejamento de Série de 4 Semanas.');
+      setResultTab('estudo');
+    } finally {
+      setIsExpandingAI(false);
+    }
+  };
+
   const copyToClipboard = (text, label) => {
     navigator.clipboard.writeText(text);
     alert(`${label} copiado! 📋`);
   };
+
+  const activeDisplayedContent =
+    resultTab === 'devocional'
+      ? weeklyDevotionalContent
+      : resultTab === 'serie'
+      ? seriesCurriculumContent
+      : generatedSermon?.content || '';
 
   return (
     <div className="w-full bg-[#0B0E14] text-white min-h-screen border-none m-0 p-0 pb-40">
@@ -206,7 +274,7 @@ export default function SermonGenerator({
           </div>
         </div>
 
-        {/* Step 3: Passagem Bíblica ou Tema Específico (Sem Gancho Pop) */}
+        {/* Step 3: Passagem Bíblica ou Tema Específico */}
         <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-2 shadow-lg">
           <label className="text-xs font-extrabold uppercase tracking-wider text-amber-400 block">
             3. Passagem Bíblica ou Tema Específico (Opcional)
@@ -215,7 +283,7 @@ export default function SermonGenerator({
             type="text"
             value={customTheme}
             onChange={(e) => setCustomTheme(e.target.value)}
-            placeholder="Ex: Romanos 8:28, O Bom Samaritano, Fruto do Espírito, Liderança Servidora..."
+            placeholder="Ex: Romanos 8:28, O Bom Samaritano, Fruto do Espírito, Carta aos Efésios..."
             className="w-full min-h-[46px] bg-slate-950/80 border border-white/10 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all"
           />
         </div>
@@ -281,7 +349,7 @@ export default function SermonGenerator({
         )}
       </AnimatePresence>
 
-      {/* Full-Screen Study Result Page */}
+      {/* Full-Screen Study Result Page with Weekly Devotional & 4-Week Series Tabs */}
       <AnimatePresence>
         {showFullResultPage && generatedSermon && (
           <motion.div
@@ -292,7 +360,7 @@ export default function SermonGenerator({
             className="fixed inset-0 z-[100] bg-[#0B0E14] w-full h-full overflow-y-auto flex flex-col m-0 p-0 border-none"
           >
             {/* Sticky Top Navigation Bar */}
-            <div className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-2xl border-b border-white/10 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3 shrink-0">
+            <div className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-2xl border-b border-white/10 px-4 sm:px-8 py-3 flex items-center justify-between gap-2 shrink-0">
               <button
                 onClick={handleCloseFullResult}
                 className="min-w-[44px] min-h-[44px] px-3 rounded-xl bg-slate-950/80 border border-white/15 text-cyan-400 hover:text-white hover:border-cyan-400 text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
@@ -306,7 +374,7 @@ export default function SermonGenerator({
                 <h3 className="text-sm font-extrabold text-white truncate">{generatedSermon.title}</h3>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   onClick={() => onSaveSermon(generatedSermon)}
                   className="px-3 py-2 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer"
@@ -320,7 +388,7 @@ export default function SermonGenerator({
                   onClick={() => onPlayAudio({
                     title: generatedSermon.title,
                     subtitle: 'Narração de Estudo',
-                    content: generatedSermon.content
+                    content: activeDisplayedContent
                   })}
                   className="px-3 py-2 rounded-xl bg-cyan-600/30 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer"
                   title="Ouvir Narração"
@@ -329,7 +397,7 @@ export default function SermonGenerator({
                 </button>
 
                 <button
-                  onClick={() => onOpenPulpit(generatedSermon)}
+                  onClick={() => onOpenPulpit({ ...generatedSermon, content: activeDisplayedContent })}
                   className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-black shadow-lg hover:brightness-110 transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <Mic className="w-3.5 h-3.5" />
@@ -339,33 +407,95 @@ export default function SermonGenerator({
             </div>
 
             {/* Main Study Content Container */}
-            <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-10 space-y-6 pb-32">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-black uppercase tracking-wider">
-                    {generatedSermon.vibe || 'Estudo Bíblico'}
-                  </span>
-                  <span className="text-xs text-slate-400">{generatedSermon.createdAt}</span>
-                </div>
-
-                <div className="text-xs font-bold text-amber-400 flex items-center gap-1">
-                  <Zap className="w-3.5 h-3.5 fill-amber-400" /> +20 XP Conquistados
-                </div>
-              </div>
-
-              <div
-                className="prose prose-invert max-w-none text-slate-100 text-sm sm:text-base leading-relaxed space-y-4 font-sans selection:bg-purple-500 selection:text-white"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(generatedSermon.content || '')) }}
-              />
-
-              <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-5 sm:py-8 space-y-5 pb-32">
+              {/* Proposta 2: Multi-Tool Curriculum & Weekly Devotional Switcher Bar */}
+              <div className="bg-slate-900/90 border border-white/10 rounded-2xl p-2 flex flex-wrap sm:flex-nowrap items-center gap-1.5 shadow-lg">
                 <button
-                  onClick={() => copyToClipboard(generatedSermon.content, 'Estudo Completo')}
-                  className="flex-1 py-3.5 px-4 rounded-xl bg-slate-900 border border-white/15 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                  type="button"
+                  onClick={() => setResultTab('estudo')}
+                  className={`flex-1 min-h-[42px] px-3 py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    resultTab === 'estudo'
+                      ? 'bg-purple-600 text-white shadow'
+                      : 'bg-slate-950/80 text-slate-300 hover:text-white'
+                  }`}
                 >
-                  <Copy className="w-4 h-4 text-purple-400" /> Copiar Estudo Completo
+                  <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                  <span>📖 Estudo Base</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSelectDevotionalTab}
+                  className={`flex-1 min-h-[42px] px-3 py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    resultTab === 'devocional'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow'
+                      : 'bg-slate-950/80 text-emerald-300 hover:text-white border border-emerald-500/20'
+                  }`}
+                >
+                  <Share2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>📲 Kit Devocional (Seg–Sex)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSelectSeriesTab}
+                  className={`flex-1 min-h-[42px] px-3 py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    resultTab === 'serie'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow'
+                      : 'bg-slate-950/80 text-amber-300 hover:text-white border border-amber-500/20'
+                  }`}
+                >
+                  <Calendar className="w-3.5 h-3.5 shrink-0" />
+                  <span>📅 Planejar Série (4 Semanas)</span>
                 </button>
               </div>
+
+              {/* Loading Indicator when generating Devotional Kit or 4-Week Series */}
+              {isExpandingAI ? (
+                <div className="rounded-2xl bg-slate-900/90 border border-purple-500/30 p-8 text-center space-y-3">
+                  <RefreshCw className="w-8 h-8 text-purple-400 animate-spin mx-auto" />
+                  <h4 className="text-base font-black text-white">
+                    {resultTab === 'devocional'
+                      ? 'Gerando os 5 Devocionais da Semana (Segunda a Sexta)...'
+                      : 'Estruturando o Currículo Completo de 4 Semanas...'}
+                  </h4>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    Organizando leituras bíblicas, perguntas de reflexão e aplicações práticas para seus alunos e igreja.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div
+                    className="prose prose-invert max-w-none text-slate-100 text-sm sm:text-base leading-relaxed space-y-4 font-sans selection:bg-purple-500 selection:text-white bg-slate-900/40 border border-white/10 rounded-2xl p-5 sm:p-7"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(activeDisplayedContent)) }}
+                  />
+
+                  <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() =>
+                        copyToClipboard(
+                          activeDisplayedContent,
+                          resultTab === 'devocional'
+                            ? 'Kit Devocional da Semana'
+                            : resultTab === 'serie'
+                            ? 'Planejamento de Série (4 Semanas)'
+                            : 'Estudo Completo'
+                        )
+                      }
+                      className="flex-1 py-3.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                    >
+                      <Copy className="w-4 h-4" />
+                      <span>
+                        {resultTab === 'devocional'
+                          ? 'Copiar Kit Devocional para WhatsApp da Turma/Igreja'
+                          : resultTab === 'serie'
+                          ? 'Copiar Planejamento Completo de 4 Semanas'
+                          : 'Copiar Estudo Completo'}
+                      </span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </motion.div>
         )}
