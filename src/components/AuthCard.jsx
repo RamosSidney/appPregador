@@ -36,35 +36,35 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
       initial={{ opacity: 0, scale: 0.96, y: 15 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full max-w-lg md:max-w-xl lg:max-w-2xl bg-[#0F172A]/95 backdrop-blur-3xl border border-purple-500/25 rounded-3xl p-6 sm:p-10 md:p-12 shadow-2xl shadow-purple-950/80 relative z-10 overflow-hidden flex flex-col justify-center my-auto"
+      className="w-full max-w-md sm:max-w-lg bg-[#0F172A]/95 backdrop-blur-3xl border border-purple-500/25 rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl shadow-purple-950/80 relative z-10 overflow-hidden flex flex-col justify-center my-auto"
     >
       {/* Top Cyber Accents */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400" />
 
-      {/* Header */}
-      <div className="text-center mb-6">
+      {/* Header (Mobile-First Compact) */}
+      <div className="text-center mb-5 sm:mb-6">
         <motion.div
           whileHover={{ scale: 1.05, rotate: 2 }}
           whileTap={{ scale: 0.95 }}
-          className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 mx-auto flex items-center justify-center shadow-lg shadow-purple-900/50 border border-white/20 mb-3"
+          className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 mx-auto flex items-center justify-center shadow-lg shadow-purple-900/50 border border-white/20 mb-2.5 sm:mb-3"
         >
-          <Zap className="w-9 h-9 text-amber-300 fill-amber-300 drop-shadow-[0_0_12px_rgba(252,211,77,0.8)]" />
+          <Zap className="w-8 h-8 sm:w-9 sm:h-9 text-amber-300 fill-amber-300 drop-shadow-[0_0_12px_rgba(252,211,77,0.8)]" />
         </motion.div>
         <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
           appPregador <span className="bg-gradient-to-r from-purple-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">2.0</span>
         </h1>
-        <p className="text-xs font-bold uppercase tracking-widest text-cyan-400 mt-1">
+        <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-cyan-400 mt-0.5">
           Geração Z & Alpha
         </p>
       </div>
 
-      {/* Tab Switcher */}
-      <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800/80 mb-6 relative">
+      {/* Tab Switcher (44px min touch target) */}
+      <div className="flex bg-slate-950/80 p-1 rounded-2xl border border-slate-800/80 mb-5 relative">
         <button
           type="button"
           tabIndex={0}
           onClick={() => setActiveTab('login')}
-          className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-colors relative z-10 flex items-center justify-center gap-1.5 ${
+          className={`flex-1 min-h-[44px] py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-colors relative z-10 flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'login' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -82,7 +82,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
           type="button"
           tabIndex={0}
           onClick={() => setActiveTab('register')}
-          className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-colors relative z-10 flex items-center justify-center gap-1.5 ${
+          className={`flex-1 min-h-[44px] py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-colors relative z-10 flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'register' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -98,7 +98,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
         <AnimatePresence mode="wait">
           {activeTab === 'register' && (
             <motion.div
@@ -107,15 +107,15 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25 }}
-              className="space-y-4 overflow-hidden"
+              className="space-y-3.5 overflow-hidden"
             >
               {/* Full Name Input */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
                   <span>Nome Completo</span>
                 </label>
                 <div className="relative">
-                  <User className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <User className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     required
@@ -123,16 +123,16 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex: Pastor Tiago Santos"
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full min-h-[48px] bg-slate-950/70 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   />
                 </div>
               </div>
 
               {/* Username Input */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-300">Nome de Usuário (@)</label>
                 <div className="relative">
-                  <AtSign className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <AtSign className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     required
@@ -140,7 +140,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="ex: pr_tiago"
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full min-h-[48px] bg-slate-950/70 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   />
                 </div>
               </div>
@@ -149,7 +149,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
         </AnimatePresence>
 
         {/* Email Input with Real-time Validation */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <div className="flex justify-between items-center text-xs font-semibold text-slate-300">
             <label htmlFor="auth-email">E-mail de Acesso</label>
             {touchedEmail && (
@@ -165,7 +165,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
             )}
           </div>
           <div className="relative">
-            <Mail className={`w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
+            <Mail className={`w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${
               touchedEmail && isValidEmail ? 'text-emerald-400' : 'text-slate-500'
             }`} />
             <input
@@ -180,7 +180,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
                 if (!touchedEmail) setTouchedEmail(true);
               }}
               placeholder="pastor@exemplo.com"
-              className={`w-full bg-slate-950/70 border rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+              className={`w-full min-h-[48px] bg-slate-950/70 border rounded-xl pl-11 pr-4 py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
                 touchedEmail && !isValidEmail && email.length > 0
                   ? 'border-rose-500/60 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
                   : 'border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20'
@@ -190,7 +190,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
         </div>
 
         {/* Password Input with Real-time Validation */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <div className="flex justify-between items-center text-xs font-semibold text-slate-300">
             <label htmlFor="auth-password">Sua Senha</label>
             {touchedPassword && (
@@ -206,7 +206,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
             )}
           </div>
           <div className="relative">
-            <Lock className={`w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors ${
+            <Lock className={`w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${
               touchedPassword && isPasswordValid ? 'text-emerald-400' : 'text-slate-500'
             }`} />
             <input
@@ -222,7 +222,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
                 if (!touchedPassword) setTouchedPassword(true);
               }}
               placeholder="••••••••"
-              className={`w-full bg-slate-950/70 border rounded-xl pl-11 pr-11 py-3 text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+              className={`w-full min-h-[48px] bg-slate-950/70 border rounded-xl pl-11 pr-12 py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
                 touchedPassword && !isPasswordValid && password.length > 0
                   ? 'border-amber-500/60 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
                   : 'border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20'
@@ -233,19 +233,19 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
               tabIndex={0}
               aria-label="Alternar visibilidade da senha"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 p-1 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white w-9 h-9 flex items-center justify-center rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500 transition-colors cursor-pointer"
             >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
             </button>
           </div>
         </div>
 
-        {/* Primary CTA Button */}
+        {/* Primary CTA Button (Min 48px Touch Target) */}
         <motion.button
           type="submit"
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-purple-900/50 hover:shadow-purple-700/60 transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer"
+          className="w-full min-h-[50px] py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-purple-900/50 hover:shadow-purple-700/60 transition-all flex items-center justify-center gap-2 mt-3 cursor-pointer"
         >
           <span>{activeTab === 'login' ? 'ACESSAR ECOSSISTEMA ⚡' : 'CRIAR MINHA CONTA 🛡️'}</span>
           <ArrowRight className="w-4 h-4" />
@@ -253,7 +253,7 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
       </form>
 
       {/* Divider */}
-      <div className="flex items-center gap-3 my-6">
+      <div className="flex items-center gap-3 my-4 sm:my-5">
         <div className="flex-1 h-[1px] bg-slate-800" />
         <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">ou</span>
         <div className="flex-1 h-[1px] bg-slate-800" />
@@ -263,10 +263,10 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
       <motion.button
         type="button"
         whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
+        whileTap={{ scale: 0.98 }}
         onClick={onGuestBypass}
         tabIndex={0}
-        className="w-full py-3 rounded-xl border border-slate-700/70 bg-slate-950/60 hover:bg-slate-800/60 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+        className="w-full min-h-[48px] py-3 rounded-xl border border-slate-700/70 bg-slate-950/60 hover:bg-slate-800/60 text-slate-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
       >
         <Smartphone className="w-4 h-4 text-cyan-400" />
         <span>Navegar no Modo Simulação 📲</span>

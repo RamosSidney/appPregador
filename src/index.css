@@ -10,22 +10,42 @@
     --accent-cyan: #06B6D4;
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     background-color: var(--bg-dark-deep);
     color: #F8FAFC;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     overflow-x: hidden;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif;
   }
+
+  /* Prevent iOS Safari auto-zoom on input focus (< 768px) */
+  @media screen and (max-width: 767px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  button, a, select, input {
+    touch-action: manipulation;
+  }
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -41,18 +61,34 @@
   background: rgba(139, 92, 246, 0.7);
 }
 
-/* Safe Area Inset Padding for Mobile Floating Dock */
+/* Mobile-First Safe Area Utilities */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 .pb-safe-dock {
-  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
+
+.min-h-dvh {
+  min-height: 100dvh;
+}
+
+.h-dvh {
+  height: 100dvh;
 }
 
 /* Hide scrollbars for smooth sliding tab navigation on mobile */
 .scrollbar-none, .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .scrollbar-none::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+  display: none;
 }
 
 /* Glassmorphism & Cyberpunk card utilities */
@@ -112,4 +148,3 @@
 .animate-pulse-glow {
   animation: pulseGlow 3s ease-in-out infinite;
 }
-

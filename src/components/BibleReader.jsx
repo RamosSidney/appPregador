@@ -742,48 +742,74 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
         </div>
       </div>
 
-      {/* Floating Context Action Bar Menu */}
-      {menuPosition && selectedVerseRef && (
-        <div
-          className="fixed z-50 transform -translate-x-1/2 -translate-y-full bg-slate-950/95 backdrop-blur-2xl border border-white/15 rounded-full px-3 py-2 shadow-2xl shadow-purple-950/80 flex items-center gap-1.5 sm:gap-2 animate-fadeIn max-w-[95vw] overflow-x-auto scrollbar-none"
-          style={{ left: menuPosition.left, top: menuPosition.top }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Color Dots */}
-          <div className="flex items-center gap-1.5 px-1.5 border-r border-white/15 shrink-0">
-            <button onClick={() => handleApplyHighlight('green')} className="w-5 h-5 rounded-full bg-emerald-400 hover:scale-110 transition-transform" />
-            <button onClick={() => handleApplyHighlight('blue')} className="w-5 h-5 rounded-full bg-cyan-400 hover:scale-110 transition-transform" />
-            <button onClick={() => handleApplyHighlight('yellow')} className="w-5 h-5 rounded-full bg-amber-400 hover:scale-110 transition-transform" />
-            <button onClick={() => handleApplyHighlight('pink')} className="w-5 h-5 rounded-full bg-rose-400 hover:scale-110 transition-transform" />
-            <button onClick={() => handleApplyHighlight('clear')} className="w-5 h-5 rounded-full border border-white/30 text-[9px] flex items-center justify-center text-slate-400 hover:text-white">✕</button>
-          </div>
-
-          {/* Action Buttons */}
-          <button onClick={handleCopyVerse} className="p-2 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-bold shrink-0" title="Copiar Versículo">
-            <Copy className="w-4 h-4" />
-          </button>
-          <button onClick={handleShareVerse} className="p-2 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-bold shrink-0" title="Compartilhar">
-            <Share2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => {
-              setMemorizeTarget({ ref: selectedVerseRef, text: selectedVerseText });
-              setIsMemorizeOpen(true);
-              setMenuPosition(null);
-            }}
-            className="px-3 py-1.5 rounded-full bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-black flex items-center gap-1 border border-amber-500/30 shrink-0"
-            title="Jogo de Memorização do Versículo Selecionado"
+      {/* Mobile-First Verse Context Action Sheet (Mobile Dock <640px / Floating Popover >=640px) */}
+      <AnimatePresence>
+        {menuPosition && selectedVerseRef && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 15 }}
+            transition={{ duration: 0.18 }}
+            className="fixed z-[65] left-3 right-3 bottom-[140px] sm:bottom-auto sm:right-auto sm:transform sm:-translate-x-1/2 sm:-translate-y-full bg-[#0F172A]/98 backdrop-blur-2xl border border-purple-500/40 rounded-2xl sm:rounded-full p-3 sm:px-3.5 sm:py-2 shadow-2xl shadow-purple-950/90 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-2 max-w-md mx-auto sm:max-w-[95vw]"
+            style={typeof window !== 'undefined' && window.innerWidth >= 640 ? { left: menuPosition.left, top: menuPosition.top } : undefined}
+            onClick={(e) => e.stopPropagation()}
           >
-            🎮 Memorizar
-          </button>
-          <button onClick={() => handleTriggerAction('quebra-gelo')} className="px-3 py-1.5 rounded-full bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500 hover:text-slate-950 text-xs font-black flex items-center gap-1 border border-cyan-500/30 shrink-0">
-            <Sparkles className="w-3.5 h-3.5" /> Quebra-Gelo
-          </button>
-          <button onClick={() => handleTriggerAction('traducao')} className="px-3 py-1.5 rounded-full bg-purple-500/20 text-purple-300 hover:bg-purple-500 hover:text-white text-xs font-black flex items-center gap-1 border border-purple-500/30 shrink-0">
-            💡 Traduzir Gen Z
-          </button>
-        </div>
-      )}
+            {/* Row 1 (Mobile) / Left Group (Desktop): Ref + Highlight Color Dots + Copy/Share/Close */}
+            <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto sm:border-r sm:border-white/15 sm:pr-2">
+              <span className="sm:hidden text-[11px] font-black text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded-md truncate max-w-[110px]">
+                {selectedVerseRef}
+              </span>
+
+              {/* Color Dots */}
+              <div className="flex items-center gap-2">
+                <button onClick={() => handleApplyHighlight('green')} aria-label="Grifar Verde" className="w-6 h-6 sm:w-5 sm:h-5 rounded-full bg-emerald-400 active:scale-90 hover:scale-110 transition-transform shadow-sm cursor-pointer" />
+                <button onClick={() => handleApplyHighlight('blue')} aria-label="Grifar Azul" className="w-6 h-6 sm:w-5 sm:h-5 rounded-full bg-cyan-400 active:scale-90 hover:scale-110 transition-transform shadow-sm cursor-pointer" />
+                <button onClick={() => handleApplyHighlight('yellow')} aria-label="Grifar Amarelo" className="w-6 h-6 sm:w-5 sm:h-5 rounded-full bg-amber-400 active:scale-90 hover:scale-110 transition-transform shadow-sm cursor-pointer" />
+                <button onClick={() => handleApplyHighlight('pink')} aria-label="Grifar Rosa" className="w-6 h-6 sm:w-5 sm:h-5 rounded-full bg-rose-400 active:scale-90 hover:scale-110 transition-transform shadow-sm cursor-pointer" />
+                <button onClick={() => handleApplyHighlight('clear')} aria-label="Remover Grifo" className="w-6 h-6 sm:w-5 sm:h-5 rounded-full border border-white/30 text-[10px] flex items-center justify-center text-slate-300 hover:text-white cursor-pointer">✕</button>
+              </div>
+
+              {/* Copy & Share Icons */}
+              <div className="flex items-center gap-1">
+                <button onClick={handleCopyVerse} className="w-8 h-8 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white flex items-center justify-center transition-colors cursor-pointer" title="Copiar Versículo">
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={handleShareVerse} className="w-8 h-8 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white flex items-center justify-center transition-colors cursor-pointer" title="Compartilhar">
+                  <Share2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Row 2 (Mobile Grid) / Right Group (Desktop): AI & RPG Tools */}
+            <div className="grid grid-cols-3 sm:flex items-center gap-1.5 w-full sm:w-auto">
+              <button
+                onClick={() => {
+                  setMemorizeTarget({ ref: selectedVerseRef, text: selectedVerseText });
+                  setIsMemorizeOpen(true);
+                  setMenuPosition(null);
+                }}
+                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-amber-500/30 shrink-0 cursor-pointer"
+                title="Jogo de Memorização do Versículo Selecionado"
+              >
+                <span>🎮 Memorizar</span>
+              </button>
+              <button
+                onClick={() => handleTriggerAction('quebra-gelo')}
+                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500 hover:text-slate-950 text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-cyan-500/30 shrink-0 cursor-pointer"
+              >
+                <Sparkles className="w-3 h-3 shrink-0" />
+                <span>Quebra-Gelo</span>
+              </button>
+              <button
+                onClick={() => handleTriggerAction('traducao')}
+                className="min-h-[38px] sm:min-h-0 px-2.5 py-1.5 rounded-xl sm:rounded-full bg-purple-600/30 text-purple-200 hover:bg-purple-500 hover:text-white text-[11px] sm:text-xs font-black flex items-center justify-center gap-1 border border-purple-400/40 shrink-0 cursor-pointer"
+              >
+                <span>💡 Gen Z</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Quick Bible Navigator Modal */}
       <QuickBibleNavigatorModal

@@ -1,28 +1,51 @@
 // Service para conexão direta com a IA (Groq API - Llama 3.3 70B e Supabase Edge Functions)
 
 async function callGroqAPI(messages, apiKey) {
-  const model = 'llama-3.3-70b-versatile';
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      temperature: 0.7,
-      max_tokens: 1800
-    })
-  });
+  const candidateModels = [
+    'openai/gpt-oss-120b',
+    'openai/gpt-oss-20b',
+    'qwen/qwen3.8-27b',
+    'llama-3.3-70b-versatile'
+  ];
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `Erro na API da Groq: Status ${response.status}`);
+  let lastError = null;
+
+  for (const model of candidateModels) {
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: 0.7,
+          max_tokens: 1800
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const msg = errorData.error?.message || `Erro na API da Groq: Status ${response.status}`;
+        lastError = new Error(msg);
+        // Se for erro de modelo inexistente/depreciado, tenta o próximo modelo da lista
+        if (response.status === 404 || response.status === 400 || msg.includes('model')) {
+          continue;
+        }
+        throw lastError;
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      if (content) return content;
+    } catch (err) {
+      lastError = err;
+    }
   }
 
-  const data = await response.json();
-  return data.choices[0]?.message?.content || '';
+  throw lastError || new Error("Falha ao comunicar com os modelos da Groq API.");
 }
 
 async function callSupabaseEdge(action, payload, config) {

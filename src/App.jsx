@@ -25,10 +25,19 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLessonOpen, setIsLessonOpen] = useState(false);
 
-  // User States
-  const [userCredits, setUserCredits] = useState(100);
-  const [userLevel, setUserLevel] = useState(1);
-  const [userXp, setUserXp] = useState(0);
+  // User States (Persisted in localStorage for Local-First reliability)
+  const [userCredits, setUserCredits] = useState(() => {
+    const saved = localStorage.getItem('app_pregador_credits');
+    return saved !== null ? parseInt(saved, 10) : 100;
+  });
+  const [userLevel, setUserLevel] = useState(() => {
+    const saved = localStorage.getItem('app_pregador_level');
+    return saved !== null ? parseInt(saved, 10) : 1;
+  });
+  const [userXp, setUserXp] = useState(() => {
+    const saved = localStorage.getItem('app_pregador_xp');
+    return saved !== null ? parseInt(saved, 10) : 0;
+  });
   const [userProfile, setUserProfile] = useState(null);
 
   // Audio Global State
@@ -87,10 +96,16 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedSermon, setGeneratedSermon] = useState(null);
 
-  // Save Sermons to LocalStorage
+  // Save Sermons & User Progress to LocalStorage
   useEffect(() => {
     localStorage.setItem('app_pregador_sermons', JSON.stringify(savedSermons));
   }, [savedSermons]);
+
+  useEffect(() => {
+    localStorage.setItem('app_pregador_credits', userCredits.toString());
+    localStorage.setItem('app_pregador_level', userLevel.toString());
+    localStorage.setItem('app_pregador_xp', userXp.toString());
+  }, [userCredits, userLevel, userXp]);
 
   // Auth Handlers
   const handleLogin = (credentials) => {
@@ -397,6 +412,10 @@ export default function App() {
         onSaveConfig={handleSaveConfig}
         onLogout={handleLogout}
         userProfile={userProfile}
+        userCredits={userCredits}
+        userLevel={userLevel}
+        userXp={userXp}
+        savedSermons={savedSermons}
       />
 
       {/* Persistent Mini Audio Player Bar */}
