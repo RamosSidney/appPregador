@@ -151,25 +151,6 @@ export default function SermonGenerator({
   return (
     <div className="w-full bg-[#0B0E14] text-white min-h-screen border-none m-0 p-0 pb-40">
       <div className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-3 sm:pt-5 space-y-4">
-        {/* Compact Header */}
-        <div className="bg-slate-900/70 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 shadow-lg">
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <div className="flex items-center gap-1.5 text-amber-400 font-extrabold text-[11px] tracking-widest uppercase">
-              <Flame className="w-3.5 h-3.5 fill-amber-400" />
-              <span>Laboratório de Ensino & Homilética</span>
-            </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300">
-              Exegese + Aplicação
-            </span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            Estruture Estudos Bíblicos e Esboços Profundos
-          </h2>
-          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
-            Escolha a modalidade de ensino e o tema central para gerar um estudo completo com contexto histórico, referências cruzadas e aplicação pastoral.
-          </p>
-        </div>
-
         {/* Step 1: Modalidade de Ensino / Estudo */}
         <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-2.5 shadow-lg">
           <label className="text-xs font-extrabold uppercase tracking-wider text-cyan-400 block">
