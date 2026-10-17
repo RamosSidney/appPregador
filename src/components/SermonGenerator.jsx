@@ -43,7 +43,7 @@ export default function SermonGenerator({
   };
 
   // Trigger Generation with 3s Animation
-  const handleGenerateClick = () => {
+  const handleGenerateClick = async () => {
     if (userCredits <= 0) {
       alert("Créditos de Raios zerados!");
       return;
@@ -52,13 +52,23 @@ export default function SermonGenerator({
     setIsLocal3sLoading(true);
     setCountdown(3);
 
-    // Call AI service in App.jsx
-    onGenerate({
-      painVibes: selectedPainVibes,
-      popVibes: [], // Item 2 removed as requested
-      customRef,
-      customTheme
-    });
+    const minDelayPromise = new Promise((resolve) => setTimeout(resolve, 3000));
+    const genPromise = Promise.resolve(
+      onGenerate({
+        painVibes: selectedPainVibes,
+        popVibes: [], // Item 2 removed as requested
+        customRef,
+        customTheme
+      })
+    );
+
+    const [, success] = await Promise.all([minDelayPromise, genPromise]);
+    setIsLocal3sLoading(false);
+
+    if (success !== false) {
+      setShowFullResultPage(true);
+      if (onResultStateChange) onResultStateChange(true);
+    }
   };
 
   // Handle 3s Countdown Timer Sync with AI Response
@@ -80,12 +90,14 @@ export default function SermonGenerator({
     return () => clearInterval(timer);
   }, [isLocal3sLoading]);
 
-  // Open Full-Screen Result when countdown reaches 0 AND generatedSermon is available
+  // Safety fallback: ensure modal closes if generation finishes
   useEffect(() => {
-    if (isLocal3sLoading && countdown === 0 && !isGenerating && generatedSermon) {
+    if (isLocal3sLoading && countdown === 0 && !isGenerating) {
       setIsLocal3sLoading(false);
-      setShowFullResultPage(true);
-      if (onResultStateChange) onResultStateChange(true);
+      if (generatedSermon) {
+        setShowFullResultPage(true);
+        if (onResultStateChange) onResultStateChange(true);
+      }
     }
   }, [isLocal3sLoading, countdown, isGenerating, generatedSermon, onResultStateChange]);
 

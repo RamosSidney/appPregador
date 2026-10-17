@@ -250,7 +250,7 @@ export default function App() {
   const handleGenerateSermon = async ({ painVibes, popVibes, customRef, customTheme }) => {
     if (userCredits <= 0) {
       alert("Créditos de Raios zerados!");
-      return;
+      return false;
     }
 
     setIsGenerating(true);
@@ -280,9 +280,11 @@ export default function App() {
       setGeneratedSermon(newSermon);
       handleAddXp(20);
       telemetryService.trackEvent('sermon_generated', { vibe: painVibes[0] || 'GenZ' });
+      return true;
     } catch (err) {
       alert(err.message || "Erro ao conectar com a Inteligência Artificial.");
       setIsSettingsOpen(true);
+      return false;
     } finally {
       setIsGenerating(false);
     }

@@ -32,12 +32,24 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA Service Worker Registration with Auto-Update & Stale Cache Cleanup -->
     <script>
+      if ('caches' in window) {
+        caches.keys().then(keys => {
+          keys.forEach(key => {
+            if (key.includes('cache-v1') || key.includes('cache-v2')) {
+              caches.delete(key);
+            }
+          });
+        });
+      }
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('[PWA] ServiceWorker registrado com sucesso no escopo:', reg.scope))
+            .then(reg => {
+              reg.update();
+              console.log('[PWA] ServiceWorker ativo e verificado:', reg.scope);
+            })
             .catch(err => console.warn('[PWA] Falha ao registrar ServiceWorker:', err));
         });
       }

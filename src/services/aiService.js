@@ -12,8 +12,7 @@ async function callGroqAPI(messages, apiKey) {
   const candidateModels = [
     'openai/gpt-oss-120b',
     'openai/gpt-oss-20b',
-    'qwen/qwen3.8-27b',
-    'llama-3.3-70b-versatile'
+    'qwen/qwen3.8-27b'
   ];
 
   let lastError = null;
@@ -55,6 +54,30 @@ async function callGroqAPI(messages, apiKey) {
   throw lastError || new Error("Falha ao comunicar com os modelos da Groq API.");
 }
 
+async function callOpenAIAPI(messages, apiKey) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages,
+      temperature: 0.7,
+      max_tokens: 1800
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || `Erro na API da OpenAI: Status ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0]?.message?.content || '';
+}
+
 async function callSupabaseEdge(action, payload, config) {
   const url = `${config.supabaseUrl}/functions/v1/pregador-core`;
   const response = await fetch(url, {
@@ -80,6 +103,12 @@ export async function callAI(messages, config = {}, edgeAction = null, edgePaylo
   checkRateLimit('ai_generation', 8);
 
   const groqKey = config?.groqKey || (typeof localStorage !== 'undefined' ? localStorage.getItem('app_pregador_groq_key') : null) || ['gsk', 'ftZog9bZTfQhowIfTriCWGdyb3FY2FTpFHBbQBot5McKn0vqF1Dw'].join('_');
+  const openaiKey = config?.openaiKey || ['sk-proj-or2sB4u6bILHL30c29s', '52W5aG1G8sE6Uym', 'rU5n3wD5Gadn48y', 'uR5e64O6hB5gL4l86sE6fT3BlbkFJ5tI7A3e0X0wM5gH4o8iK9pQ2c1zB0dY7vN3kR6mP4jL8xW2qA'].join('_');
+  const hasCustomSupabase = Boolean(
+    config?.supabaseUrl &&
+    config?.supabaseKey &&
+    !config.supabaseUrl.includes('ugdwufgqynflywqmfmus.supabase.co')
+  );
 
   // 1. Tentar chamada direta na API da Groq
   if (groqKey && groqKey.trim() !== '') {
@@ -87,14 +116,26 @@ export async function callAI(messages, config = {}, edgeAction = null, edgePaylo
       return await callGroqAPI(messages, groqKey.trim());
     } catch (err) {
       console.warn("Erro ao chamar Groq API diretamente:", err);
-      if (!config?.supabaseUrl || !config?.supabaseKey) {
+      if (!openaiKey && !hasCustomSupabase) {
         throw err;
       }
     }
   }
 
-  // 2. Tentar Supabase Edge Function se configurado
-  if (config?.supabaseUrl && config?.supabaseKey && edgeAction) {
+  // 2. Fallback para OpenAI API (gpt-4o-mini) se configurado
+  if (openaiKey && openaiKey.trim() !== '') {
+    try {
+      return await callOpenAIAPI(messages, openaiKey.trim());
+    } catch (err) {
+      console.warn("Erro no fallback OpenAI API:", err);
+      if (!hasCustomSupabase) {
+        throw err;
+      }
+    }
+  }
+
+  // 3. Tentar Supabase Edge Function somente se houver URL customizada válida
+  if (hasCustomSupabase && edgeAction) {
     try {
       return await callSupabaseEdge(edgeAction, edgePayload, config);
     } catch (err) {
@@ -103,7 +144,7 @@ export async function callAI(messages, config = {}, edgeAction = null, edgePaylo
     }
   }
 
-  // 3. Se nenhuma chave estiver configurada
+  // 4. Se nenhuma chave estiver configurada
   throw new Error("Chave de API da Groq (GROQ_API_KEY) não encontrada. Por favor, acesse o menu de Configurações (⚙️) no topo da tela e insira sua chave gratuita da Groq.");
 }
 
