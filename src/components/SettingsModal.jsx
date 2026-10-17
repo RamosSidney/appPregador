@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { X, Key, Database, LogOut, Check, Zap, BarChart3, Download, Upload, Trash2 } from 'lucide-react';
+import { X, Key, Database, LogOut, Check, Zap, BarChart3, Download, Upload, ShieldCheck, Activity } from 'lucide-react';
+import { validateBackupPayload } from '../services/securityService.js';
+import { telemetryService } from '../services/telemetryService.js';
 
 export default function SettingsModal({
   isOpen,
@@ -18,11 +20,18 @@ export default function SettingsModal({
   const [openaiKey, setOpenaiKey] = useState(config.openaiKey || '');
   const [supabaseUrl, setSupabaseUrl] = useState(config.supabaseUrl || '');
   const [supabaseKey, setSupabaseKey] = useState(config.supabaseKey || '');
+  const [clarityId, setClarityId] = useState(() => localStorage.getItem('app_pregador_clarity_id') || '');
 
   if (!isOpen) return null;
 
   const handleSave = () => {
-    onSaveConfig({ groqKey, openaiKey, supabaseUrl, supabaseKey });
+    if (clarityId.trim()) {
+      localStorage.setItem('app_pregador_clarity_id', clarityId.trim());
+      telemetryService.init(clarityId.trim());
+    } else {
+      localStorage.removeItem('app_pregador_clarity_id');
+    }
+    onSaveConfig({ groqKey, openaiKey, supabaseUrl, supabaseKey, clarityId: clarityId.trim() });
     onClose();
   };
 
@@ -32,20 +41,22 @@ export default function SettingsModal({
       const highlights = JSON.parse(localStorage.getItem('app_pregador_bible_highlights') || '{}');
       const completedModules = JSON.parse(localStorage.getItem('app_pregador_completed_modules') || '[]');
       const completedBoss = JSON.parse(localStorage.getItem('app_pregador_completed_boss_fights') || '[]');
+      const eventCounters = telemetryService.getEventCounters();
       return {
         highlightsCount: Object.keys(highlights).length,
         modulesCount: completedModules.length,
         bossCount: completedBoss.length,
-        sermonsCount: savedSermons.length
+        sermonsCount: savedSermons.length,
+        aiCallsCount: (eventCounters.sermon_generated || 0) + (eventCounters.bible_lens_used || 0) + (eventCounters.mentor_chat_used || 0)
       };
     } catch {
-      return { highlightsCount: 0, modulesCount: 0, bossCount: 0, sermonsCount: savedSermons.length };
+      return { highlightsCount: 0, modulesCount: 0, bossCount: 0, sermonsCount: savedSermons.length, aiCallsCount: 0 };
     }
   };
 
   const stats = getTelemetryStats();
 
-  // Export all user data as a portable JSON file (Zero-DB Backup)
+  // Export all user data as a portable JSON file (Zero-DB Backup — NUNCA exporta chaves de API por segurança!)
   const handleExportBackup = () => {
     const backupPayload = {
       app: 'appPregador 2.0',
@@ -66,24 +77,26 @@ export default function SettingsModal({
     a.download = `appPregador-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    telemetryService.trackEvent('backup_exported');
   };
 
-  // Import JSON backup
+  // Import JSON backup validated by securityService
   const handleImportBackup = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target.result);
-        if (data.sermons) localStorage.setItem('app_pregador_sermons', JSON.stringify(data.sermons));
-        if (data.bibleHighlights) localStorage.setItem('app_pregador_bible_highlights', JSON.stringify(data.bibleHighlights));
-        if (data.completedModules) localStorage.setItem('app_pregador_completed_modules', JSON.stringify(data.completedModules));
-        if (data.completedBossFights) localStorage.setItem('app_pregador_completed_boss_fights', JSON.stringify(data.completedBossFights));
-        alert("Backup restaurado com sucesso! Recarregando dados...");
+        const safeData = validateBackupPayload(event.target.result);
+        if (safeData.sermons) localStorage.setItem('app_pregador_sermons', JSON.stringify(safeData.sermons));
+        if (safeData.bibleHighlights) localStorage.setItem('app_pregador_bible_highlights', JSON.stringify(safeData.bibleHighlights));
+        if (safeData.completedModules) localStorage.setItem('app_pregador_completed_modules', JSON.stringify(safeData.completedModules));
+        if (safeData.completedBossFights) localStorage.setItem('app_pregador_completed_boss_fights', JSON.stringify(safeData.completedBossFights));
+        telemetryService.trackEvent('backup_imported');
+        alert("Backup verificado e restaurado com segurança! Recarregando dados...");
         window.location.reload();
       } catch (err) {
-        alert("Arquivo de backup inválido.");
+        alert(err.message || "Arquivo de backup inválido ou bloqueado por segurança.");
       }
     };
     reader.readAsText(file);
@@ -95,7 +108,7 @@ export default function SettingsModal({
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-3.5 shrink-0">
           <h3 className="text-base sm:text-xl font-extrabold text-white flex items-center gap-2">
-            <Zap className="w-5 h-5 text-amber-400 fill-amber-400" /> Configurações & Controle
+            <Zap className="w-5 h-5 text-amber-400 fill-amber-400" /> Configurações & Segurança
           </h3>
           <button
             onClick={onClose}
@@ -114,7 +127,7 @@ export default function SettingsModal({
               activeTab === 'api' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            🔑 Chaves IA
+            🔑 IA & Clarity
           </button>
           <button
             onClick={() => setActiveTab('data')}
@@ -122,7 +135,7 @@ export default function SettingsModal({
               activeTab === 'data' ? 'bg-cyan-500 text-slate-950 shadow font-black' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            📊 Dados & Backup
+            📊 Telemetria
           </button>
           <button
             onClick={() => setActiveTab('account')}
@@ -137,13 +150,34 @@ export default function SettingsModal({
         {/* Tab Body */}
         <div className="flex-1 overflow-y-auto pr-1 space-y-4">
           {activeTab === 'api' && (
-            <div className="space-y-4">
+            <div className="space-y-4" data-clarity-mask="true">
+              {/* Security Status Badge */}
+              <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2.5 text-[11px] text-emerald-300">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Campos protegidos com <strong>Clarity Privacy Masking</strong>, Anti-XSS e Guardrails contra Prompt Injection.</span>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <Key className="w-4 h-4 text-purple-400" /> Groq API Key (Llama 3.3 70B - Texto)
+                  <Activity className="w-4 h-4 text-cyan-400" /> Microsoft Clarity Project ID (Heatmaps & Sessões)
+                </label>
+                <input
+                  type="text"
+                  value={clarityId}
+                  onChange={(e) => setClarityId(e.target.value)}
+                  placeholder="Ex: lq8x9abcde (ID do projeto no clarity.microsoft.com)"
+                  className="w-full min-h-[44px] bg-slate-950 border border-cyan-500/30 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400"
+                />
+                <p className="text-[10px] text-slate-400">Ativa mapas de calor e gravações de tela gratuitas no painel Microsoft Clarity.</p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Key className="w-4 h-4 text-purple-400" /> Groq API Key (Modelos LLM - Texto)
                 </label>
                 <input
                   type="password"
+                  autoComplete="off"
                   value={groqKey}
                   onChange={(e) => setGroqKey(e.target.value)}
                   placeholder="gsk_..."
@@ -157,12 +191,12 @@ export default function SettingsModal({
                 </label>
                 <input
                   type="password"
+                  autoComplete="off"
                   value={openaiKey}
                   onChange={(e) => setOpenaiKey(e.target.value)}
                   placeholder="sk-proj-..."
                   className="w-full min-h-[44px] bg-slate-950 border border-amber-500/30 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
                 />
-                <p className="text-[10px] text-slate-400">Ativa vozes neurais humanizadas (Onyx, Nova, Fable, Alloy).</p>
               </div>
 
               <div className="space-y-1.5">
@@ -184,6 +218,7 @@ export default function SettingsModal({
                 </label>
                 <input
                   type="password"
+                  autoComplete="off"
                   value={supabaseKey}
                   onChange={(e) => setSupabaseKey(e.target.value)}
                   placeholder="eyJhbG..."
@@ -219,10 +254,10 @@ export default function SettingsModal({
               <div className="bg-slate-950/90 border border-cyan-500/30 rounded-2xl p-4 space-y-3">
                 <div className="flex items-center gap-2 text-cyan-400 font-black text-xs uppercase tracking-wider">
                   <BarChart3 className="w-4 h-4" />
-                  <span>Portabilidade Local-First (Sem Banco Pago)</span>
+                  <span>Backup Seguro (Sem Vazamento de Chaves)</span>
                 </div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">
-                  Seus dados ficam salvos instantaneamente no dispositivo (Offline-First). Exporte ou restaure um arquivo JSON para levar seus sermões e progresso para outro celular ou PC.
+                  O arquivo exportado contém apenas seus sermões, grifos e progresso RPG (suas chaves de API são omitidas por segurança). A importação possui filtro anti-XSS e validação de schema.
                 </p>
 
                 <div className="grid grid-cols-2 gap-2 pt-1">
@@ -246,7 +281,7 @@ export default function SettingsModal({
           )}
 
           {activeTab === 'account' && (
-            <div className="space-y-4 text-center py-4">
+            <div className="space-y-4 text-center py-4" data-clarity-mask="true">
               {userProfile ? (
                 <div className="space-y-3">
                   <div className="w-16 h-16 rounded-full bg-purple-600/20 border border-purple-500/40 mx-auto flex items-center justify-center font-black text-xl text-purple-400">

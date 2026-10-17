@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Play, Pause, RotateCcw, Type, Plus, Minus, Clock } from 'lucide-react';
 import { marked } from 'marked';
+import { sanitizeHtml } from '../services/securityService.js';
 
 export default function PulpitMode({ sermon, onClose }) {
   const [fontSize, setFontSize] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 640 ? 22 : 30));
@@ -191,7 +192,7 @@ export default function PulpitMode({ sermon, onClose }) {
       >
         <div
           className="prose prose-invert max-w-none text-slate-100 font-serif leading-relaxed break-words"
-          dangerouslySetInnerHTML={{ __html: marked.parse(sermon?.content || '') }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(sermon?.content || '')) }}
         />
         {/* Extra spacing at bottom for teleprompter scroll finish */}
         <div className="h-[55dvh]" />

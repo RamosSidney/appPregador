@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { marked } from 'marked';
 import { generateBibleLensAI, refineBibleChatAI } from '../services/aiService.js';
+import { sanitizeHtml } from '../services/securityService.js';
 import { audioService } from '../services/audioService.js';
 import { backgroundMusicService, MUSIC_TRACKS } from '../services/backgroundMusicService.js';
 import { mediaSessionService } from '../services/mediaSessionService.js';
@@ -1091,10 +1092,10 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
                       </div>
                     </div>
 
-                    {/* MARKDOWN PROSE CONTENT */}
+                    {/* MARKDOWN PROSE CONTENT (Sanitized against XSS) */}
                     <div
                       className="prose prose-invert max-w-none text-slate-100 text-sm md:text-base leading-relaxed space-y-4 prose-h1:text-xl sm:prose-h1:text-2xl prose-h1:font-black prose-h1:text-purple-300 prose-h2:text-base sm:prose-h2:text-lg prose-h2:font-extrabold prose-h2:text-cyan-300 prose-h3:text-amber-400 prose-strong:text-amber-300 prose-blockquote:border-l-4 prose-blockquote:border-cyan-400 prose-blockquote:bg-purple-950/20 prose-blockquote:p-4 prose-blockquote:rounded-r-xl prose-li:marker:text-purple-400 break-words"
-                      dangerouslySetInnerHTML={{ __html: marked.parse(msg.content || '') }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(msg.content || '')) }}
                     />
                   </article>
                 );

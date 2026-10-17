@@ -16,6 +16,7 @@ import VoiceInteractionModal from './components/audio/VoiceInteractionModal.jsx'
 import PWAInstallBanner from './components/PWAInstallBanner.jsx';
 import { generateSermonAI } from './services/aiService.js';
 import { audioService } from './services/audioService.js';
+import { telemetryService } from './services/telemetryService.js';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -85,12 +86,19 @@ export default function App() {
     }
   });
 
-  // Sync OpenAI Key to audioService
+  // Sync OpenAI Key to audioService & Initialize Microsoft Clarity Telemetry
   useEffect(() => {
     if (config?.openaiKey) {
       audioService.setOpenAIKey(config.openaiKey);
     }
+    telemetryService.init(config?.clarityId);
   }, [config]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      telemetryService.trackEvent('view_changed', { view: currentView });
+    }
+  }, [currentView, isAuthenticated]);
 
   // Generator State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -271,6 +279,7 @@ export default function App() {
 
       setGeneratedSermon(newSermon);
       handleAddXp(20);
+      telemetryService.trackEvent('sermon_generated', { vibe: painVibes[0] || 'GenZ' });
     } catch (err) {
       alert(err.message || "Erro ao conectar com a Inteligência Artificial.");
       setIsSettingsOpen(true);

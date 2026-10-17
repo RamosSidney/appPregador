@@ -4,6 +4,7 @@ import {
   Zap, Check, Sparkles, Copy, Bookmark, Mic, RefreshCw, Flame, ArrowLeft, Film, Share2
 } from 'lucide-react';
 import { marked } from 'marked';
+import { sanitizeHtml } from '../services/securityService.js';
 
 export default function SermonGenerator({
   onGenerate,
@@ -307,10 +308,10 @@ export default function SermonGenerator({
                 </div>
               </div>
 
-              {/* Formatted Markdown Body */}
+              {/* Formatted Markdown Body (Sanitized against XSS) */}
               <div
                 className="prose prose-invert max-w-none text-slate-100 text-sm sm:text-base leading-relaxed space-y-4 font-sans selection:bg-purple-500 selection:text-white"
-                dangerouslySetInnerHTML={{ __html: marked.parse(generatedSermon.content || '') }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(generatedSermon.content || '')) }}
               />
 
               {/* Bottom Quick Copy Action Buttons */}

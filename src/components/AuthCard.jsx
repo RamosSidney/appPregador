@@ -97,8 +97,8 @@ export default function AuthCard({ onSubmitLogin, onSubmitRegister, onGuestBypas
         </button>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
+      {/* Form (Masked in Microsoft Clarity Session Recordings for LGPD/Security) */}
+      <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4" data-clarity-mask="true">
         <AnimatePresence mode="wait">
           {activeTab === 'register' && (
             <motion.div

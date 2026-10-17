@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Send, ArrowLeft, MessageSquare, RefreshCw, Mic } from 'lucide-react';
 import { marked } from 'marked';
 import { mentorChatAI } from '../services/aiService.js';
+import { sanitizeHtml } from '../services/securityService.js';
 import MentorCard from './mentorship/MentorCard.jsx';
 
 export default function MentorshipRoom({ onDeductCredit, userCredits, config, onOpenSettings, onStartVoiceChat }) {
@@ -157,7 +158,7 @@ export default function MentorshipRoom({ onDeductCredit, userCredits, config, on
                   </div>
                   <div
                     className="prose prose-invert max-w-none text-xs sm:text-sm break-words"
-                    dangerouslySetInnerHTML={{ __html: marked.parse(msg.content || '') }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(msg.content || '')) }}
                   />
                 </div>
               </div>

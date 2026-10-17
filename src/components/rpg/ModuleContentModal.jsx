@@ -16,6 +16,7 @@ import {
   Target
 } from 'lucide-react';
 import { getEnrichedContentForModule } from '../../data/enrichedContent';
+import { sanitizeHtml } from '../../services/securityService.js';
 
 export default function ModuleContentModal({
   module,
@@ -187,7 +188,7 @@ export default function ModuleContentModal({
                 </div>
                 <div
                   className="prose prose-invert max-w-none text-slate-200 text-sm sm:text-base leading-relaxed space-y-4"
-                  dangerouslySetInnerHTML={{ __html: module.contextoPratico }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(module.contextoPratico) }}
                 />
               </div>
 
@@ -198,7 +199,7 @@ export default function ModuleContentModal({
                 </div>
                 <div
                   className="prose prose-invert max-w-none text-slate-200 text-sm sm:text-base leading-relaxed space-y-4"
-                  dangerouslySetInnerHTML={{ __html: module.insightAplicacao }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(module.insightAplicacao) }}
                 />
               </div>
             </div>
