@@ -88,7 +88,7 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
   useEffect(() => {
     mediaSessionService.updateMetadata({
       title: `${selectedBook} ${selectedChapter}`,
-      artist: 'Nova Versão Internacional, Edição Gen Z',
+      artist: 'Bíblia Sagrada — Estudo & Mentoria',
       album: 'appPregador 2.0 — Bíblia Sagrada'
     });
 
@@ -593,11 +593,6 @@ export default function BibleReader({ userCredits, onDeductCredit, config, onOpe
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span className="hidden sm:inline">🎮 Memorizar</span>
             </button>
-
-            {/* NVI Tag */}
-            <span className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[10px] font-black uppercase">
-              NVI
-            </span>
           </div>
 
           {/* Right Group: Font Size Controls & Font Family */}

@@ -13,124 +13,161 @@ import {
   CheckCircle2,
   ShieldCheck,
   Smartphone,
+  Laptop,
+  Tablet,
   Mic,
   ChevronDown,
-  Play,
-  Star,
   X,
-  MessageSquare,
-  Share2,
-  Compass
+  GraduationCap,
+  Sun,
+  Moon
 } from 'lucide-react';
 import AuthCard from './AuthCard';
 
+const MULTI_DEVICE_SHOWCASE = [
+  {
+    device: 'Smartphone (iOS & Android)',
+    icon: Smartphone,
+    tag: 'Estudo & Mentoria no Bolso',
+    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80',
+    title: 'Mentoria por Voz e Bíblia Sempre com Você',
+    description:
+      'Tire dúvidas teológicas por voz com gigantes da fé, ouça capítulos narrados em áudio e anote insights bíblicos a qualquer hora do dia.'
+  },
+  {
+    device: 'Notebook & Desktop',
+    icon: Laptop,
+    tag: 'Preparo Profundo de Aulas & Sermões',
+    image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80',
+    title: 'Laboratório Completo de Exegese e Ensino',
+    description:
+      'Estruture esboços expositivos, estudos para pequenos grupos, referências cruzadas e trilhas da Academia em uma tela ampla de estudo.'
+  },
+  {
+    device: 'Tablet & iPad no Altar',
+    icon: Tablet,
+    tag: 'Modo Púlpito & Sala de Aula',
+    image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=900&q=80',
+    title: 'Teleprompter Inteligente para Ministrar',
+    description:
+      'Suba ao púlpito ou lidere sua classe com rolagem automática, controle de fonte de alto contraste e cronômetro de pregação integrado.'
+  }
+];
+
 const ECOSYSTEM_FEATURES = [
-  {
-    icon: BookOpen,
-    badge: '100% Offline + IA',
-    title: 'Bíblia NVI + Lente Cultural Gen Z',
-    description:
-      'Navegue pelos 66 livros com busca instantânea, marcação por cores e acione a IA em qualquer versículo para gerar Exegese Profunda, Tradução Gen Z/Alpha e Quebra-Gelo de Célula.',
-    accent: 'from-cyan-500 to-blue-600',
-    border: 'border-cyan-500/30',
-    glow: 'shadow-cyan-950/40'
-  },
-  {
-    icon: Flame,
-    badge: 'Em 3 Segundos',
-    title: 'Gerador de Sermões Disruptivos',
-    description:
-      'Cruze as dores reais da juventude (ansiedade, identidade, propósito, vício digital) com referências bíblicas e receba esboços completos + roteiros prontos para Reels e TikTok.',
-    accent: 'from-purple-600 to-indigo-600',
-    border: 'border-purple-500/30',
-    glow: 'shadow-purple-950/40'
-  },
   {
     icon: Users,
     badge: 'Voz & Chat IA',
     title: 'Mentoria com Gigantes da Fé',
     description:
-      'Converse por texto ou chamada de voz em tempo real com mentores inspirados em C.S. Lewis, Charles Spurgeon, Paulo de Tarso e Agostinho para destravar seus estudos.',
+      'Estude teologia, apologética e liderança conversando por texto ou voz com mentores inspirados em C.S. Lewis, Charles Spurgeon, Bonhoeffer, Agostinho e João Wesley.',
     accent: 'from-amber-500 to-orange-600',
     border: 'border-amber-500/30',
     glow: 'shadow-amber-950/40'
+  },
+  {
+    icon: BookOpen,
+    badge: 'Offline + Exegese IA',
+    title: 'Bíblia Sagrada com Lente de Estudo',
+    description:
+      'Navegue pelos 66 livros com busca rápida, marcação por cores e toque em qualquer versículo para destravar contexto histórico, referências cruzadas e aplicação.',
+    accent: 'from-cyan-500 to-blue-600',
+    border: 'border-cyan-500/30',
+    glow: 'shadow-cyan-950/40'
+  },
+  {
+    icon: GraduationCap,
+    badge: 'Homilética & Ensino',
+    title: 'Estruturador de Estudos e Esboços',
+    description:
+      'Elabore pregações expositivas, aulas bíblicas, estudos de célula e roteiros de discipulado fundamentados nas Escrituras em poucos segundos.',
+    accent: 'from-purple-600 to-indigo-600',
+    border: 'border-purple-500/30',
+    glow: 'shadow-purple-950/40'
+  },
+  {
+    icon: Award,
+    badge: 'Catálogo de Séries',
+    title: 'Academia de Ensino (Estilo Streaming)',
+    description:
+      'Assista e estude séries práticas de hermenêutica, oratória, liderança cristã e discipulado organizadas em temporadas e episódios interativos.',
+    accent: 'from-indigo-500 to-purple-600',
+    border: 'border-indigo-500/30',
+    glow: 'shadow-indigo-950/40'
   },
   {
     icon: Monitor,
     badge: 'Teleprompter Pro',
     title: 'Modo Púlpito de Alto Contraste',
     description:
-      'Leve seu esboço direto para o altar com rolagem automática ajustável, controle de tamanho de fonte, cronômetro regressivo de pregação e gravação de voz ao vivo.',
+      'Leve seu estudo ou sermão direto para o altar com rolagem automática ajustável, ajuste de fonte e cronômetro regressivo de ministração.',
     accent: 'from-emerald-500 to-teal-600',
     border: 'border-emerald-500/30',
     glow: 'shadow-emerald-950/40'
   },
   {
     icon: Volume2,
-    badge: 'Text-to-Speech',
-    title: 'Narração & Áudio Dinâmico',
+    badge: 'Áudio Dinâmico',
+    title: 'Narração Bíblica & Estudos em Áudio',
     description:
-      'Ouça capítulos inteiros da Bíblia ou seus esboços de pregação narrados com timbres pastorais enquanto estuda, caminha ou se prepara para ministrar.',
+      'Ouça capítulos da Bíblia e seus próprios esboços de ensino com fundo musical devocional enquanto revisa sua ministração.',
     accent: 'from-pink-500 to-rose-600',
     border: 'border-pink-500/30',
     glow: 'shadow-pink-950/40'
-  },
-  {
-    icon: Award,
-    badge: 'Gamificação Cristã',
-    title: 'Academia RPG do Pregador',
-    description:
-      'Evolua seu nível de liderança completando missões práticas de homilética, exegese, oratória e discipulado digital, desbloqueando bônus de Raios IA.',
-    accent: 'from-indigo-500 to-purple-600',
-    border: 'border-indigo-500/30',
-    glow: 'shadow-indigo-950/40'
   }
 ];
 
 const STEPS = [
   {
     step: '01',
-    title: 'Escolha o Texto ou a Dor da Juventude',
+    title: 'Escolha o Texto Bíblico ou Tema de Ensino',
     description:
-      'Selecione um versículo na Bíblia NVI integrada ou escolha até 2 dores reais que sua igreja, célula ou juventude está enfrentando hoje.'
+      'Abra a Bíblia Sagrada integrada ou selecione a modalidade de estudo (Pregação Expositiva, Aula Bíblica, Célula ou Discipulado).'
   },
   {
     step: '02',
-    title: 'Ative o Cérebro Conectado 2.0',
+    title: 'Aprofunde com Exegese e Mentoria Histórica',
     description:
-      'Em 3 segundos, nossa IA teológica estrutura o Gancho Cultural, o Download Bíblico com referências cruzadas, o Desafio Prático e o Roteiro de Reels.'
+      'Receba o contexto histórico, referências cruzadas e consulte mentores como Spurgeon ou C.S. Lewis por texto ou voz para enriquecer sua aula.'
   },
   {
     step: '03',
-    title: 'Suba ao Púlpito ou Compartilhe na Rede',
+    title: 'Ensine em Qualquer Lugar e Dispositivo',
     description:
-      'Abra no Modo Púlpito (Teleprompter) para pregar com segurança no altar ou envie o estudo formatado direto para o WhatsApp da sua liderança.'
+      'Exporte seu estudo, compartilhe com seus alunos ou abra no Modo Púlpito no celular, tablet ou computador.'
   }
 ];
 
 const FAQS = [
   {
-    q: 'A teologia gerada pelo appPregador 2.0 é fiel às Escrituras?',
-    a: 'Sim! O motor de IA foi instruído com guardrails teológicos cristãos ortodoxos e cristocêntricos. Ele moderniza a linguagem, as metáforas e a comunicação para conectar com a Geração Z e Alpha, mantendo 100% de fidelidade ao texto bíblico original.'
+    q: 'O appPregador 2.0 funciona em celular, tablet e computador?',
+    a: 'Sim! A plataforma é 100% responsiva e multi-dispositivo. Você pode preparar seu estudo no notebook, revisar no celular pelo caminho e usar o tablet no púlpito ou sala de aula.'
   },
   {
-    q: 'Funciona no celular sem precisar baixar na loja de aplicativos?',
-    a: 'Sim! O appPregador 2.0 é um Web App Progressivo (PWA) 100% Mobile-First. Você pode usar direto no navegador ou clicar em "Adicionar à Tela de Início" no iPhone ou Android para usá-lo em tela cheia como aplicativo nativo, inclusive com a Bíblia NVI offline.'
+    q: 'A teologia dos estudos e mentores é fiel às Escrituras?',
+    a: 'Totalmente. Todo o motor de ensino e mentoria opera sob diretrizes cristocêntricas, priorizando a exegese bíblica fiel, o contexto histórico e a edificação da Igreja.'
   },
   {
-    q: 'Para quem o ecossistema foi desenhado?',
-    a: 'Para pastores, líderes de jovens e adolescentes, líderes de célula/pequenos grupos, professores de EBD e criadores de conteúdo cristão que desejam comunicar o Evangelho com relevância e profundidade.'
+    q: 'Como funciona a Sala de Mentoria e a Academia?',
+    a: 'Na Sala de Mentoria você dialoga por texto ou voz com perfis teológicos baseados nas obras de grandes mestres cristãos. Já na Academia, você estuda séries estruturadas no formato de episódios com certificação prática.'
   },
   {
-    q: 'Meus sermões e anotações ficam salvos com segurança?',
-    a: 'Totalmente. Seus esboços, favoritos e marcações bíblicas ficam salvos no seu dispositivo com proteção contra vazamento de dados e opção de Exportação/Backup em arquivo JSON a qualquer momento.'
+    q: 'Meus estudos e esboços ficam salvos com segurança?',
+    a: 'Sim. Sua biblioteca de estudos, destaques bíblicos e progresso na Academia ficam salvos com segurança e podem ser exportados em backup a qualquer momento.'
   }
 ];
 
-export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
+export default function LandingPage({
+  onLogin,
+  onRegister,
+  onGuestBypass,
+  themeMode = 'dark',
+  onToggleTheme
+}) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
-  const [activeDemoTab, setActiveDemoTab] = useState('genz'); // 'genz' | 'quebragelo' | 'reels'
+  const [activeDemoTab, setActiveDemoTab] = useState('exegese');
+  const isLight = themeMode === 'light';
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -144,14 +181,13 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
       {/* Ambient Background Glows */}
       <div className="fixed top-[-10%] left-[-10%] w-[360px] sm:w-[620px] h-[360px] sm:h-[620px] bg-purple-600/20 rounded-full blur-[130px] pointer-events-none" />
       <div className="fixed bottom-[-10%] right-[-10%] w-[340px] sm:w-[580px] h-[340px] sm:h-[580px] bg-cyan-500/15 rounded-full blur-[130px] pointer-events-none" />
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#1e293b14_1px,transparent_1px),linear-gradient(to_bottom,#1e293b14_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] pointer-events-none" />
 
       {/* Top Sticky Navbar */}
       <header className="sticky top-0 z-50 bg-[#07090E]/85 backdrop-blur-2xl border-b border-white/10 pt-safe">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
           {/* Brand Logo */}
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-purple-900/50 border border-white/20 shrink-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 flex items-center justify-center shadow-lg border border-white/20 shrink-0">
               <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300 fill-amber-300" />
             </div>
             <div>
@@ -159,76 +195,92 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
                 <span className="font-black text-base sm:text-xl tracking-tight text-white">
                   appPregador
                 </span>
-                <span className="text-[10px] sm:text-xs font-black px-1.5 py-0.5 rounded-md bg-gradient-to-r from-purple-500/30 to-cyan-500/30 border border-cyan-400/40 text-cyan-300">
+                <span className="text-[10px] sm:text-xs font-black px-1.5 py-0.5 rounded-md bg-purple-500/20 border border-purple-400/40 text-purple-300">
                   2.0
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 font-semibold hidden sm:block">
-                Ecossistema de Pregação & Liderança Gen Z
+                Mentoria, Ensino & Estudos Bíblicos
               </p>
             </div>
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-7 text-xs font-bold uppercase tracking-wider text-slate-300">
+          <nav className="hidden md:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-slate-300">
+            <button onClick={() => scrollToSection('dispositivos')} className="hover:text-cyan-400 transition-colors cursor-pointer">
+              Multi-Dispositivo
+            </button>
             <button onClick={() => scrollToSection('recursos')} className="hover:text-cyan-400 transition-colors cursor-pointer">
-              Recursos
+              Mentoria & Ensino
             </button>
             <button onClick={() => scrollToSection('demonstracao')} className="hover:text-cyan-400 transition-colors cursor-pointer">
-              Lente IA ao Vivo
-            </button>
-            <button onClick={() => scrollToSection('como-funciona')} className="hover:text-cyan-400 transition-colors cursor-pointer">
-              Como Funciona
+              Estudo ao Vivo
             </button>
             <button onClick={() => scrollToSection('faq')} className="hover:text-cyan-400 transition-colors cursor-pointer">
               Dúvidas
             </button>
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Right Actions + Theme Switcher */}
+          <div className="flex items-center gap-2">
+            {onToggleTheme && (
+              <button
+                type="button"
+                onClick={onToggleTheme}
+                aria-label="Alternar Modo Claro ou Escuro"
+                title={isLight ? 'Mudar para Modo Escuro' : 'Mudar para Modo Claro'}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/15 flex items-center justify-center transition-all cursor-pointer"
+              >
+                {isLight ? (
+                  <Moon className="w-4 h-4 text-indigo-600" />
+                ) : (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                )}
+              </button>
+            )}
+
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-xs sm:text-sm font-bold text-slate-200 hover:text-white transition-all cursor-pointer"
+              className="min-h-[40px] sm:min-h-[44px] px-3 sm:px-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-xs sm:text-sm font-bold text-slate-200 hover:text-white transition-all cursor-pointer"
             >
               Entrar
             </button>
             <button
               onClick={onGuestBypass}
-              className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-purple-900/40 flex items-center gap-1.5 transition-all cursor-pointer"
+              className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white text-xs sm:text-sm font-extrabold shadow-lg flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <span>Testar Grátis</span>
+              <span>Começar Agora</span>
               <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* HERO SECTION */}
-      <section className="relative z-10 pt-8 pb-16 sm:pt-16 sm:pb-24 px-4 sm:px-6 max-w-7xl mx-auto">
+      {/* HERO SECTION: FOCO EM MENTORIA, ENSINO & ESTUDOS */}
+      <section className="relative z-10 pt-8 pb-14 sm:pt-14 sm:pb-20 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* Left Column: High-Converting Copy */}
-          <div className="lg:col-span-7 text-center lg:text-left space-y-6">
+          {/* Left Column */}
+          <div className="lg:col-span-7 text-center lg:text-left space-y-5">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-950/70 border border-purple-500/40 text-purple-200 text-[11px] sm:text-xs font-extrabold uppercase tracking-widest shadow-lg"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Novo Motor IA Teológico + Voz em Tempo Real</span>
+              <GraduationCap className="w-4 h-4 text-amber-400" />
+              <span>Plataforma de Mentoria, Ensino & Estudos Bíblicos</span>
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]"
+              className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12]"
             >
-              Transforme Versículos em{' '}
+              Profundidade Bíblica,{' '}
               <span className="bg-gradient-to-r from-purple-400 via-cyan-300 to-amber-300 bg-clip-text text-transparent">
-                Mensagens Inesquecíveis
+                Mentoria Teológica
               </span>{' '}
-              para a Nova Geração.
+              e Ensino em Qualquer Tela.
             </motion.h1>
 
             <motion.p
@@ -237,10 +289,7 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
               transition={{ delay: 0.1 }}
               className="text-sm sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium"
             >
-              O primeiro ecossistema cristão que une <strong className="text-white">Bíblia NVI Offline</strong>,{' '}
-              <strong className="text-cyan-300">Exegese & Tradução Cultural Gen Z/Alpha</strong>,{' '}
-              <strong className="text-purple-300">Mentoria por Voz com Gigantes da Fé</strong> e{' '}
-              <strong className="text-amber-300">Teleprompter de Púlpito</strong> em uma única plataforma.
+              Prepare estudos bíblicos profundos, dialogue por voz com grandes mestres da fé cristã, domine a exposição das Escrituras na Academia e ministre com segurança no celular, tablet ou computador.
             </motion.p>
 
             {/* Primary CTA Buttons */}
@@ -252,10 +301,9 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
             >
               <button
                 onClick={onGuestBypass}
-                className="min-h-[54px] px-7 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-black text-sm sm:text-base uppercase tracking-wider shadow-xl shadow-purple-900/50 flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
+                className="min-h-[54px] px-7 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-black text-sm sm:text-base uppercase tracking-wider shadow-xl flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
               >
-                <Smartphone className="w-5 h-5 text-amber-300" />
-                <span>Acessar App Agora (Sem Cadastro)</span>
+                <span>Acessar Plataforma Agora</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 
@@ -263,86 +311,84 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
                 onClick={() => setIsAuthModalOpen(true)}
                 className="min-h-[54px] px-6 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-purple-500/30 text-slate-100 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
-                <span>Criar Conta / Login</span>
+                <span>Entrar na Minha Conta</span>
               </button>
             </motion.div>
 
             {/* Quick Trust Pills */}
-            <div className="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-slate-400 font-semibold">
+            <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-slate-400 font-semibold">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Bíblia NVI Completa Inclusa</span>
+                <span>Bíblia Sagrada Completa Offline</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                <span>100% Mobile-First (iOS & Android)</span>
+                <span>Celular, Tablet & Computador</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-purple-400" />
-                <span>Teologia Cristocêntrica</span>
+                <span>Mentoria & Exegese Cristocêntrica</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Interactive App Preview Mockup */}
+          {/* Right Column: Visual Hero Showcase with Study Image + Floating UI Cards */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
             className="lg:col-span-5"
           >
-            <div className="relative mx-auto max-w-md rounded-3xl bg-gradient-to-b from-slate-900/95 to-[#0B0E14] border border-purple-500/30 p-4 sm:p-6 shadow-2xl shadow-purple-950/70 overflow-hidden">
-              {/* Top Status Bar Mockup */}
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-amber-400/80" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-400/80" />
-                  <span className="text-[11px] font-bold text-slate-400 ml-1">Cérebro Conectado 2.0</span>
+            <div className="relative mx-auto max-w-md rounded-3xl bg-slate-900/95 border border-purple-500/30 overflow-hidden shadow-2xl">
+              {/* Top Study Hero Photo */}
+              <div className="relative h-52 sm:h-60 w-full overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1000&q=80"
+                  alt="Estudo Bíblico e Preparação de Ensino"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-[11px] font-extrabold text-amber-300 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" /> Mentoria & Exegese ao Vivo
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] font-black">
-                  ⚡ 20 RAIOS IA ATIVOS
-                </span>
+                <div className="absolute bottom-3 left-4 right-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-cyan-300">
+                    Bíblia Sagrada + Mentores Históricos
+                  </p>
+                  <h3 className="text-lg font-black text-white leading-tight">
+                    Estude cada versículo com contexto histórico e aplicação pastoral
+                  </h3>
+                </div>
               </div>
 
-              {/* Verse Preview Card */}
-              <div className="rounded-2xl bg-slate-950/90 border border-white/10 p-4 mb-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400">
-                    📖 Romanos 12:2 (NVI)
-                  </span>
-                  <span className="text-[10px] font-bold text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded-md border border-purple-500/30">
-                    Lente Gen Z Ativa
-                  </span>
+              {/* Interactive Card Body */}
+              <div className="p-4 sm:p-5 space-y-3.5">
+                <div className="rounded-2xl bg-slate-950/90 border border-white/10 p-3.5 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-extrabold text-purple-300">
+                      🎓 Mentoria com C.S. Lewis & Spurgeon
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-400">Voz & Texto</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    "Um bom ensino bíblico ilumina a mente com a verdade das Escrituras e aquece o coração com a graça de Cristo."
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-200 italic leading-relaxed">
-                  "Não se amoldem ao padrão deste mundo, mas transformem-se pela renovação da sua mente..."
-                </p>
-              </div>
 
-              {/* Generated AI Preview Output */}
-              <div className="rounded-2xl bg-gradient-to-br from-purple-950/50 via-slate-900/90 to-cyan-950/40 border border-purple-500/30 p-4 space-y-3">
-                <div className="flex items-center gap-2 text-amber-300 text-xs font-black uppercase tracking-wider">
-                  <Flame className="w-4 h-4 fill-amber-400" />
-                  <span>Tradução Cultural & Gancho Viral</span>
-                </div>
-                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                  <strong className="text-cyan-300">⚡ Metáfora Digital:</strong> "Não deixe o algoritmo do mundo rodar o código-fonte da sua identidade. Faça um <span className="text-amber-300 font-bold">update de firmware</span> na sua mente pelo Espírito Santo para destravar o propósito real de Deus."
-                </p>
-                <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className="grid grid-cols-2 gap-2.5">
                   <button
                     onClick={onGuestBypass}
-                    className="py-2.5 px-3 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 border border-purple-400/40 text-[11px] font-extrabold text-purple-200 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    className="py-3 px-3 rounded-xl bg-purple-600 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md hover:brightness-110 transition-all cursor-pointer"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Gerar Esboço</span>
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Iniciar Estudo</span>
                   </button>
                   <button
                     onClick={onGuestBypass}
-                    className="py-2.5 px-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-[11px] font-extrabold text-cyan-200 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    className="py-3 px-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-white/15 text-cyan-300 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                   >
-                    <Mic className="w-3.5 h-3.5 text-cyan-300" />
-                    <span>Ouvir Narração</span>
+                    <Mic className="w-3.5 h-3.5" />
+                    <span>Ouvir Mentores</span>
                   </button>
                 </div>
               </div>
@@ -351,39 +397,87 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
         </div>
       </section>
 
-      {/* STATS STRIP */}
-      <section className="relative z-10 border-y border-white/10 bg-slate-950/60 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div>
-            <p className="text-2xl sm:text-4xl font-black text-white">66 Livros</p>
-            <p className="text-xs sm:text-sm text-slate-400 font-semibold mt-1">Bíblia NVI 100% Integrada</p>
+      {/* MULTI-DEVICE VISUAL SHOWCASE SECTION */}
+      <section id="dispositivos" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 bg-slate-950/70 border-y border-white/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-3">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-cyan-400">
+              Experiência Multi-Dispositivo Sem Limites
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              Funciona Perfeitamente no Celular, Tablet e Computador
+            </h2>
+            <p className="text-sm sm:text-base text-slate-400">
+              Comece a pesquisar um texto bíblico no smartphone, estruture sua aula no notebook e suba ao púlpito com o tablet. Tudo sincronizado e adaptado para cada tela.
+            </p>
           </div>
-          <div>
-            <p className="text-2xl sm:text-4xl font-black text-cyan-400">3 Seg</p>
-            <p className="text-xs sm:text-sm text-slate-400 font-semibold mt-1">Para Gerar Esboços & Quebra-Gelos</p>
-          </div>
-          <div>
-            <p className="text-2xl sm:text-4xl font-black text-purple-400">4 Mentores</p>
-            <p className="text-xs sm:text-sm text-slate-400 font-semibold mt-1">Históricos com Voz em Tempo Real</p>
-          </div>
-          <div>
-            <p className="text-2xl sm:text-4xl font-black text-amber-400">100% Mobile</p>
-            <p className="text-xs sm:text-sm text-slate-400 font-semibold mt-1">Pronto para o Altar e Célula</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {MULTI_DEVICE_SHOWCASE.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  whileHover={{ y: -5 }}
+                  className="rounded-3xl bg-[#0F172A] border border-slate-800 overflow-hidden shadow-xl flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Visual Image Header */}
+                    <div className="relative h-52 w-full overflow-hidden bg-slate-950">
+                      <img
+                        src={item.image}
+                        alt={item.device}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/30 to-transparent" />
+                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-[11px] font-extrabold text-cyan-300 flex items-center gap-1.5">
+                        <Icon className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{item.device}</span>
+                      </div>
+                    </div>
+
+                    {/* Text Description */}
+                    <div className="p-6 space-y-2.5">
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-purple-400">
+                        {item.tag}
+                      </span>
+                      <h3 className="text-lg sm:text-xl font-black text-white">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="px-6 pb-6">
+                    <button
+                      onClick={onGuestBypass}
+                      className="w-full py-3 rounded-xl bg-slate-950/90 hover:bg-purple-600 border border-white/10 text-xs font-extrabold text-slate-200 hover:text-white flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <span>Abrir neste dispositivo</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* BENTO GRID: OS 6 MÓDULOS DO ECOSSISTEMA */}
+      {/* BENTO GRID: OS 6 PILARES DE MENTORIA, ENSINO E ESTUDO */}
       <section id="recursos" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-3">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-cyan-400">
-            Ecossistema Completo 6 em 1
+          <span className="text-xs font-extrabold uppercase tracking-widest text-purple-400">
+            Formação, Exegese & Ensino
           </span>
           <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            Tudo o que um Pregador da Nova Geração Precisa no Bolso
+            Um Ecossistema Completo para Quem Ama Ensinar a Palavra
           </h2>
           <p className="text-sm sm:text-base text-slate-400">
-            Deixe para trás blocos de notas espalhados. Prepare, aprofunde, treine por voz e suba ao púlpito usando uma única ferramenta.
+            Reunimos as melhores ferramentas de estudo bíblico, mentoria histórica, academia em vídeo/séries e teleprompter de púlpito em um só lugar.
           </p>
         </div>
 
@@ -419,7 +513,7 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
                   onClick={onGuestBypass}
                   className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-extrabold text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
                 >
-                  <span>Experimentar módulo agora</span>
+                  <span>Explorar ferramenta</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </motion.div>
@@ -428,122 +522,117 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
         </div>
       </section>
 
-      {/* INTERACTIVE LIVE DEMO SECTION */}
+      {/* INTERACTIVE LIVE STUDY DEMO */}
       <section id="demonstracao" className="relative z-10 py-16 sm:py-20 px-4 sm:px-6 bg-slate-950/70 border-y border-white/10">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
             <span className="text-xs font-extrabold uppercase tracking-widest text-amber-400">
-              Veja na Prática
+              Demonstração Prática de Estudo
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-white">
-              O Que Acontece Quando Você Toca em um Versículo?
+              Veja Como o App Aprofunda Seus Estudos Bíblicos
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
-              alterne entre as abas abaixo para ver exemplos reais do que o motor do appPregador 2.0 entrega instantaneamente:
-            </p>
           </div>
 
-          {/* Demo Switcher Tabs */}
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8">
             <button
-              onClick={() => setActiveDemoTab('genz')}
+              onClick={() => setActiveDemoTab('exegese')}
               className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
-                activeDemoTab === 'genz'
+                activeDemoTab === 'exegese'
                   ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
                   : 'bg-slate-900 border border-white/10 text-slate-400 hover:text-white'
               }`}
             >
-              💡 Tradução & Exegese Gen Z
+              📖 Exegese & Contexto Histórico
             </button>
             <button
-              onClick={() => setActiveDemoTab('quebragelo')}
+              onClick={() => setActiveDemoTab('mentoria')}
               className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
-                activeDemoTab === 'quebragelo'
+                activeDemoTab === 'mentoria'
                   ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
                   : 'bg-slate-900 border border-white/10 text-slate-400 hover:text-white'
               }`}
             >
-              🎲 Quebra-Gelo de Célula
+              🎓 Conselho de Mentoria
             </button>
             <button
-              onClick={() => setActiveDemoTab('reels')}
+              onClick={() => setActiveDemoTab('celula')}
               className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
-                activeDemoTab === 'reels'
+                activeDemoTab === 'celula'
                   ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
                   : 'bg-slate-900 border border-white/10 text-slate-400 hover:text-white'
               }`}
             >
-              🎬 Roteiro Viral (Reels / TikTok)
+              👥 Roteiro de Ensino & Grupo
             </button>
           </div>
 
-          {/* Demo Content Card */}
           <div className="rounded-3xl bg-[#0B0E14] border border-purple-500/30 p-5 sm:p-8 shadow-2xl">
-            {activeDemoTab === 'genz' && (
+            {activeDemoTab === 'exegese' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-xs sm:text-sm font-black text-cyan-400">
-                    📖 Salmos 119:105 — "Lâmpada para os meus pés é a tua palavra..."
+                    📖 Salmos 119:105 — "Lâmpada para os meus pés é a tua palavra e luz para o meu caminho."
                   </span>
-                  <span className="text-[11px] font-bold text-amber-300">Exegese + Cultura</span>
+                  <span className="text-[11px] font-bold text-amber-300">Estudo Profundo</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="rounded-2xl bg-slate-900/90 border border-white/10 p-4 space-y-2">
                     <h4 className="text-xs font-extrabold uppercase tracking-wider text-purple-300">
-                      🏛️ Contexto Histórico Original
+                      🏛️ Contexto Histórico & Cultural
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                      No antigo Oriente Médio, as lâmpadas a óleo de barro não iluminavam a estrada inteira a quilômetros — elas clareavam apenas o <strong>próximo passo imediato</strong> para evitar abismos e serpentes.
+                      No antigo Oriente Médio, o viajante noturno carregava uma pequena lamparina de barro a azeite. Ela não projetava um facho a quilômetros, mas iluminava com segurança o próximo passo diante de terrenos rochosos.
                     </p>
                   </div>
                   <div className="rounded-2xl bg-purple-950/30 border border-purple-500/30 p-4 space-y-2">
                     <h4 className="text-xs font-extrabold uppercase tracking-wider text-cyan-300">
-                      ⚡ Tradução na Linguagem Gen Z
+                      🎯 Aplicação para o Ensino Hoje
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                      "A Palavra de Deus não te dá o spoiler do mapa inteiro da temporada, mas renderiza em alta definição o próximo pixel que você precisa pisar hoje sem cair em cilada."
+                      Deus raramente revela todo o roteiro dos próximos dez anos de uma só vez, mas Sua Palavra garante clareza suficiente para a obediência de hoje, desenvolvendo dependência diária e confiança.
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {activeDemoTab === 'quebragelo' && (
+            {activeDemoTab === 'mentoria' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-xs sm:text-sm font-black text-amber-400">
-                    🎲 Dinâmica Prática para Célula de Jovens (15 min)
+                    🎓 Diálogo com Charles Spurgeon & C.S. Lewis
                   </span>
-                  <span className="text-[11px] font-bold text-cyan-300">Pronto para Usar</span>
+                  <span className="text-[11px] font-bold text-cyan-300">Mentoria Histórica</span>
                 </div>
                 <div className="space-y-3 text-xs sm:text-sm text-slate-300">
                   <p>
-                    <strong className="text-white">1. Desafio do Modo Avião:</strong> Peça para todos olharem a porcentagem atual de bateria do celular e perguntarem: <em>"Se sua fé hoje fosse a bateria do seu celular, em quantos % ela estaria?"</em>
+                    <strong className="text-white">Pergunta do Aluno:</strong> <em>"Como ensinar doutrinas profundas de forma que jovens e adultos compreendam com clareza?"</em>
                   </p>
                   <p>
-                    <strong className="text-white">2. Conexão Bíblica (Isaías 40:29-31):</strong> Mostre a diferença entre carregadores piratas (distrações rápidas do feed) e estar conectado na fonte original que renova as forças.
+                    <strong className="text-purple-300">Resposta da Mentoria:</strong> "Traduza conceitos abstratos em imagens concretas do cotidiano, assim como Jesus ensinava as multidões por meio de sementes, redes e pérolas. A profundidade não está em palavras difíceis, mas na nitidez com que Cristo é visto no texto."
                   </p>
                 </div>
               </div>
             )}
 
-            {activeDemoTab === 'reels' && (
+            {activeDemoTab === 'celula' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <span className="text-xs sm:text-sm font-black text-pink-400">
-                    🎬 Roteiro de 30 Segundos para Reels / Shorts
+                  <span className="text-xs sm:text-sm font-black text-emerald-400">
+                    👥 Estrutura de Aula e Pequeno Grupo
                   </span>
-                  <span className="text-[11px] font-bold text-emerald-300">Alta Retenção</span>
+                  <span className="text-[11px] font-bold text-purple-300">Pronto para Ministrar</span>
                 </div>
                 <div className="space-y-2.5 text-xs sm:text-sm text-slate-300">
                   <p>
-                    <strong className="text-amber-300">[00s - 03s | GANCHO VISUAL]:</strong> "Você já sentiu que está vivendo a vida no 2x, mas sem sair do lugar?"
+                    <strong className="text-amber-300">1. Quebra-Gelo Reflexivo:</strong> Pergunta inicial para despertar a participação de todos os presentes.
                   </p>
                   <p>
-                    <strong className="text-cyan-300">[04s - 18s | VIRADA DE CHAVE]:</strong> "Em Mateus 11:28, Jesus não oferece mais uma lista de tarefas religiosas. Ele oferece descanso para a alma sobrecarregada de notificações."
+                    <strong className="text-cyan-300">2. Exposição do Texto & Referências Cruzadas:</strong> Três pontos claros conectando o Antigo e o Novo Testamento.
                   </p>
                   <p>
-                    <strong className="text-purple-300">[19s - 30s | CHAMADA PRÁTICA]:</strong> "Hoje, tire 10 minutos no modo avião e fale com Aquele que conhece seu coração. Salve esse vídeo para lembrar."
+                    <strong className="text-purple-300">3. Desafio Prático de Discipulado:</strong> Como aplicar o princípio estudado durante a semana na família, no trabalho e na igreja.
                   </p>
                 </div>
               </div>
@@ -553,13 +642,13 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
       </section>
 
       {/* COMO FUNCIONA EM 3 PASSOS */}
-      <section id="como-funciona" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto">
+      <section className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
           <span className="text-xs font-extrabold uppercase tracking-widest text-purple-400">
-            Fluxo Simples & Rápido
+            Fluxo de Estudo & Preparo
           </span>
           <h2 className="text-2xl sm:text-4xl font-black text-white">
-            Do Estudo Bíblico ao Púlpito em 3 Passos
+            Da Leitura Bíblica ao Ensino em 3 Passos
           </h2>
         </div>
 
@@ -589,7 +678,7 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
             Perguntas Frequentes
           </span>
           <h2 className="text-2xl sm:text-3xl font-black text-white">
-            Tire Suas Dúvidas Sobre o appPregador 2.0
+            Dúvidas Sobre a Plataforma de Estudos
           </h2>
         </div>
 
@@ -632,18 +721,18 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
 
       {/* FINAL HIGH-IMPACT CTA BANNER */}
       <section className="relative z-10 py-14 sm:py-20 px-4 sm:px-6 max-w-5xl mx-auto">
-        <div className="rounded-3xl bg-gradient-to-br from-purple-950/90 via-slate-900 to-cyan-950/90 border border-purple-500/40 p-7 sm:p-12 text-center shadow-2xl shadow-purple-950/80 space-y-6">
+        <div className="rounded-3xl bg-gradient-to-br from-purple-950/90 via-slate-900 to-cyan-950/90 border border-purple-500/40 p-7 sm:p-12 text-center shadow-2xl space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-extrabold uppercase tracking-wider">
             <Zap className="w-3.5 h-3.5 fill-amber-300" />
-            <span>Comece com 20 Raios IA Gratuitos</span>
+            <span>Acesso Imediato em Qualquer Dispositivo</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-black text-white max-w-2xl mx-auto leading-tight">
-            Pronto para Preparar Sua Próxima Mensagem em Nível Extraordinário?
+            Comece Agora Seus Estudos, Mentorias e Preparo de Mensagens
           </h2>
 
           <p className="text-xs sm:text-base text-slate-300 max-w-xl mx-auto">
-            Entre agora mesmo no modo simulação gratuito com um clique ou crie sua conta para salvar sua biblioteca de sermões.
+            Experimente gratuitamente sem precisar de cadastro ou acesse sua conta para sincronizar sua biblioteca de estudos.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
@@ -652,7 +741,7 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
               className="w-full sm:w-auto min-h-[54px] px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-black text-sm uppercase tracking-wider shadow-xl flex items-center justify-center gap-2 cursor-pointer"
             >
               <Smartphone className="w-5 h-5 text-amber-300" />
-              <span>Entrar Direto no App ⚡</span>
+              <span>Entrar Direto na Plataforma ⚡</span>
             </button>
             <button
               onClick={() => setIsAuthModalOpen(true)}
@@ -670,9 +759,9 @@ export default function LandingPage({ onLogin, onRegister, onGuestBypass }) {
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-purple-400" />
             <span className="font-bold text-slate-300">appPregador 2.0</span>
-            <span>— Ecossistema Cristão para Geração Z & Alpha</span>
+            <span>— Mentoria, Ensino & Estudos Bíblicos</span>
           </div>
-          <p>© {new Date().getFullYear()} appPregador 2.0 • Protegido por Guardrails de IA & Segurança Local-First</p>
+          <p>© {new Date().getFullYear()} appPregador 2.0 • Disponível para Celular, Tablet e Computador</p>
         </div>
       </footer>
 

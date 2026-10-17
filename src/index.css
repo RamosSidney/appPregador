@@ -24,6 +24,7 @@
     overflow-x: hidden;
     min-height: 100dvh;
     overscroll-behavior-y: none;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -40,6 +41,109 @@
   button, a, select, input {
     touch-action: manipulation;
   }
+}
+
+/* ==========================================================================
+   LIGHT MODE THEME OVERRIDES (.light-theme on <html>)
+   Transforms Dark Space tokens into a clean, high-contrast Editorial Light UI
+   ========================================================================== */
+html.light-theme body {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+html.light-theme .bg-dark-space,
+html.light-theme .bg-\[\#07090E\],
+html.light-theme .bg-\[\#0B0E14\] {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+html.light-theme .bg-\[\#0B0E14\]\/95,
+html.light-theme .bg-\[\#07090E\]\/85 {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light-theme .bg-\[\#0F172A\],
+html.light-theme .bg-\[\#0F172A\]\/95,
+html.light-theme .bg-slate-900,
+html.light-theme .bg-slate-900\/95,
+html.light-theme .bg-slate-900\/90,
+html.light-theme .bg-slate-900\/80,
+html.light-theme .bg-slate-900\/75,
+html.light-theme .bg-slate-900\/70,
+html.light-theme .bg-slate-900\/60,
+html.light-theme .bg-slate-900\/40 {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light-theme .bg-slate-950,
+html.light-theme .bg-slate-950\/95,
+html.light-theme .bg-slate-950\/90,
+html.light-theme .bg-slate-950\/80,
+html.light-theme .bg-slate-950\/70,
+html.light-theme .bg-slate-950\/60 {
+  background-color: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+}
+
+html.light-theme .text-white,
+html.light-theme .text-slate-100,
+html.light-theme .text-slate-200 {
+  color: #0F172A !important;
+}
+
+/* Keep white text inside vibrant gradient buttons and badges */
+html.light-theme button.from-purple-600,
+html.light-theme button.from-amber-500,
+html.light-theme .bg-gradient-to-r.from-purple-600,
+html.light-theme .bg-gradient-to-r.from-amber-500,
+html.light-theme .bg-gradient-to-br.from-purple-600,
+html.light-theme .bg-purple-600 {
+  color: #FFFFFF !important;
+}
+
+html.light-theme button.from-purple-600 span,
+html.light-theme button.from-amber-500 span,
+html.light-theme .bg-gradient-to-r.from-purple-600 span,
+html.light-theme .bg-purple-600 span {
+  color: #FFFFFF !important;
+}
+
+html.light-theme .text-slate-300,
+html.light-theme .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light-theme .text-cyan-400,
+html.light-theme .text-cyan-300 {
+  color: #0284C7 !important;
+}
+
+html.light-theme .text-purple-400,
+html.light-theme .text-purple-300,
+html.light-theme .text-purple-200 {
+  color: #6D28D9 !important;
+}
+
+html.light-theme .text-amber-400,
+html.light-theme .text-amber-300 {
+  color: #D97706 !important;
+}
+
+html.light-theme .border-white\/10,
+html.light-theme .border-white\/15,
+html.light-theme .border-white\/5,
+html.light-theme .border-slate-800,
+html.light-theme .border-slate-800\/80 {
+  border-color: #E2E8F0 !important;
+}
+
+html.light-theme .prose-invert {
+  color: #1E293B !important;
 }
 
 /* Custom Scrollbars */
@@ -71,7 +175,7 @@
 }
 
 .pb-safe-dock {
-  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .min-h-dvh {

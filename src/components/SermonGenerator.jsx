@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Zap, Check, Sparkles, Copy, Bookmark, Mic, RefreshCw, Flame, ArrowLeft, Film, Share2
+  Zap,
+  Check,
+  Sparkles,
+  Copy,
+  Bookmark,
+  Mic,
+  Flame,
+  ArrowLeft,
+  BookOpen,
+  GraduationCap,
+  Users,
+  Compass
 } from 'lucide-react';
 import { marked } from 'marked';
 import { sanitizeHtml } from '../services/securityService.js';
@@ -16,8 +27,8 @@ export default function SermonGenerator({
   generatedSermon,
   onResultStateChange
 }) {
-  const [selectedPainVibes, setSelectedPainVibes] = useState(['Ansiedade & Pressão']);
-  const [customRef, setCustomRef] = useState('');
+  const [studyFormat, setStudyFormat] = useState('Pregação Expositiva');
+  const [selectedPainVibes, setSelectedPainVibes] = useState(['Identidade em Cristo']);
   const [customTheme, setCustomTheme] = useState('');
 
   // 3-Second Loading Animation & Fullscreen Result Page State
@@ -25,14 +36,29 @@ export default function SermonGenerator({
   const [countdown, setCountdown] = useState(3);
   const [showFullResultPage, setShowFullResultPage] = useState(false);
 
+  const studyFormats = [
+    { id: 'Pregação Expositiva', label: 'Pregação Expositiva', icon: BookOpen },
+    { id: 'Estudo & Ensino Bíblico', label: 'Aula / Estudo Bíblico', icon: GraduationCap },
+    { id: 'Pequeno Grupo / Célula', label: 'Estudo para Célula', icon: Users },
+    { id: 'Mentoria & Discipulado', label: 'Mentoria & Discipulado', icon: Compass }
+  ];
+
   const painOptions = [
-    'Ansiedade & Pressão', 'Vício em Telas / Dopamina', 'Crise de Identidade',
-    'Solidão no Quarto', 'Falta de Propósito', 'Comparações no Feed'
+    'Identidade em Cristo',
+    'Ansiedade & Paz Interior',
+    'Propósito & Vocação',
+    'Fé em Tempos de Dúvida',
+    'Santidade & Foco',
+    'Perdão & Recomeço',
+    'Comunhão & Família',
+    'Esperança nas Provações'
   ];
 
   const togglePainChip = (value) => {
     if (selectedPainVibes.includes(value)) {
-      setSelectedPainVibes(selectedPainVibes.filter(v => v !== value));
+      if (selectedPainVibes.length > 1) {
+        setSelectedPainVibes(selectedPainVibes.filter(v => v !== value));
+      }
     } else {
       if (selectedPainVibes.length < 2) {
         setSelectedPainVibes([...selectedPainVibes, value]);
@@ -52,13 +78,17 @@ export default function SermonGenerator({
     setIsLocal3sLoading(true);
     setCountdown(3);
 
+    const combinedTheme = customTheme.trim()
+      ? `${studyFormat}: ${customTheme.trim()}`
+      : `${studyFormat} — ${selectedPainVibes.join(' & ')}`;
+
     const minDelayPromise = new Promise((resolve) => setTimeout(resolve, 3000));
     const genPromise = Promise.resolve(
       onGenerate({
         painVibes: selectedPainVibes,
-        popVibes: [], // Item 2 removed as requested
-        customRef,
-        customTheme
+        popVibes: [studyFormat],
+        customRef: '',
+        customTheme: combinedTheme
       })
     );
 
@@ -101,7 +131,6 @@ export default function SermonGenerator({
     }
   }, [isLocal3sLoading, countdown, isGenerating, generatedSermon, onResultStateChange]);
 
-  // Notify parent when full screen result state changes
   const handleCloseFullResult = () => {
     setShowFullResultPage(false);
     if (onResultStateChange) onResultStateChange(false);
@@ -120,29 +149,61 @@ export default function SermonGenerator({
   };
 
   return (
-    <div className="w-full bg-[#0B0E14] text-white min-h-screen border-none m-0 p-0 space-y-6 pb-28">
-      {/* Edge-to-Edge Borda Infinita Main Form */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-4 space-y-6">
-        {/* Title Header */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl">
-          <div className="flex items-center gap-2 text-amber-400 font-extrabold text-xs tracking-widest uppercase mb-1">
-            <Flame className="w-4 h-4 fill-amber-400" />
-            <span>Gerador de Sermões Disruptivos</span>
+    <div className="w-full bg-[#0B0E14] text-white min-h-screen border-none m-0 p-0 pb-40">
+      <div className="max-w-4xl mx-auto px-3.5 sm:px-6 pt-3 sm:pt-5 space-y-4">
+        {/* Compact Header */}
+        <div className="bg-slate-900/70 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 shadow-lg">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-1.5 text-amber-400 font-extrabold text-[11px] tracking-widest uppercase">
+              <Flame className="w-3.5 h-3.5 fill-amber-400" />
+              <span>Laboratório de Ensino & Homilética</span>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300">
+              Exegese + Aplicação
+            </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Engajamento Real para Gen Z & Alpha
+          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            Estruture Estudos Bíblicos e Esboços Profundos
           </h2>
-          <p className="text-slate-400 text-xs sm:text-sm mt-1">
-            Selecione a dor da juventude para gerar esboços teológicos profundos com ganchos virais para redes e cultos.
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
+            Escolha a modalidade de ensino e o tema central para gerar um estudo completo com contexto histórico, referências cruzadas e aplicação pastoral.
           </p>
         </div>
 
-        {/* Section: Dores da Juventude */}
-        <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-5 space-y-3 shadow-lg">
-          <label className="text-xs font-extrabold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-            <span>Dores & Temas da Juventude (Escolha até 2)</span>
+        {/* Step 1: Modalidade de Ensino / Estudo */}
+        <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-2.5 shadow-lg">
+          <label className="text-xs font-extrabold uppercase tracking-wider text-cyan-400 block">
+            1. Modalidade do Estudo ou Mensagem
           </label>
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {studyFormats.map((fmt) => {
+              const Icon = fmt.icon;
+              const active = studyFormat === fmt.id;
+              return (
+                <button
+                  key={fmt.id}
+                  type="button"
+                  onClick={() => setStudyFormat(fmt.id)}
+                  className={`min-h-[46px] p-2.5 rounded-xl text-left flex items-center gap-2 text-xs font-extrabold transition-all cursor-pointer ${
+                    active
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white border border-purple-400/50 shadow-md'
+                      : 'bg-slate-950/80 hover:bg-slate-800/80 text-slate-300 border border-white/10'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-amber-300' : 'text-cyan-400'}`} />
+                  <span className="leading-tight">{fmt.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Step 2: Eixo Temático / Necessidade Espiritual */}
+        <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-2.5 shadow-lg">
+          <label className="text-xs font-extrabold uppercase tracking-wider text-purple-400 block">
+            2. Eixo Temático & Necessidade Espiritual (Escolha até 2)
+          </label>
+          <div className="flex flex-wrap gap-2">
             {painOptions.map((option) => {
               const isSelected = selectedPainVibes.includes(option);
               return (
@@ -150,13 +211,13 @@ export default function SermonGenerator({
                   key={option}
                   type="button"
                   onClick={() => togglePainChip(option)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-950/60 border border-purple-400/50 scale-[1.02]'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-purple-400/50'
                       : 'bg-slate-950/80 hover:bg-slate-800/80 text-slate-300 border border-white/10'
                   }`}
                 >
-                  {isSelected && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-amber-300 shrink-0" />}
                   <span>{option}</span>
                 </button>
               );
@@ -164,52 +225,47 @@ export default function SermonGenerator({
           </div>
         </div>
 
-        {/* Section: Custom Referência e Tema (Opcional) */}
-        <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-5 space-y-4 shadow-lg">
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-300">Gancho Pop Customizado (Opcional)</label>
-            <input
-              type="text"
-              value={customRef}
-              onChange={(e) => setCustomRef(e.target.value)}
-              placeholder="Ex: Homem-Aranha, Valorant, Matrix..."
-              className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-300">Tema Central Customizado (Opcional)</label>
-            <input
-              type="text"
-              value={customTheme}
-              onChange={(e) => setCustomTheme(e.target.value)}
-              placeholder="Ex: Superação, Pureza, Identidade..."
-              className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all"
-            />
-          </div>
+        {/* Step 3: Passagem Bíblica ou Tema Específico (Sem Gancho Pop) */}
+        <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-2 shadow-lg">
+          <label className="text-xs font-extrabold uppercase tracking-wider text-amber-400 block">
+            3. Passagem Bíblica ou Tema Específico (Opcional)
+          </label>
+          <input
+            type="text"
+            value={customTheme}
+            onChange={(e) => setCustomTheme(e.target.value)}
+            placeholder="Ex: Romanos 8:28, O Bom Samaritano, Fruto do Espírito, Liderança Servidora..."
+            className="w-full min-h-[46px] bg-slate-950/80 border border-white/10 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all"
+          />
         </div>
 
-        {/* CTA Principal de Geração */}
-        <button
-          type="button"
-          disabled={isGenerating || isLocal3sLoading}
-          onClick={handleGenerateClick}
-          className="w-full py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-amber-500 via-purple-600 to-cyan-500 hover:from-amber-400 hover:via-purple-500 hover:to-cyan-400 text-white font-black text-sm sm:text-base uppercase tracking-wider shadow-xl shadow-purple-950/60 active:scale-[0.99] transition-all flex items-center justify-center gap-2 border border-white/20 group relative overflow-hidden cursor-pointer"
-        >
-          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <Zap className={`w-5 h-5 text-amber-400 fill-amber-400 ${isGenerating || isLocal3sLoading ? 'animate-spin' : 'animate-bounce'}`} />
-          <span>{isGenerating || isLocal3sLoading ? 'PROCESSANDO INTELIGÊNCIA IA...' : '⚡ GERAR MENSAGEM VIRAL ⚡'}</span>
-        </button>
-
-        {/* Button to Re-open Previous Result if available */}
-        {generatedSermon && !showFullResultPage && !isLocal3sLoading && (
+        {/* Primary Action Button (Well above the Bottom Nav) */}
+        <div className="pt-1 space-y-2.5">
           <button
-            onClick={handleOpenFullResultManually}
-            className="w-full py-3 rounded-xl bg-slate-900/80 border border-purple-500/30 text-purple-300 hover:text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md"
+            type="button"
+            disabled={isGenerating || isLocal3sLoading}
+            onClick={handleGenerateClick}
+            className="w-full min-h-[54px] py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-black text-sm sm:text-base uppercase tracking-wider shadow-xl shadow-purple-950/60 active:scale-[0.99] transition-all flex items-center justify-center gap-2 border border-white/20 cursor-pointer"
           >
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>Ver Mensagem Viral Gerada Anteriormente</span>
+            <Zap className={`w-5 h-5 text-amber-300 fill-amber-300 ${isGenerating || isLocal3sLoading ? 'animate-spin' : ''}`} />
+            <span>
+              {isGenerating || isLocal3sLoading
+                ? 'PREPARANDO ESTUDO & EXEGESE...'
+                : '⚡ GERAR ESTUDO & ESBOÇO COMPLETO'}
+            </span>
           </button>
-        )}
+
+          {generatedSermon && !showFullResultPage && !isLocal3sLoading && (
+            <button
+              type="button"
+              onClick={handleOpenFullResultManually}
+              className="w-full min-h-[44px] py-2.5 rounded-xl bg-slate-900/90 border border-purple-500/30 text-purple-300 hover:text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Abrir Último Estudo Gerado ({generatedSermon.title})</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 3-Second Loading Animation Modal */}
@@ -222,7 +278,6 @@ export default function SermonGenerator({
             className="fixed inset-0 z-[300] bg-[#0B0E14] w-screen h-screen min-h-screen flex flex-col items-center justify-center p-6 text-center m-0 border-none overflow-hidden"
           >
             <div className="relative w-28 h-28 flex items-center justify-center mb-6">
-              {/* Outer Pulse Ring */}
               <div className="absolute inset-0 rounded-full border-4 border-purple-500/30 animate-ping" />
               <div className="absolute inset-0 rounded-full border-4 border-t-amber-400 border-r-purple-500 border-b-cyan-400 border-l-transparent animate-spin" />
               <div className="w-20 h-20 rounded-full bg-slate-900 border border-white/20 flex flex-col items-center justify-center shadow-2xl shadow-purple-950/80">
@@ -232,20 +287,20 @@ export default function SermonGenerator({
             </div>
 
             <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">
-              Gerando Mensagem Disruptiva...
+              Elaborando Estudo & Esboço Teológico...
             </h3>
 
             <p className="text-xs sm:text-sm text-purple-300 max-w-sm mx-auto font-medium">
-              {countdown === 3 && "⚡ Escaneando dores e buscas da juventude..."}
-              {countdown === 2 && "🔥 Alinhando hermenêutica com ganchos virais..."}
-              {countdown === 1 && "✨ Finalizando aplicação prática e roteiro Reels..."}
-              {countdown === 0 && "🚀 Abrindo mensagem viral em tela cheia..."}
+              {countdown === 3 && "📖 Examinando contexto bíblico e referências cruzadas..."}
+              {countdown === 2 && "🎓 Estruturando tópicos de ensino e exegese prática..."}
+              {countdown === 1 && "✨ Finalizando aplicações pastorais e perguntas de mentoria..."}
+              {countdown === 0 && "🚀 Abrindo estudo completo em tela cheia..."}
             </p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 100% Full-Screen Responsive Result Page (Borda Infinita) */}
+      {/* Full-Screen Study Result Page */}
       <AnimatePresence>
         {showFullResultPage && generatedSermon && (
           <motion.div
@@ -257,7 +312,6 @@ export default function SermonGenerator({
           >
             {/* Sticky Top Navigation Bar */}
             <div className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-2xl border-b border-white/10 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3 shrink-0">
-              {/* Back Button with 44px Touch Target */}
               <button
                 onClick={handleCloseFullResult}
                 className="min-w-[44px] min-h-[44px] px-3 rounded-xl bg-slate-950/80 border border-white/15 text-cyan-400 hover:text-white hover:border-cyan-400 text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
@@ -271,11 +325,10 @@ export default function SermonGenerator({
                 <h3 className="text-sm font-extrabold text-white truncate">{generatedSermon.title}</h3>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onSaveSermon(generatedSermon)}
-                  className="px-3 py-2 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-extrabold flex items-center gap-1 transition-all"
+                  className="px-3 py-2 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer"
                   title="Salvar na Biblioteca"
                 >
                   <Bookmark className="w-3.5 h-3.5" />
@@ -285,10 +338,10 @@ export default function SermonGenerator({
                 <button
                   onClick={() => onPlayAudio({
                     title: generatedSermon.title,
-                    subtitle: 'Narração de Esboço',
+                    subtitle: 'Narração de Estudo',
                     content: generatedSermon.content
                   })}
-                  className="px-3 py-2 rounded-xl bg-cyan-600/30 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-extrabold flex items-center gap-1 transition-all"
+                  className="px-3 py-2 rounded-xl bg-cyan-600/30 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer"
                   title="Ouvir Narração"
                 >
                   🎙️ <span className="hidden sm:inline">Ouvir</span>
@@ -296,7 +349,7 @@ export default function SermonGenerator({
 
                 <button
                   onClick={() => onOpenPulpit(generatedSermon)}
-                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-black shadow-lg hover:brightness-110 transition-all flex items-center gap-1"
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-black shadow-lg hover:brightness-110 transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <Mic className="w-3.5 h-3.5" />
                   <span>Púlpito</span>
@@ -304,13 +357,12 @@ export default function SermonGenerator({
               </div>
             </div>
 
-            {/* Main Sermon Content Container */}
-            <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-10 space-y-6 pb-28">
-              {/* Vibe Pills Header */}
+            {/* Main Study Content Container */}
+            <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-10 space-y-6 pb-32">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-black uppercase tracking-wider">
-                    {generatedSermon.vibe || 'Mensagem Viral'}
+                    {generatedSermon.vibe || 'Estudo Bíblico'}
                   </span>
                   <span className="text-xs text-slate-400">{generatedSermon.createdAt}</span>
                 </div>
@@ -320,26 +372,17 @@ export default function SermonGenerator({
                 </div>
               </div>
 
-              {/* Formatted Markdown Body (Sanitized against XSS) */}
               <div
                 className="prose prose-invert max-w-none text-slate-100 text-sm sm:text-base leading-relaxed space-y-4 font-sans selection:bg-purple-500 selection:text-white"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(generatedSermon.content || '')) }}
               />
 
-              {/* Bottom Quick Copy Action Buttons */}
               <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={() => copyToClipboard(generatedSermon.content, 'Sermão Completo')}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-900 border border-white/15 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md"
+                  onClick={() => copyToClipboard(generatedSermon.content, 'Estudo Completo')}
+                  className="flex-1 py-3.5 px-4 rounded-xl bg-slate-900 border border-white/15 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
                 >
-                  <Copy className="w-4 h-4 text-purple-400" /> Copiar Texto Completo
-                </button>
-
-                <button
-                  onClick={() => copyToClipboard(generatedSermon.reelsScript || generatedSermon.content, 'Roteiro Reels')}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-900 border border-white/15 hover:bg-slate-800 text-cyan-300 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md"
-                >
-                  <Film className="w-4 h-4 text-cyan-400" /> Copiar Roteiro Reels
+                  <Copy className="w-4 h-4 text-purple-400" /> Copiar Estudo Completo
                 </button>
               </div>
             </div>

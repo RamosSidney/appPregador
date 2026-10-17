@@ -26,6 +26,26 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLessonOpen, setIsLessonOpen] = useState(false);
 
+  // Theme Mode State ('dark' | 'light')
+  const [themeMode, setThemeMode] = useState(() => {
+    return localStorage.getItem('app_pregador_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('app_pregador_theme', themeMode);
+    if (themeMode === 'light') {
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+      document.documentElement.classList.add('dark');
+    }
+  }, [themeMode]);
+
+  const handleToggleTheme = () => {
+    setThemeMode(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // User States (Persisted in localStorage for Local-First reliability)
   const [userCredits, setUserCredits] = useState(() => {
     const saved = localStorage.getItem('app_pregador_credits');
@@ -325,6 +345,8 @@ export default function App() {
         onLogin={handleLogin}
         onRegister={handleRegister}
         onGuestBypass={handleGuestBypass}
+        themeMode={themeMode}
+        onToggleTheme={handleToggleTheme}
       />
     );
   }
@@ -346,6 +368,8 @@ export default function App() {
         userLevel={userLevel}
         userXp={userXp}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        themeMode={themeMode}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main View Container */}

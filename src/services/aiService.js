@@ -152,14 +152,19 @@ export async function callAI(messages, config = {}, edgeAction = null, edgePaylo
  * Gerador de Sermões com IA Real e Proteção contra Prompt Injection
  */
 export async function generateSermonAI({ painVibes = [], popVibes = [], customRef = '', customTheme = '', config }) {
-  const safeTheme = sanitizePromptInput(customTheme, 120);
-  const safeRef = sanitizePromptInput(customRef, 120);
+  const safeTheme = sanitizePromptInput(customTheme, 140);
   const safePains = painVibes.slice(0, 3).map(p => sanitizePromptInput(p, 80));
-  const safePops = popVibes.slice(0, 3).map(p => sanitizePromptInput(p, 80));
+  const safeFormat = popVibes.slice(0, 2).map(p => sanitizePromptInput(p, 80)).join(', ') || 'Pregação Expositiva';
 
-  const systemPrompt = `Você é o 'Cérebro Conectado 2.0', um teólogo e pregador especialista em comunicação para a Geração Z e Alpha. Sua missão é criar um esboço bíblico disruptivo e profundo. Formate o resultado estritamente em Markdown limpo contendo:\n# [Título Viral Disruptivo]\n## ⚡ O Gancho Cultural (Primeiros 3 Segundos)\n## 📖 O Download Bíblico (Versículo & Exegese Prática)\n## 🎬 Roteiro Reels / TikTok (Cenas & Falas)\n## 🏆 O Desafio Prático da Semana\n${SECURITY_GUARDRAIL_RULES}`;
+  const systemPrompt = `Você é um mentor teológico, exegeta e professor de homilética cristã. Sua missão é criar um esboço de ensino e estudo bíblico profundo, claro e edificante. Formate o resultado estritamente em Markdown limpo e bem espaçado contendo:
+# [Título Inspirador do Estudo / Mensagem]
+## 📖 Texto Bíblico Base & Contexto Histórico
+## 🎓 Desenvolvimento Exegético (3 Tópicos Estruturados)
+## 🔗 Referências Bíblicas Cruzadas
+## 💬 Perguntas para Mentoria, Discipulado e Aplicação Prática
+${SECURITY_GUARDRAIL_RULES}`;
 
-  const userPrompt = `Gere um esboço de mensagem virando a chave com base nos parâmetros abaixo:\n<user_input>\nTEMA CENTRAL: ${safeTheme || 'Identidade e Propósito'}\nDORES DA JUVENTUDE: ${safePains.join(', ')}\nUNIVERSO POP & ANALOGIAS: ${safePops.join(', ')} ${safeRef ? `(Gancho extra: ${safeRef})` : ''}\n</user_input>`;
+  const userPrompt = `Elabore um estudo bíblico e esboço completo com base nos parâmetros abaixo:\n<user_input>\nMODALIDADE DE ENSINO: ${safeFormat}\nTEMA OU PASSAGEM CENTRAL: ${safeTheme || 'Identidade e Propósito em Cristo'}\nEIXO PASTORAL: ${safePains.join(', ')}\n</user_input>`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
